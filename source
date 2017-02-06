@@ -1,4 +1,4 @@
-
+newtype mat array(integer, 3, 4);
 
 func ciao (integer a, floating x) : integer
 begin
