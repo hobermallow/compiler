@@ -33,6 +33,9 @@ struct sym_rec {
 	void* val;
 	param* par_list;
 	char* param_type;
+	//hacking
+	//parametro temporaneo che punta all'elemento in esame della par_list
+	param* current_param;
 	sym_rec* next;
 };
 
@@ -272,3 +275,21 @@ void copy_val_in_param(param* dst, value* src) {
 	}
 }
 
+void check_array_arguments(value* id, value* val) {
+	//recupero il sym_rec corrispondente all'id
+	sym_rec* rec = get_sym_rec(id->name);
+	//controllo con current_param, di cui dereferenzio il valore con int
+	if( *((int*)(val->val)) >= *((int*)(rec->current_param->val)) ) {
+		printf("Indice oltre l'array\n");
+		exit(1);
+	}
+	//sposto il current_param
+	rec->current_param = rec->current_param->next;
+}
+
+void reset_current_param(value* val) {
+	//trovo il sym_rec
+	sym_rec* rec = get_sym_rec(val->name);
+	//resetto
+	rec->current_param = rec->par_list;
+}

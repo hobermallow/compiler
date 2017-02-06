@@ -102,6 +102,8 @@ typebuilder : RECORD OP fieldlist field CP {
 						temp->par_list = $4;
 						//setto il tipo
 						temp->type = "record";
+						//imposto current_param
+						temp->current_param = temp->par_list;
 						//ritorno il sym_rec
 						$$ = temp;
 					}
@@ -125,6 +127,8 @@ typebuilder : RECORD OP fieldlist field CP {
 						temp->par_list = temp_2;
 						//salvo il tipo della matrice
 						temp->param_type = strdup($3);
+						//setto current_param
+						temp->current_param = temp->par_list;
 						//ritorno il sym_rec
 						$$ = temp;
 					}
@@ -151,6 +155,8 @@ typebuilder : RECORD OP fieldlist field CP {
 							}
 							//aggiungo la lista al simbolo
 							rec->par_list = parlist;
+							//setto current_param
+							rec->current_param = rec->par_list;
 							rec->param_type = strdup($3);
 							$$ = rec;
 							}
@@ -264,17 +270,27 @@ assignment_operator : ASSIGN
 unary_operator : MINUS
 	;
 	
-unary_expression : postfix_expression { $$ = $1; }
+unary_expression : postfix_expression { $$ = $1;  reset_current_param($1);}
 	| unary_operator cast_expression { change_sign($2); $$ = $2; }
 	;
 
 postfix_expression : primary_expression { $$ = $1; }
-	| postfix_expression OSP expression CSP
+	| postfix_expression OSP expression CSP {
+						//debbo controllare che l'espressione inserita sia compatibile con le espressioni inserite
+						//in primis, essendo indice di array, controllo che expression sia integer
+						check_is_integer($3);
+						//in secundis, controllo che il valore dell'espressione sia compreso nel limite dell'array
+						check_array_arguments($1, $3);
+						//ritorno $1
+						$$ = $1;
+						}
 	| postfix_expression OSP expression COMMA expression CSP
 	| postfix_expression OP exprlist CP {
 						//debbo controllare che i parametri inseriti corrispondano a quelli dichiarati nella func
 						//richiamo una routine che prende in input il nome della funzione e la lista di argomenti
 						check_function_arguments($1, $3);
+						//ritorno il value corrispondente alla funzione, che cosi ho il tipo
+						$$ = $1;
 						}
 	| postfix_expression ARROW IDENTIFIER
 	;

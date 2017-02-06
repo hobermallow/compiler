@@ -1,17 +1,13 @@
-newtype arraytemp matrix(integer, 3, 4);
-newtype aaa array(integer, 3, 4, 5);
 
 
 func ciao (integer a, floating x) : integer
 begin
   newvars integer y;
-  a = 2;
-
+  
 end
 newvars integer x, j;
 newvars floating z, d;
 func exec (integer x) : integer 
 begin
 	ciao(x, z);
-
 end
