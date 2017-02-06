@@ -66,7 +66,7 @@
 %token EOF_TOKEN
 %type <str> type
 %type <str> basetype
-%type <par> param parlist params var varlist
+%type <par> param parlist params var varlist field fieldlist
 %type <val> constant primary_expression expression conditional_expression logical_or_expression logical_and_expression logical_not_expression exclusive_or_expression and_expression equality_expression relational_expression shift_expression additive_expression multiplicative_expression exp_expression cast_expression unary_expression postfix_expression exprlist exprlist_temp
 %type <symrec> typebuilder
 
@@ -93,7 +93,18 @@ decl : NEWTYPE IDENTIFIER typebuilder SEMI_COLON {
 						}
 							 
 	;
-typebuilder : RECORD OP fieldlist field CP 
+typebuilder : RECORD OP fieldlist field CP {
+						//unisco i field
+						$4->next = $3;
+						//creo il nuovo record
+						sym_rec* temp = (sym_rec*) malloc(sizeof(sym_rec));
+						//setto i parametri
+						temp->par_list = $4;
+						//setto il tipo
+						temp->type = "record";
+						//ritorno il sym_rec
+						$$ = temp;
+					}
 	| MATRIX OP basetype COMMA expression COMMA expression CP {
 						//controllo che il tipo delle espressioni sia intero
 						check_is_integer($5);
@@ -127,11 +138,20 @@ arrayexpr :
 	;
 
 fieldlist : 
-	/* empty */
-	| fieldlist field COMMA
+	/* empty */	{ $$ = 0; }
+	| fieldlist field COMMA {
+					//recupero il parametro
+					$2->next = $1;
+					$$ = $2;
+				}
 	;
  
-field : type IDENTIFIER
+field : type IDENTIFIER {
+				//creo il parametro
+				param* temp = malloc(sizeof(param));	
+				temp->type = strdup($1);
+				temp->name = strdup($2);
+			}
 	; 
 
 type : basetype { $$ = $1; }
