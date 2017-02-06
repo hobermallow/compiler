@@ -290,6 +290,6 @@ void check_array_arguments(value* id, value* val) {
 void reset_current_param(value* val) {
 	//trovo il sym_rec
 	sym_rec* rec = get_sym_rec(val->name);
-	//resetto
-	rec->current_param = rec->par_list;
+	if(rec != 0) 
+		rec->current_param = rec->par_list;
 }

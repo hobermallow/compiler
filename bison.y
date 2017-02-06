@@ -271,7 +271,7 @@ unary_operator : MINUS
 	;
 	
 unary_expression : postfix_expression { $$ = $1; 
-					// reset_current_param($1);
+					reset_current_param($1);
 					}
 	| unary_operator cast_expression { change_sign($2); $$ = $2; }
 	;
@@ -280,9 +280,9 @@ postfix_expression : primary_expression { $$ = $1; }
 	| postfix_expression OSP expression CSP {
 						//debbo controllare che l'espressione inserita sia compatibile con le espressioni inserite
 						//in primis, essendo indice di array, controllo che expression sia integer
-						//check_is_integer($3);
+						check_is_integer($3);
 						//in secundis, controllo che il valore dell'espressione sia compreso nel limite dell'array
-						//check_array_arguments($1, $3);
+						check_array_arguments($1, $3);
 						//ritorno $1
 						$$ = $1;
 						}
