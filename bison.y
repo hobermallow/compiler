@@ -67,7 +67,7 @@
 %type <str> type
 %type <str> basetype
 %type <par> param parlist params var varlist field fieldlist
-%type <val> constant primary_expression expression conditional_expression logical_or_expression logical_and_expression logical_not_expression exclusive_or_expression and_expression equality_expression relational_expression shift_expression additive_expression multiplicative_expression exp_expression cast_expression unary_expression postfix_expression exprlist exprlist_temp
+%type <val> constant primary_expression expression conditional_expression logical_or_expression logical_and_expression logical_not_expression exclusive_or_expression and_expression equality_expression relational_expression shift_expression additive_expression multiplicative_expression exp_expression cast_expression unary_expression postfix_expression exprlist exprlist_temp arrayexpr
 %type <symrec> typebuilder
 
 %start S
@@ -129,12 +129,40 @@ typebuilder : RECORD OP fieldlist field CP {
 						$$ = temp;
 					}
 
-	| ARRAY OP type COMMA arrayexpr expression CP
+	| ARRAY OP type COMMA arrayexpr expression CP {
+							//creo il nuovo elemento per la symbol table
+							sym_rec* rec = malloc (sizeof(sym_rec));
+							rec->type = "array";
+							//per ciacun valore, debbo creare il parametro
+							value* temp;
+							param* parlist = (param*) malloc(sizeof(param));
+							param* parlisttemp;
+							//creo il primo parametro
+							copy_val_in_param(parlist, $6);
+							//segnaposto
+							parlisttemp = parlist;
+							for(temp = $5; temp != 0; temp = temp->next) {
+								//creo il parametro
+								param* tem = malloc(sizeof(param));
+								copy_val_in_param(tem, temp);
+								//aggiungo il parametro alla lista
+								parlisttemp->next = tem;
+								parlisttemp = tem;
+							}
+							//aggiungo la lista al simbolo
+							rec->par_list = parlist;
+							rec->param_type = strdup($3);
+							$$ = rec;
+							}
 	;
 
 arrayexpr :	
-	 /* empty */
-	| arrayexpr expression COMMA 
+	 /* empty */ { $$ = 0; }
+	| arrayexpr expression COMMA {
+					//aggiungo il valore alla lista
+					$2->next = $1;
+					$$ = $2;
+				} 
 	;
 
 fieldlist : 

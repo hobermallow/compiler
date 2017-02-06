@@ -1,4 +1,5 @@
 newtype arraytemp matrix(integer, 3, 4);
+newtype aaa array(integer, 3, 4, 5);
 
 
 func ciao (integer a, floating x) : integer
