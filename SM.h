@@ -276,9 +276,12 @@ void copy_val_in_param(param* dst, value* src) {
 }
 
 void check_array_arguments(value* id, value* val) {
-	//recupero il sym_rec corrispondente all'id
-	sym_rec* rec = get_sym_rec(id->name);
+	//recupero il sym_rec corrispondente al tipo dell'array
+	sym_rec* rec = get_sym_rec(id->type);
 	//controllo con current_param, di cui dereferenzio il valore con int
+	//DEBUG
+	printf("valore del parametro dell'array %d\n", *((int*)(rec->current_param->val)));
+	printf("valore inserito %d\n", *((int*)(val->val)));
 	if( *((int*)(val->val)) >= *((int*)(rec->current_param->val)) ) {
 		printf("Indice oltre l'array\n");
 		exit(1);
@@ -289,7 +292,15 @@ void check_array_arguments(value* id, value* val) {
 
 void reset_current_param(value* val) {
 	//trovo il sym_rec
-	sym_rec* rec = get_sym_rec(val->name);
+	sym_rec* rec = get_sym_rec(val->type);
 	if(rec != 0) 
 		rec->current_param = rec->par_list;
+}
+
+void print_array_params(sym_rec* array) {
+	//debbo stampare la lista par_list
+	param* temp;
+	for(temp = array->par_list; temp != 0; temp = temp->next) {
+		printf("Parametro di valore %d\n", *((int*)(temp->val)) );
+	}
 }

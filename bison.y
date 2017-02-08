@@ -90,6 +90,8 @@ decl : NEWTYPE IDENTIFIER typebuilder SEMI_COLON {
 						sym->text = strdup($2);	
 						//aggiungo il simbolo alla symbol table
 						insert_sym_rec(sym);
+						//debug
+						print_array_params(sym);
 						}
 							 
 	;
@@ -155,10 +157,22 @@ typebuilder : RECORD OP fieldlist field CP {
 							}
 							//aggiungo la lista al simbolo
 							rec->par_list = parlist;
+							//inverto la lista
+							param *x, *y, *z;
+							x = 0;
+							y = rec->par_list;
+							while(y != 0) {
+								z = y->next;
+								y->next = x;
+								x = y;
+								y = z;
+							}
+							rec->par_list= x;
 							//setto current_param
 							rec->current_param = rec->par_list;
 							rec->param_type = strdup($3);
 							$$ = rec;
+							print_array_params(rec);
 							}
 	;
 
@@ -282,6 +296,7 @@ postfix_expression : primary_expression { $$ = $1; }
 						//in primis, essendo indice di array, controllo che expression sia integer
 						check_is_integer($3);
 						//in secundis, controllo che il valore dell'espressione sia compreso nel limite dell'array
+						//print_array_params(get_sym_rec($1->name));
 						check_array_arguments($1, $3);
 						//ritorno $1
 						$$ = $1;

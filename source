@@ -7,7 +7,9 @@ begin
 end
 newvars integer x, j;
 newvars floating z, d;
+newvars mat arra;
 func exec (integer x) : integer 
 begin
 	ciao(x, z);
+	arra[3][3];
 end
