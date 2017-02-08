@@ -91,7 +91,7 @@ decl : NEWTYPE IDENTIFIER typebuilder SEMI_COLON {
 						//aggiungo il simbolo alla symbol table
 						insert_sym_rec(sym);
 						//debug
-						print_array_params(sym);
+					//	print_array_params(sym);
 						}
 							 
 	;
@@ -158,21 +158,22 @@ typebuilder : RECORD OP fieldlist field CP {
 							//aggiungo la lista al simbolo
 							rec->par_list = parlist;
 							//inverto la lista
-							param *x, *y, *z;
-							x = 0;
-							y = rec->par_list;
-							while(y != 0) {
-								z = y->next;
-								y->next = x;
-								x = y;
-								y = z;
-							}
-							rec->par_list= x;
+							//param *x, *y, *z;
+							//x = 0;
+							//y = rec->par_list;
+							//while(y != 0) {
+							//	z = y->next;
+							//	y->next = x;
+							//	x = y;
+							//	y = z;
+							//}
+							//rec->par_list= x;
 							//setto current_param
+							INVERT_PARAM_LIST(rec->par_list)
 							rec->current_param = rec->par_list;
 							rec->param_type = strdup($3);
 							$$ = rec;
-							print_array_params(rec);
+							//print_array_params(rec);
 							}
 	;
 

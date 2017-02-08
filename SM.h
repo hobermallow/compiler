@@ -1,4 +1,5 @@
-
+#define INVERT_PARAM_LIST(root)  { param *x, *z;  while(root != 0) { z = root->next; root->next = x; x = root; root = z; } root = x;}
+	
 //struttura per la gestione di parametri (di funzione, di array, di matrici )
 typedef struct param param;
 
@@ -304,3 +305,5 @@ void print_array_params(sym_rec* array) {
 		printf("Parametro di valore %d\n", *((int*)(temp->val)) );
 	}
 }
+
+			  
