@@ -84,7 +84,7 @@ declist :
 
 
 decl : NEWTYPE IDENTIFIER typebuilder SEMI_COLON {
-						//recupero il sym_rec
+												//recupero il sym_rec
 						sym_rec* sym = $3;
 						//debbo aggiungere solamente il nome
 						sym->text = strdup($2);	
@@ -292,7 +292,9 @@ unary_expression : postfix_expression { $$ = $1;
 	| unary_operator cast_expression { change_sign($2); $$ = $2; }
 	;
 
-postfix_expression : primary_expression { $$ = $1; }
+postfix_expression : primary_expression { //check_mem_alloc($1); 
+					  $$ = $1;
+					 }
 	| postfix_expression OSP expression CSP {
 						//debbo controllare che l'espressione inserita sia compatibile con le espressioni inserite
 						//in primis, essendo indice di array, controllo che expression sia integer
@@ -300,6 +302,8 @@ postfix_expression : primary_expression { $$ = $1; }
 						//in secundis, controllo che il valore dell'espressione sia compreso nel limite dell'array
 						//print_array_params(get_sym_rec($1->name));
 						check_array_arguments($1, $3);
+						//controllo che sia stata allocata memoria per l'array
+						//check_mem_alloc($1);
 						//ritorno $1
 						$$ = $1;
 						}
@@ -309,6 +313,8 @@ postfix_expression : primary_expression { $$ = $1; }
 									check_is_integer($5);
 									//controllo che il valore delle espressioni sia compreso nei parametri della matrice
 									check_matrix_arguments($1, $3, $5);
+									//controllo sia stata allocata memoria per la matrice
+									//check_mem_alloc($1);
 									//ritorno $1
 									$$ = $1;
 								}
@@ -322,6 +328,8 @@ postfix_expression : primary_expression { $$ = $1; }
 	| postfix_expression ARROW IDENTIFIER {
 						//debbo controllare che l'identificatore esista per quel tipo di record
 						check_record_arguments($1, $3);
+						//controllo l'allocazione di memoria per il record
+						//check_mem_alloc($1);
 						$$ = $1;
 					      }
 	;
@@ -385,6 +393,11 @@ varlistdecl :
 	;
 
 vardecl : NEWVARS type varlist var  SEMI_COLON  {
+						//variabile utility per l'allocazione
+						int alloc = 0;
+						if(is_base_type($2)) {
+							alloc = 1;
+						}
 						//per ciascun paramentro aggiungo simbolo
 						sym_rec* symbol;
 						param* temp;
@@ -392,7 +405,7 @@ vardecl : NEWVARS type varlist var  SEMI_COLON  {
 							symbol = (sym_rec*) malloc(sizeof(sym_rec));
 							symbol->text = strdup(temp->name);
 							symbol->type = strdup($2);
-							symbol->memoryAllocated = 0;
+							symbol->memoryAllocated = alloc;
 							//inserisco il simbolo nella symbol table
 							insert_sym_rec(symbol);
 							printf("Inserisco simbolo %s di tipo %s\n", symbol->text, symbol->type);
@@ -401,7 +414,7 @@ vardecl : NEWVARS type varlist var  SEMI_COLON  {
 						symbol = (sym_rec*) malloc(sizeof(sym_rec));
 						symbol->text = strdup($4->name);
 						symbol->type = strdup($2);
-						symbol->memoryAllocated = 0;
+						symbol->memoryAllocated = alloc;
 						initialize_value(symbol);
 						insert_sym_rec(symbol);	
 						printf("Inserisco simbolo %s di tipo %s\n", symbol->text, symbol->type);

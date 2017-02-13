@@ -343,3 +343,31 @@ void check_record_arguments(value* record, char* field) {
 	exit(1);
 }
 			  
+void check_mem_alloc(value* val) {
+	//recupero il record corrispondente alla variabile
+	sym_rec* rec = get_sym_rec(val->name);
+	//controllo l'allocazione
+	if(rec->memoryAllocated == 0) {
+		printf("Memoria per la variabile non allocata\n");
+		exit(1);
+	}
+}
+
+int is_base_type(char* type) {
+	if(strcmp(type, "integer") == 0) {
+		return 1;
+	}
+	else if(strcmp(type, "floating") == 0) {
+		return 1;
+	}
+	else if(strcmp(type, "boolean")){
+		return 1;
+	}
+	else if(strcmp(type, "char") == 0) {
+		return 1;
+	}
+	else if(strcmp(type, "string") == 0) {
+		return 1;
+	}
+	return 0;
+}
