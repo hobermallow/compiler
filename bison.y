@@ -124,9 +124,9 @@ typebuilder : RECORD OP fieldlist field CP {
 						copy_val_in_param(temp_1, $5);
 						copy_val_in_param(temp_2, $7);
 						//unisco i parametri
-						temp_2->next = temp_1;
+						temp_1->next = temp_2;
 						//salvo i parametri
-						temp->par_list = temp_2;
+						temp->par_list = temp_1;
 						//salvo il tipo della matrice
 						temp->param_type = strdup($3);
 						//setto current_param
@@ -302,7 +302,15 @@ postfix_expression : primary_expression { $$ = $1; }
 						//ritorno $1
 						$$ = $1;
 						}
-	| postfix_expression OSP expression COMMA expression CSP
+	| postfix_expression OSP expression COMMA expression CSP {
+									//controllo che le espressioni siano di tipo intero
+									check_is_integer($3);
+									check_is_integer($5);
+									//controllo che il valore delle espressioni sia compreso nei parametri della matrice
+									check_matrix_arguments($1, $3, $5);
+									//ritorno $1
+									$$ = $1;
+								}
 	| postfix_expression OP exprlist CP {
 						//debbo controllare che i parametri inseriti corrispondano a quelli dichiarati nella func
 						//richiamo una routine che prende in input il nome della funzione e la lista di argomenti

@@ -1,4 +1,5 @@
-newtype mat array(integer, 3, 4);
+newtype mioarray array(integer, 3, 4);
+newtype miamatrice matrix(integer, 4, 5);
 
 func ciao (integer a, floating x) : integer
 begin
@@ -7,9 +8,12 @@ begin
 end
 newvars integer x, j;
 newvars floating z, d;
-newvars mat arra;
+newvars mioarray arra;
+newvars miamatrice mat;
 func exec (integer x) : integer 
 begin
 	ciao(x, z);
-	arra[3][3];
+	arra[2][3];
+	arra[2][3];
+	mat[4, 3];
 end

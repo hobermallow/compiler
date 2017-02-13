@@ -291,6 +291,23 @@ void check_array_arguments(value* id, value* val) {
 	rec->current_param = rec->current_param->next;
 }
 
+void check_matrix_arguments(value* id, value* val_1, value* val_2) {
+	//recupero il sym_rec corrispondente al tipo della matrice
+	sym_rec* rec = get_sym_rec(id->type);
+	//controllo i due valori
+	if(*((int*)(val_1->val)) >=  *((int*)(rec->current_param->val))) {
+		printf("Indice oltre la matrice\n");
+		exit(1);
+	} 
+	//sposto il current_param
+	rec->current_param = rec->current_param->next;
+	//controllo il secondo parametro
+	if(*((int*)(val_2->val)) >=  *((int*)(rec->current_param->val))) {
+                printf("Indice oltre la matrice\n");
+                exit(1);
+        }
+}
+
 void reset_current_param(value* val) {
 	//trovo il sym_rec
 	sym_rec* rec = get_sym_rec(val->type);
