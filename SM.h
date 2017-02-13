@@ -372,3 +372,14 @@ int is_base_type(char* type) {
 	}
 	return 0;
 }
+
+void alloc_mem(value* val) {
+	sym_rec* rec = get_sym_rec(val->name);
+	//alloco la memoria
+	rec->memoryAllocated = 1;
+}
+
+void dealloc_mem(value* val) {
+	sym_rec* rec = get_sym_rec(val->name);
+	rec->memoryAllocated = 0;
+}

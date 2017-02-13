@@ -552,8 +552,23 @@ assignment_statement : unary_expression assignment_operator expression SEMI_COLO
 	/* eliminata statements fatta da solo SEMI_COLON */
 	;
 
-object_statement : FREE OP IDENTIFIER CP SEMI_COLON
-	| unary_expression ASSIGN  NEW OP IDENTIFIER CP SEMI_COLON
+object_statement : FREE OP IDENTIFIER CP SEMI_COLON {
+							value* val;
+							val = (value*) malloc(sizeof(value));
+							val->name = strdup($3);
+							//dealloco la memoria
+							dealloc_mem(val);
+						    }
+	| unary_expression ASSIGN  NEW OP IDENTIFIER CP SEMI_COLON {
+									//debbo controllare che l'unary_expression sia dello stesso tipo
+									//identificato dall'identifier
+									value* temp;
+									temp = (value*) malloc(sizeof(value));
+									temp->type = strdup($5);
+									check_type($1, temp);
+									//alloco memoria per il valore dell'unary_expression
+									alloc_mem($1);
+								   }
 	;
 
 overloads :
