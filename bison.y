@@ -392,6 +392,7 @@ vardecl : NEWVARS type varlist var  SEMI_COLON  {
 							symbol = (sym_rec*) malloc(sizeof(sym_rec));
 							symbol->text = strdup(temp->name);
 							symbol->type = strdup($2);
+							symbol->memoryAllocated = 0;
 							//inserisco il simbolo nella symbol table
 							insert_sym_rec(symbol);
 							printf("Inserisco simbolo %s di tipo %s\n", symbol->text, symbol->type);
@@ -400,6 +401,7 @@ vardecl : NEWVARS type varlist var  SEMI_COLON  {
 						symbol = (sym_rec*) malloc(sizeof(sym_rec));
 						symbol->text = strdup($4->name);
 						symbol->type = strdup($2);
+						symbol->memoryAllocated = 0;
 						initialize_value(symbol);
 						insert_sym_rec(symbol);	
 						printf("Inserisco simbolo %s di tipo %s\n", symbol->text, symbol->type);
@@ -490,6 +492,7 @@ param : type IDENTIFIER {//prova di aggiunta di simbolo
 			sym_rec* rec = (sym_rec*)malloc(sizeof(sym_rec));
 			rec->text = strdup($2);
 			rec->type = strdup($1);
+			rec->memoryAllocated = 0;
 			initialize_value(rec);
 			insert_sym_rec(rec);
 			printf("Inserito simbolo %s di tipo %s\n", rec->text, rec->type);

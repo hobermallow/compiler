@@ -38,6 +38,10 @@ struct sym_rec {
 	//parametro temporaneo che punta all'elemento in esame della par_list
 	param* current_param;
 	sym_rec* next;
+	//doppio hack
+	//parametro int per info su inizializzazione record
+	//le variabili di tipo custom vanno inizializzate
+	int memoryAllocated;
 };
 
 
