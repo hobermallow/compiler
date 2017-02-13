@@ -200,6 +200,7 @@ field : type IDENTIFIER {
 				param* temp = malloc(sizeof(param));	
 				temp->type = strdup($1);
 				temp->name = strdup($2);
+				$$ = temp;
 			}
 	; 
 
@@ -318,7 +319,11 @@ postfix_expression : primary_expression { $$ = $1; }
 						//ritorno il value corrispondente alla funzione, che cosi ho il tipo
 						$$ = $1;
 						}
-	| postfix_expression ARROW IDENTIFIER
+	| postfix_expression ARROW IDENTIFIER {
+						//debbo controllare che l'identificatore esista per quel tipo di record
+						check_record_arguments($1, $3);
+						$$ = $1;
+					      }
 	;
 
 exprlist : 

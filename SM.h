@@ -323,4 +323,19 @@ void print_array_params(sym_rec* array) {
 	}
 }
 
+void check_record_arguments(value* record, char* field) {
+	//debbo controllare che il field sia contenuto all'interno del record
+	//recupero il record corrispondente al tipo di record
+	sym_rec* rec = get_sym_rec(record->type);
+	//itero sui parametri del record, cercando l'identificatore
+	param* temp;
+	for(temp = rec->par_list; temp != 0; temp = temp->next) {
+		//compare del nome del parametro con la stringa passata come argomento
+		if(strcmp(temp->name, field)== 0) {
+			return;
+		}
+	}
+	//se arrivo a questo punto, vuol dire che non ho trovato il record
+	exit(1);
+}
 			  
