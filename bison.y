@@ -303,7 +303,7 @@ postfix_expression : primary_expression { //check_mem_alloc($1);
 						//print_array_params(get_sym_rec($1->name));
 						check_array_arguments($1, $3);
 						//controllo che sia stata allocata memoria per l'array
-						//check_mem_alloc($1);
+						check_mem_alloc($1);
 						//ritorno $1
 						$$ = $1;
 						}
@@ -314,7 +314,7 @@ postfix_expression : primary_expression { //check_mem_alloc($1);
 									//controllo che il valore delle espressioni sia compreso nei parametri della matrice
 									check_matrix_arguments($1, $3, $5);
 									//controllo sia stata allocata memoria per la matrice
-									//check_mem_alloc($1);
+									check_mem_alloc($1);
 									//ritorno $1
 									$$ = $1;
 								}
@@ -329,7 +329,7 @@ postfix_expression : primary_expression { //check_mem_alloc($1);
 						//debbo controllare che l'identificatore esista per quel tipo di record
 						check_record_arguments($1, $3);
 						//controllo l'allocazione di memoria per il record
-						//check_mem_alloc($1);
+						check_mem_alloc($1);
 						$$ = $1;
 					      }
 	;
@@ -395,7 +395,7 @@ varlistdecl :
 vardecl : NEWVARS type varlist var  SEMI_COLON  {
 						//variabile utility per l'allocazione
 						int alloc = 0;
-						if(is_base_type($2)) {
+						if(is_base_type($2) == 1) {
 							alloc = 1;
 						}
 						//per ciascun paramentro aggiungo simbolo
