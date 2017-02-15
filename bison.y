@@ -3,6 +3,7 @@
 	#include <stdlib.h>
 	#include "SM.h"
 	#include <string.h>
+	
 %}
 %union {
 	int intval;
@@ -79,8 +80,11 @@
 S : declist deffunclist overloads varlistdecl main EOF_TOKEN  	{ printf("parsato !\n"); return 0; }
 	;
 declist : 
-	/*empty */
-	| declist decl
+	/*empty */ {
+	        	//controllo le dichiarazioni dei tipi effettuate
+			//check_type_definitions();
+		   }
+	| declist decl 
 	;
 
 

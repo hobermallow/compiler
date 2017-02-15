@@ -53,6 +53,7 @@ struct sym_table {
 	sym_rec* entries;
 } ;
 
+//variabile globale contenente il riferimento alla symbol_table
 sym_table* top;
 
 //funzione per lo swicht dell'environment ( scoping a blocchi del C)
@@ -382,4 +383,28 @@ void alloc_mem(value* val) {
 void dealloc_mem(value* val) {
 	sym_rec* rec = get_sym_rec(val->name);
 	rec->memoryAllocated = 0;
+}
+
+void check_type_definitions() {
+	//metodo da ottimizzare assolutamente
+	sym_table* temp_table;
+	sym_rec* temp_rec;
+	param* temp_param;
+	for(temp_table = top; temp_table != 0; temp_table = temp_table->next) {
+		for(temp_rec = top->entries; temp_rec != 0; temp_rec = temp_rec->next) {
+			//dovrei essere sicuro , al momento dell'invocazione della funzione, che i record presenti corrispondono solamente a
+			//dichiarazioni di tipo
+			//DEBUG
+			printf("record di nome %s\n", temp_rec->text);
+			for(temp_param = temp_rec->par_list; temp_param != 0; temp_param = temp_param->next) {
+				//cerco nella symbol table il record corrispondente al tipo del parametro
+				printf("cerco il tipo %s (nome %s) \n", temp_param->name, temp_param->type);
+				if(get_sym_rec(temp_param->type) == 0) {
+					printf("Tipo non trovato: %s\n", temp_param->type);
+					exit(1);
+				}
+			}
+						
+		}
+	}
 }
