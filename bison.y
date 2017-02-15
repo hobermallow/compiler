@@ -57,6 +57,7 @@
 %token LTE
 %token NEWVARS
 %token THEN
+%token <str> BOOLEAN_CONSTANT
 %token <str> INTEGER FLOATING BOOLEAN STRING_TYPE CHAR
 %token <intval> INTEGER_CONSTANT
 %token <str> CHARACTER_CONSTANT
