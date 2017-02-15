@@ -114,6 +114,11 @@ typebuilder : RECORD OP fieldlist field CP {
 						//controllo che il tipo delle espressioni sia intero
 						check_is_integer($5);
 						check_is_integer($7);
+						//controllo che il tipo degli elementi della matrice sia intero o floating
+						if(strcmp($3, "integer) != 0 && strcmp($3, "floating") != 0) {
+							printf("Tipo selezionato per i campi della matrice non valido \n");
+							exit(1);
+						}
 						//creo il nuovo tipo
 						sym_rec* temp = (sym_rec*) malloc(sizeof(sym_rec));
 						temp->type = "matrix";
