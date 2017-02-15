@@ -1,6 +1,6 @@
 newtype mioarray array(integer, 3, 4);
 newtype miamatrice matrix(integer, 4, 5);
-newtype miorecord record(integer a, boolean b);
+newtype miorecord record(mioarray a, boolean b);
 
 func ciao (integer a, floating x) : integer
 begin

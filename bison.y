@@ -115,7 +115,7 @@ typebuilder : RECORD OP fieldlist field CP {
 						check_is_integer($5);
 						check_is_integer($7);
 						//controllo che il tipo degli elementi della matrice sia intero o floating
-						if(strcmp($3, "integer) != 0 && strcmp($3, "floating") != 0) {
+						if(strcmp($3, "integer") != 0 && strcmp($3, "floating") != 0 ) {
 							printf("Tipo selezionato per i campi della matrice non valido \n");
 							exit(1);
 						}
