@@ -51,6 +51,8 @@ func[ ]+exec {change_environment(); printf("Nuovo environment\n"); return FUNC_E
 "<=" {return LTE; }
 "newvars" {return NEWVARS; }
 "then" {return THEN; }
+"true" {yylval.str = (char*) strdup(yytext); return TRUE; }
+"false" {yylval.str = (char*) strdup(yytext); return FALSE;}
 [1-9][0-9]* {yylval.intval = atoi(yytext); return INTEGER_CONSTANT; }
 "'"[:alnum:]*"'"  {yylval.str = (char*) strdup(yytext); return CHARACTER_CONSTANT; }
 "\""[:alnum:]*"\""  {yylval.str = (char*) strdup(yytext); return STRING; }
