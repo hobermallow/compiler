@@ -89,14 +89,14 @@ declist :
 
 
 decl : NEWTYPE IDENTIFIER typebuilder SEMI_COLON {
-												//recupero il sym_rec
+						//recupero il sym_rec
 						sym_rec* sym = $3;
 						//debbo aggiungere solamente il nome
 						sym->text = strdup($2);	
 						//aggiungo il simbolo alla symbol table
 						insert_sym_rec(sym);
 						//debug
-					//	print_array_params(sym);
+						//print_array_params(sym);
 						}
 							 
 	;
@@ -325,8 +325,14 @@ postfix_expression : primary_expression { //check_mem_alloc($1);
 									check_matrix_arguments($1, $3, $5);
 									//controllo sia stata allocata memoria per la matrice
 									check_mem_alloc($1);
-									//ritorno $1
-									$$ = $1;
+									//ritorno un oggetto di tipo value con tipo settato al 
+									//tipo dei parametri della matrice
+									value* temp = (value*)malloc(sizeof(value));
+									temp->val = (int*)malloc(sizeof(int));
+									//recupero il sym_rec del tipo della matrice
+									sym_rec* temp_rec = (sym_rec*) get_sym_rec($1->type);
+									temp->type = strdup(temp_rec->param_type); 
+									$$ = temp;
 								}
 	| postfix_expression OP exprlist CP {
 						//debbo controllare che i parametri inseriti corrispondano a quelli dichiarati nella func
@@ -557,7 +563,7 @@ selection_statement : IF OP expression CP BEG stmts END
 iteration_statement : LOOP OP expression CP BEG stmts END
 	;
 
-assignment_statement : unary_expression assignment_operator expression SEMI_COLON { check_type($1,$3); copy_val($1,$3); }
+assignment_statement : unary_expression assignment_operator expression SEMI_COLON {check_type($1,$3); copy_val($1,$3); }
 	| expression SEMI_COLON
 	/* eliminata statements fatta da solo SEMI_COLON */
 	;

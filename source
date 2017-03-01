@@ -20,6 +20,6 @@ begin
 	ciao(x, z);
 	arra[2][3];
 	arra[2][3];
-	mat[2, 3];
+	mat[2, 3] = 3;
 	acc->a;
 end

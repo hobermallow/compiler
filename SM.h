@@ -323,8 +323,11 @@ void reset_current_param(value* val) {
 void print_array_params(sym_rec* array) {
 	//debbo stampare la lista par_list
 	param* temp;
-	for(temp = array->par_list; temp != 0; temp = temp->next) {
-		printf("Parametro di valore %d\n", *((int*)(temp->val)) );
+	for(temp = array->par_list; temp->next != 0; temp = temp->next) {
+		printf("sto stampando un parametro\n");
+		printf("valore del puntatore %p\n", temp);
+		printf("parametro di tipo %s\n", temp->name);
+		printf("Parametro di valore %d\n", *((int*)(temp->val)));
 	}
 }
 
