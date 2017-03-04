@@ -296,7 +296,8 @@ assignment_operator : ASSIGN
 unary_operator : MINUS
 	;
 	
-unary_expression : postfix_expression { $$ = $1; 
+unary_expression : postfix_expression {
+					 $$ = $1; 
 					reset_current_param($1);
 					}
 	| unary_operator cast_expression { change_sign($2); $$ = $2; }
@@ -311,9 +312,20 @@ postfix_expression : primary_expression { //check_mem_alloc($1);
 						check_is_integer($3);
 						//in secundis, controllo che il valore dell'espressione sia compreso nel limite dell'array
 						//print_array_params(get_sym_rec($1->name));
-						check_array_arguments($1, $3);
+						//siccome non voglio cambiare la funzione check , creo un nuovo val...
+						//lebensraum
+						value* val = (value*)malloc(sizeof(value));
+						val->name = strdup($1->name);
+						val->type = strdup($1->custom_type);
+						check_array_arguments(val, $3);
 						//controllo che sia stata allocata memoria per l'array
 						check_mem_alloc($1);
+						//sto dereferenziando array , quindi modifico il tipo
+						if(is_base_type($1->type) == 0) {
+							//recupero il record corrispondente al tipo dell'array
+							sym_rec* type = (sym_rec*)get_sym_rec($1->type);
+							$1->type = strdup(type->param_type);
+						}
 						//ritorno $1
 						$$ = $1;
 						}
@@ -379,6 +391,8 @@ primary_expression : IDENTIFIER { //controllo se sia stato dichiarato l'identifi
 					value* temp = (value*) malloc(sizeof(value));
 					//recupero il tipo dalla dichiarazione
 					temp->type = strdup(rec->type);
+					//overhead dovuto alla scarsa capacita' progettuale....
+					temp->custom_type = strdup(rec->type);
 					//recuper il nome
 					temp->name = strdup(rec->text); 
 					//recuper il valore

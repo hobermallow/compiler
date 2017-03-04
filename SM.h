@@ -21,6 +21,7 @@ typedef struct value value;
 
 struct value {
 	char* type;
+	char* custom_type;
 	char* name;
 	void* val;
 	value* next;
@@ -225,10 +226,12 @@ void check_is_integer(value* val) {
 }
 
 void copy_val(value* dst, value* src) {
-	if(strcmp(dst->type, "integer") == 0) {
+	if(strcmp(src->type, "integer") == 0) {
+		dst->val = (int*) malloc(sizeof(int));
 		*((int*)(dst->val)) = *((int*)(src->val));
 	}
-	if(strcmp(dst->type, "floating") == 0) {
+	if(strcmp(src->type, "floating") == 0) {
+		dst->val = (double*) malloc(sizeof(double));
 		*((double*)(dst->val)) = *((double*)(src->val));
 	}
 }
