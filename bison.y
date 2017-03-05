@@ -435,14 +435,18 @@ vardecl : NEWVARS type varlist var  SEMI_COLON  {
 						//per ciascun paramentro aggiungo simbolo
 						sym_rec* symbol;
 						param* temp;
-						for(temp = $3; temp != 0; temp = temp->next) {
-							symbol = (sym_rec*) malloc(sizeof(sym_rec));
-							symbol->text = strdup(temp->name);
-							symbol->type = strdup($2);
-							symbol->memoryAllocated = alloc;
-							//inserisco il simbolo nella symbol table
-							insert_sym_rec(symbol);
-							printf("Inserisco simbolo %s di tipo %s\n", symbol->text, symbol->type);
+						int flag = $3;
+						if(flag != 0) {
+							for(temp = $3; temp != 0; temp = temp->next) {
+								symbol = (sym_rec*) malloc(sizeof(sym_rec));
+								symbol->text = strdup(temp->name);
+								symbol->type = strdup($2);
+								symbol->memoryAllocated = alloc;
+								//inserisco il simbolo nella symbol table
+								insert_sym_rec(symbol);
+								printf("Inserisco simbolo %s di tipo %s\n", symbol->text, symbol->type);
+							}
+	
 						}
 						//inserico val
 						symbol = (sym_rec*) malloc(sizeof(sym_rec));
@@ -464,7 +468,7 @@ var : IDENTIFIER {
 	;
 
 varlist :
-	/* empty */ { $$ = 0; }
+	/* empty */ { $$ = 0;  }
 	| varlist var COMMA {
 				//aggiungo la lista a var
 				$2->next = $1;
@@ -610,7 +614,7 @@ overloads :
 	| overloads overload 
 	;
 
-overload : OVERLOAD OP overloadable_operands COMMA IDENTIFIER CP BEG stmts END
+overload : OVERLOAD OP overloadable_operands COMMA IDENTIFIER CP BEG stmts END  {printf("parsato l'overload\n"); }
 	;
 
 overloadable_operands : PLUS

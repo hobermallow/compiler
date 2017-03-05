@@ -57,7 +57,7 @@ func[ ]+exec {change_environment(); printf("Nuovo environment\n"); return FUNC_E
 "'"[:alnum:]*"'"  {yylval.str = (char*) strdup(yytext); return CHARACTER_CONSTANT; }
 "\""[:alnum:]*"\""  {yylval.str = (char*) strdup(yytext); return STRING; }
 [0-9]*"."[0-9]* {yylval.dval = atof(yytext); return FLOATING_CONSTANT; }
-"overload" {return OVERLOAD; }
+"overload" {change_environment(); printf("Nuovo environment\n");return OVERLOAD; }
 [_a-zA-Z][_a-zA-Z0-9]{0,30} { yylval.id = (char*) strdup(yytext); return IDENTIFIER;}
 "\t"
 " "
