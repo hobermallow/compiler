@@ -43,6 +43,8 @@ struct sym_rec {
 	//parametro int per info su inizializzazione record
 	//le variabili di tipo custom vanno inizializzate
 	int memoryAllocated;
+	//variabile per l'operando di eventuale overload
+	char* operand;
 };
 
 

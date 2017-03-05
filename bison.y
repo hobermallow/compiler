@@ -28,17 +28,17 @@
 %token <str> STRING
 %token COMMA
 %token ASSIGN
-%token MINUS
+%token <str> MINUS
 %token ARROW
 %token OR
 %token AND
 %token NOT
-%token EQUAL
-%token NOTEQUAL
-%token PLUS
-%token MUL
-%token EXP
-%token DIV
+%token <str> EQUAL
+%token <str> NOTEQUAL
+%token <str> PLUS
+%token <str> MUL
+%token <str> EXP
+%token <str> DIV
 %token FUNC
 %token FUNC_EXEC /*fare in lexer */
 %token COLON
@@ -52,10 +52,10 @@
 %token ELSE
 %token LOOP
 %token FREE
-%token GRT
-%token LST
-%token GTE
-%token LTE
+%token <str> GRT
+%token <str> LST
+%token <str> GTE
+%token <str> LTE
 %token NEWVARS
 %token THEN
 %token <str> BOOLEAN_CONSTANT
@@ -71,6 +71,7 @@
 %type <par> param parlist params var varlist field fieldlist
 %type <val> constant primary_expression expression conditional_expression logical_or_expression logical_and_expression logical_not_expression exclusive_or_expression and_expression equality_expression relational_expression shift_expression additive_expression multiplicative_expression exp_expression cast_expression unary_expression postfix_expression exprlist exprlist_temp arrayexpr
 %type <symrec> typebuilder
+%type <str> overloadable_operands
 
 %start S
 
@@ -614,7 +615,14 @@ overloads :
 	| overloads overload 
 	;
 
-overload : OVERLOAD OP overloadable_operands COMMA IDENTIFIER CP BEG stmts END  {printf("parsato l'overload\n"); }
+overload : OVERLOAD OP overloadable_operands COMMA IDENTIFIER CP BEG stmts END  {
+											//debbo inserire l'overload
+											sym_rec* rec = (sym_rec*)malloc(sizeof(sym_rec));
+											rec->operand = strdup($3);
+											rec->type = strdup($5);
+											rec->text = "";
+											insert_sym_rec(rec);
+										 }
 	;
 
 overloadable_operands : PLUS
