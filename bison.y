@@ -356,9 +356,13 @@ postfix_expression : primary_expression { //check_mem_alloc($1);
 	| postfix_expression ARROW IDENTIFIER {
 						//debbo controllare che l'identificatore esista per quel tipo di record
 						check_record_arguments($1, $3);
+						printf("record field\n");
 						//controllo l'allocazione di memoria per il record
 						check_mem_alloc($1);
-						$$ = $1;
+						//debbo passare come value quello corrispondente al campo del record
+						value* temp = get_record_field($1, $3);
+						exit;
+						$$ = temp;
 					      }
 	;
 

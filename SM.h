@@ -414,3 +414,22 @@ void check_type_definitions() {
 		}
 	}
 }
+
+//funzione per recuperare il field di un record
+value* get_record_field(value* record, char* field) {
+	//recupero il record corrispondente al record
+	sym_rec* rec = (sym_rec*) get_sym_rec(record->type);	
+	//cerco il field specifico
+	param* ret;
+	for(ret = rec->par_list; ret != 0; ret = ret->next) {
+		if(strcmp(ret->name, field) == 0) {
+			//ho trovato il valore
+			break;
+		}
+	}
+	//creo il nuovo value
+	value* temp = (value*) malloc(sizeof(value));
+	temp->name = strdup(ret->name);
+	temp->type = strdup(ret->type);
+	return temp;
+}
