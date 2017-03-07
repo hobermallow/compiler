@@ -1,4 +1,4 @@
-#define INVERT_PARAM_LIST(root)  { param *x, *z;  while(root != 0) { z = root->next; root->next = x; x = root; root = z; } root = x;}
+#define INVERT_PARAM_LIST(root)  { param *x, *z, *y; y = root;  while(root != 0) { z = root->next; root->next = x; x = root; root = z; }y->next= 0; root = x;}
 	
 //struttura per la gestione di parametri (di funzione, di array, di matrici )
 typedef struct param param;
@@ -435,3 +435,50 @@ value* get_record_field(value* record, char* field) {
 	temp->type = strdup(ret->type);
 	return temp;
 }
+
+
+//funzione che controlla l'esistenza di tutti i tipi utilizzati nelle
+//definizioni di tipo
+int check_recursive_definitions() {
+	//a partire dalla symbol table, per ogni record di tipo
+	//array, matrice o record , controlla la lista dei parametri, cercando
+	//per ciascun tipo custom il corrispondente record nella symbol table
+	sym_rec* temp_rec;
+	param* temp_param;
+	for(temp_rec = top->entries; (int)temp_rec != 0; temp_rec = temp_rec->next) {
+		//se e' record corrispondente a typebuilder
+		if(is_recursive_type_builder(temp_rec->type)) {
+			printf("nome del record %s\n", temp_rec->text);
+			//itero sui parametri e controllo che il tipo di ciascun parametro sia esistente
+			for(temp_param = temp_rec->par_list; (int) temp_param != 0; temp_param = temp_param->next) {
+				printf("puntatore prossimo elemento %d\n", temp_param->next);
+				//controllo che esista un record corrispondente al tipo del parametro se non e' base type
+				if(is_base_type(temp_param->type) == 0) {
+					//cerco il record corrispondente al tipo del parametro
+					sym_rec* aaaa =get_sym_rec(temp_param->type);
+					if((int)aaaa == 0) {
+						return 0;
+					}
+					printf("ciao\n");
+					//se non esiste si genera in automatico un errore e la compilazione fallisce
+				}
+			}
+		}
+	
+			
+	}
+	printf("ritorno dalla funzione check_recursive_definitions\n");
+	return 1;
+}
+
+//utility per controllare che una stringa di tipo indichi un record corrispondente ad un typebuilder
+int is_recursive_type_builder(char* type) {
+	if(strcmp(type, "array")==0) {
+		return 1;
+	}
+	if(strcmp(type, "record")==0) {
+		return 1;
+	}
+	return 0;
+}
+

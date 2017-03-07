@@ -81,10 +81,7 @@
 S : declist deffunclist overloads varlistdecl main EOF_TOKEN  	{ printf("parsato !\n"); return 0; }
 	;
 declist : 
-	/*empty */ {
-	        	//controllo le dichiarazioni dei tipi effettuate
-			//check_type_definitions();
-		   }
+	/*empty */
 	| declist decl 
 	;
 
@@ -156,16 +153,22 @@ typebuilder : RECORD OP fieldlist field CP {
 							param* parlisttemp;
 							//creo il primo parametro
 							copy_val_in_param(parlist, $6);
+							//assegno anche il tipo del parametro
+							//serve per controllo di definizioni ricorsive dei tipi
+							parlist->type = strdup($3);
 							//segnaposto
 							parlisttemp = parlist;
 							for(temp = $5; temp != 0; temp = temp->next) {
 								//creo il parametro
 								param* tem = malloc(sizeof(param));
 								copy_val_in_param(tem, temp);
+								tem->type = strdup($3);
 								//aggiungo il parametro alla lista
 								parlisttemp->next = tem;
 								parlisttemp = tem;
 							}
+							//parlisttemp e' alias di parlist
+							parlisttemp->next = 0;
 							//aggiungo la lista al simbolo
 							rec->par_list = parlist;
 							//inverto la lista

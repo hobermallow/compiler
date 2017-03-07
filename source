@@ -1,6 +1,10 @@
 newtype miamatrice matrix(integer, 4, 5);
-newtype mioarray array(integer, 3, 4);
-newtype miorecord record(integer int, floating float);
+newtype mioarray array(miorecord, 3, 4);
+newtype miorecord record(mioarray int, floating float);
+
+func stocazz(integer a, floating b): floating
+begin
+end
 
 overload(+, mioarray)
 begin
@@ -18,7 +22,5 @@ begin
 	mat = new(miamatrice);
 	arra = new(mioarray);
 	acc = new(miorecord);
-	arra[2][2] = 1;
 	mat[1,3] = 1; 
-	acc->int = 3.2;
 end

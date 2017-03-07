@@ -33,7 +33,7 @@
 "#" {return EXP; }
 "/" { return DIV; }
 "func" {change_environment();printf("Nuovo environment\n"); return FUNC; }
-func[ ]+exec {change_environment(); printf("Nuovo environment\n"); return FUNC_EXEC; }
+func[ ]+exec {if(check_recursive_definitions()== 1) {change_environment(); printf("Nuovo environment\n"); return FUNC_EXEC; } else { printf("Errore nelle definizioni ricorsive\n"); exit(1); }}
 ":" { return COLON; }
 "begin" {return BEG; }
 "end" {pop_environment();printf("Pop environment\n"); return END; }
