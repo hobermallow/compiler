@@ -17,7 +17,7 @@ newvars mioarray arra;
 newvars miorecord acc;
 
 
-func exec (integer x) : integer 
+func exec (integer x) : boolean
 begin
 	mat = new(miamatrice);
 	arra = new(mioarray);

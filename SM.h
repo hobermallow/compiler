@@ -482,3 +482,20 @@ int is_recursive_type_builder(char* type) {
 	return 0;
 }
 
+void check_param_list_base_type(param* list) {
+	//controllo il primo elemento
+	if((int)list != 0) {
+		if(is_base_type(list->type) == 0) {
+			printf("Parametro non di tipo base nelle funzione exec\n");
+			exit(1);
+		}
+		else {
+			for(list = list->next; list != 0; list = list->next) {
+				if(is_base_type(list->type) == 0) {
+					printf("Parametro non di tipo base nella funzione exec\n");
+					exit(1);
+				}
+			}
+		}
+	}
+}

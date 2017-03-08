@@ -389,7 +389,7 @@ exprlist_temp :
 
 primary_expression : IDENTIFIER { //controllo se sia stato dichiarato l'identificatore
 				sym_rec* rec = get_sym_rec($1);
-				if(rec == 0) {
+				if(rec == 0 ) {
 					printf("Identificarore %s non trovato\n", $1);
 					exit(1);
 				}
@@ -509,6 +509,13 @@ main : FUNC_EXEC OP params CP COLON type block  { //inserisco nella symbol table
 							func->type = strdup($6);
 							//inserisco i parametri
 							func->par_list = $3;
+							//controllo che i parametri della funzione exec siano tutti di tipo base
+							check_param_list_base_type(func->par_list);
+							//controllo che il tipo di ritorno della funzione sia integer o null
+							if(strcmp($6, "integer") != 0 && strcmp($6, "null")) {
+								printf("Tipo di ritorno non valido per la funzione exec\n");
+								exit(1);
+							}
 							//inserisco il simbolo appena creato nella symbol table
 							insert_sym_rec(func);
 							printf("Inserito simbolo per la funzione %s\n", func->text);
