@@ -3,7 +3,7 @@
 	#include <stdlib.h>
 	#include "SM.h"
 	#include <string.h>
-	
+
 %}
 %union {
 	int intval;
@@ -80,9 +80,9 @@
 /* grammar starting symbol */
 S : declist deffunclist overloads varlistdecl main EOF_TOKEN  	{ printf("parsato !\n"); return 0; }
 	;
-declist : 
+declist :
 	/*empty */
-	| declist decl 
+	| declist decl
 	;
 
 
@@ -90,13 +90,13 @@ decl : NEWTYPE IDENTIFIER typebuilder SEMI_COLON {
 						//recupero il sym_rec
 						sym_rec* sym = $3;
 						//debbo aggiungere solamente il nome
-						sym->text = strdup($2);	
+						sym->text = strdup($2);
 						//aggiungo il simbolo alla symbol table
 						insert_sym_rec(sym);
 						//debug
 						//print_array_params(sym);
 						}
-							 
+
 	;
 typebuilder : RECORD OP fieldlist field CP {
 						//unisco i field
@@ -191,16 +191,16 @@ typebuilder : RECORD OP fieldlist field CP {
 							}
 	;
 
-arrayexpr :	
+arrayexpr :
 	 /* empty */ { $$ = 0; }
 	| arrayexpr expression COMMA {
 					//aggiungo il valore alla lista
 					$2->next = $1;
 					$$ = $2;
-				} 
+				}
 	;
 
-fieldlist : 
+fieldlist :
 	/* empty */	{ $$ = 0; }
 	| fieldlist field COMMA {
 					//recupero il parametro
@@ -208,15 +208,15 @@ fieldlist :
 					$$ = $2;
 				}
 	;
- 
+
 field : type IDENTIFIER {
 				//creo il parametro
-				param* temp = malloc(sizeof(param));	
+				param* temp = malloc(sizeof(param));
 				temp->type = strdup($1);
 				temp->name = strdup($2);
 				$$ = temp;
 			}
-	; 
+	;
 
 type : basetype { $$ = $1; }
 	| IDENTIFIER { $$ = $1; }
@@ -224,7 +224,7 @@ type : basetype { $$ = $1; }
 
 basetype : INTEGER  { $$ = $1; }
 	| BOOLEAN { $$ = $1; }
-	| FLOATING { $$ = $1; } 
+	| FLOATING { $$ = $1; }
 	| CHAR { $$ = $1; }
 	| STRING_TYPE { $$ = $1; }
 	;
@@ -299,15 +299,15 @@ assignment_operator : ASSIGN
 
 unary_operator : MINUS
 	;
-	
+
 unary_expression : postfix_expression {
-					 $$ = $1; 
+					 $$ = $1;
 					reset_current_param($1);
 					}
 	| unary_operator cast_expression { change_sign($2); $$ = $2; }
 	;
 
-postfix_expression : primary_expression { //check_mem_alloc($1); 
+postfix_expression : primary_expression { //check_mem_alloc($1);
 					  $$ = $1;
 					 }
 	| postfix_expression OSP expression CSP {
@@ -341,13 +341,13 @@ postfix_expression : primary_expression { //check_mem_alloc($1);
 									check_matrix_arguments($1, $3, $5);
 									//controllo sia stata allocata memoria per la matrice
 									check_mem_alloc($1);
-									//ritorno un oggetto di tipo value con tipo settato al 
+									//ritorno un oggetto di tipo value con tipo settato al
 									//tipo dei parametri della matrice
 									value* temp = (value*)malloc(sizeof(value));
 									temp->val = (int*)malloc(sizeof(int));
 									//recupero il sym_rec del tipo della matrice
 									sym_rec* temp_rec = (sym_rec*) get_sym_rec($1->type);
-									temp->type = strdup(temp_rec->param_type); 
+									temp->type = strdup(temp_rec->param_type);
 									$$ = temp;
 								}
 	| postfix_expression OP exprlist CP {
@@ -370,7 +370,7 @@ postfix_expression : primary_expression { //check_mem_alloc($1);
 					      }
 	;
 
-exprlist : 
+exprlist :
 	/* empty rule */ { $$ = 0; }
 	| exprlist_temp expression {
 					//aggiungo a $2 il valore di $1 come next
@@ -379,7 +379,7 @@ exprlist :
 					$$ = $2;
 				   }
 	;
-exprlist_temp : 
+exprlist_temp :
 	/* empty */ { $$ = 0; }
 	| exprlist_temp expression COMMA {
 					$2->next = $1;
@@ -395,14 +395,14 @@ primary_expression : IDENTIFIER { //controllo se sia stato dichiarato l'identifi
 				}
 				else {
 					printf("Record %s trovato\n", $1);
-					//creo il value 
+					//creo il value
 					value* temp = (value*) malloc(sizeof(value));
 					//recupero il tipo dalla dichiarazione
 					temp->type = strdup(rec->type);
 					//overhead dovuto alla scarsa capacita' progettuale....
 					temp->custom_type = strdup(rec->type);
 					//recuper il nome
-					temp->name = strdup(rec->text); 
+					temp->name = strdup(rec->text);
 					//recuper il valore
 					temp->val = rec->val;
 					//ritorno il valore
@@ -425,9 +425,9 @@ constant : INTEGER_CONSTANT { value* temp = (value*) malloc(sizeof(value)); temp
 	;
 
 
-varlistdecl : 
+varlistdecl :
 	/* empty */
-	| varlistdecl vardecl 
+	| varlistdecl vardecl
 	;
 
 vardecl : NEWVARS type varlist var  SEMI_COLON  {
@@ -450,7 +450,7 @@ vardecl : NEWVARS type varlist var  SEMI_COLON  {
 								insert_sym_rec(symbol);
 								printf("Inserisco simbolo %s di tipo %s\n", symbol->text, symbol->type);
 							}
-	
+
 						}
 						//inserico val
 						symbol = (sym_rec*) malloc(sizeof(sym_rec));
@@ -458,7 +458,7 @@ vardecl : NEWVARS type varlist var  SEMI_COLON  {
 						symbol->type = strdup($2);
 						symbol->memoryAllocated = alloc;
 						initialize_value(symbol);
-						insert_sym_rec(symbol);	
+						insert_sym_rec(symbol);
 						printf("Inserisco simbolo %s di tipo %s\n", symbol->text, symbol->type);
 						}
 	;
@@ -482,7 +482,7 @@ varlist :
 
 deffunclist :
 	/* empty */
-	| deffunclist deffunc 
+	| deffunclist deffunc
 	;
 
 deffunc : FUNC IDENTIFIER OP params CP COLON type block { //inserisco nella symbol table il simbolo corrispondente alla funzione
@@ -490,6 +490,11 @@ deffunc : FUNC IDENTIFIER OP params CP COLON type block { //inserisco nella symb
 							//inserisco nome della funzione
 							func->text = strdup($2);
 							//inserisco il tipo di ritorno della funzione
+							//controllo che il tipo sia esistente
+							if(!is_base_type($7) && strcmp($7, "null") != 0) {
+								//controllo che esista un record corrispondente al tipo custom
+								get_sym_rec($7);
+							}
 							func->type = strdup($7);
 							//inserisco i parametri
 							func->par_list = $4;
@@ -498,13 +503,18 @@ deffunc : FUNC IDENTIFIER OP params CP COLON type block { //inserisco nella symb
 							printf("Inserito simbolo per la funzione %s\n", func->text);
 							}
 
-							
+
 	;
 
 main : FUNC_EXEC OP params CP COLON type block  { //inserisco nella symbol table il simbolo corrispondente alla funzione
 							sym_rec *func = (sym_rec*) malloc(sizeof(sym_rec));
 							//inserisco nome della funzione
 							func->text = "exec";
+							//controllo che il tipo di ritorno di exec sia null o integer
+							if(strcmp($6, "integer") != 0 && strcmp($6, "null") != 0) {
+								printf("Tipo di ritorno per la funzione exec non valido\n");
+								exit(1);
+							}
 							//inserisco il tipo di ritorno della funzione
 							func->type = strdup($6);
 							//inserisco i parametri
@@ -523,7 +533,7 @@ main : FUNC_EXEC OP params CP COLON type block  { //inserisco nella symbol table
 
 	;
 
-params : 
+params :
 	/* empty */ { $$ = 0; }
 	| parlist param {
 			$2->next = $1;
@@ -533,12 +543,12 @@ params :
 			}
 	;
 
-parlist : 
+parlist :
 	/* empty */ { $$ = 0; }
 	| parlist param COMMA {//provo cosi. salvo il valore di ritorno di parlist come next element di param
 				$2->next = $1;
 				//ritorno la lista completa
-				$$ = $2; 
+				$$ = $2;
 				}
 	;
 
@@ -561,15 +571,15 @@ param : type IDENTIFIER {//prova di aggiunta di simbolo
 			}
 	;
 
-block : BEG body END 
+block : BEG body END
 	;
 
-body : declist varlistdecl stmts 
+body : declist varlistdecl stmts
 	;
 
-stmts : 
+stmts :
 	/* empty */
-	| stmts stmt 
+	| stmts stmt
 	;
 
 stmt :	assignment_statement
@@ -586,11 +596,11 @@ jump_statement : RETURN jump_temp SEMI_COLON
 jump_temp :
 	/* empty */
 	| expression
-	;	
+	;
 
 
 selection_statement : IF OP expression CP BEG stmts END
-	| IF OP expression CP BEG stmts END ELSE BEG stmts END 
+	| IF OP expression CP BEG stmts END ELSE BEG stmts END
 	;
 
 iteration_statement : LOOP OP expression CP BEG stmts END
@@ -622,7 +632,7 @@ object_statement : FREE OP IDENTIFIER CP SEMI_COLON {
 
 overloads :
 	/*empty */
-	| overloads overload 
+	| overloads overload
 	;
 
 overload : OVERLOAD OP overloadable_operands COMMA IDENTIFIER CP BEG stmts END  {
@@ -647,7 +657,7 @@ overloadable_operands : PLUS
 	| EQUAL
 	| NOTEQUAL
 	;
- 
+
 
 
 %%
@@ -662,14 +672,14 @@ main(int argc, char* argv[]) {
 	//variabile corrispondente al buffer del lexer
 	extern FILE* yyin;
 	//inizializzo la symbol table
-	extern sym_table* top ; 
+	extern sym_table* top ;
 	top = (sym_table*) malloc(sizeof(sym_table));
         if(argc == 2) {
                 f = fopen(argv[1], "r");
                 yyin = f;
         }
         yyparse();
-	//DEBUG, STAMPO TUTTI I SIMBOLI PRESENTI NELLA SYMBOL TABLE 
+	//DEBUG, STAMPO TUTTI I SIMBOLI PRESENTI NELLA SYMBOL TABLE
 	sym_table* table;
 	sym_rec* rec;
 	for(table = top; table != 0; table = table->next) {
@@ -681,4 +691,3 @@ main(int argc, char* argv[]) {
 		}
 	}
 }
-
