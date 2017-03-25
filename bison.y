@@ -307,7 +307,29 @@ unary_expression : postfix_expression {
 	| unary_operator cast_expression { change_sign($2); $$ = $2; }
 	;
 
-postfix_expression : primary_expression { //check_mem_alloc($1);
+postfix_expression : primary_expression {
+ 					//controllo se sia stato dichiarato l'identificatore
+					sym_rec* rec = get_sym_rec($1);
+					if(rec == 0 ) {
+						printf("Identificarore %s non trovato\n", $1);
+						exit(1);
+					}
+					else {
+							printf("Record %s trovato\n", $1);
+							//creo il value
+							value* temp = (value*) malloc(sizeof(value));
+							//recupero il tipo dalla dichiarazione
+							temp->type = strdup(rec->type);
+							//overhead dovuto alla scarsa capacita' progettuale....
+							temp->custom_type = strdup(rec->type);
+							//recuper il nome
+							temp->name = strdup(rec->text);
+							//recuper il valore
+							temp->val = rec->val;
+							//ritorno il valore
+							$$ = temp;
+						}
+
 					  $$ = $1;
 					 }
 	| postfix_expression OSP expression CSP {
@@ -351,6 +373,27 @@ postfix_expression : primary_expression { //check_mem_alloc($1);
 									$$ = temp;
 								}
 	| postfix_expression OP exprlist CP {
+					//controllo se sia stato dichiarato l'identificatore
+					sym_rec* rec = get_sym_rec($1);
+					if(rec == 0 ) {
+						printf("Identificarore %s non trovato\n", $1);
+						exit(1);
+					}
+					else {
+						printf("Record %s trovato\n", $1);
+						//creo il value
+						value* temp = (value*) malloc(sizeof(value));
+						//recupero il tipo dalla dichiarazione
+						temp->type = strdup(rec->type);
+						//overhead dovuto alla scarsa capacita' progettuale....
+						temp->custom_type = strdup(rec->type);
+						//recuper il nome
+						temp->name = strdup(rec->text);
+						//recuper il valore
+						temp->val = rec->val;
+						//ritorno il valore
+						$$ = temp;
+						}
 						//debbo controllare che i parametri inseriti corrispondano a quelli dichiarati nella func
 						//richiamo una routine che prende in input il nome della funzione e la lista di argomenti
 						check_function_arguments($1, $3);

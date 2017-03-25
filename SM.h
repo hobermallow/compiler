@@ -1,5 +1,5 @@
 #define INVERT_PARAM_LIST(root)  { param *x, *z, *y; y = root;  while(root != 0) { z = root->next; root->next = x; x = root; root = z; }y->next= 0; root = x;}
-	
+
 //struttura per la gestione di parametri (di funzione, di array, di matrici )
 typedef struct param param;
 
@@ -9,7 +9,15 @@ struct param {
 	char* type;
 	void* val;
 } ;
-//struttura per la gestione di un nuovo tipo 
+
+//struttura per la gestione della definizione di funzioni mututamente ricorsive
+typedef struct func func;
+
+struct func {
+	char* name;
+	struct func* next;
+}
+//struttura per la gestione di un nuovo tipo
 typedef struct new_type new_type;
 
 struct new_type {
@@ -58,6 +66,10 @@ struct sym_table {
 
 //variabile globale contenente il riferimento alla symbol_table
 sym_table* top;
+//variabile globale per lista funzioni utilizzate all'interno di definizioni di funzioni
+func* func_list;
+//variabile per escludere dal normale controllo sugli identificatori di funzione la sezione deditcata alla definizioni di funzioni
+int functionDefinitions = 1;
 
 //funzione per lo swicht dell'environment ( scoping a blocchi del C)
 void change_environment() {
@@ -87,11 +99,11 @@ sym_rec* get_sym_rec(char* name) {
 			printf("Sto analizzando record %s\n", record->text);
 			printf("Cerco l'identificatore %s\n", name);
 			if(strcmp(record->text, name)== 0) {
-				return record;	
+				return record;
 			}
 		}
 	}
-	
+
 	return 0;
 }
 
@@ -107,7 +119,7 @@ void check_type(value* val_1, value* val_2) {
 
 //confronto fra due valori , da utilizzare dopo funzione precedente
 int check_equal(value* val_1, value* val_2) {
-	
+
 	if(strcmp(val_1->type, "integer") == 0 ) {
 		return *((int*)(val_1->val)) == *((int*)(val_2->val));
 	}
@@ -123,7 +135,7 @@ int check_equal(value* val_1, value* val_2) {
 	if(strcmp(val_1->type, "char") == 0 ) {
 		return strcmp(val_1->val, val_2->val) == 0;
 	}
-	
+
 	if(strcmp(val_1->type, "boolean") == 0) {
 		return *((int*)(val_1->val)) == *((int*)(val_2->val));
 	}
@@ -180,7 +192,7 @@ void mul_base_type(int op, value* val_1, value* val_2, value* temp) {
 }
 
 void exp_base_type(value* val_1, value* temp) {
-	
+
 	if(strcmp("integer", val_1->type) == 0 ) {
 		if(*((int*)(val_1->val)) == 0) {
 			*((int*)(temp->val)) =  1;
@@ -194,7 +206,7 @@ void exp_base_type(value* val_1, value* temp) {
 			*((int*)(temp->val)) = t;
 		}
 	}
-			
+
 }
 
 void initialize_value(sym_rec* rec) {
@@ -206,20 +218,20 @@ void initialize_value(sym_rec* rec) {
 		rec->val = (double*) malloc(sizeof(double));
 		*((double*)(rec->val)) = 0;
 	}
-	
+
 	if(strcmp("char", rec->type) == 0) {
-		rec->val = strdup(""); 
+		rec->val = strdup("");
 	}
 
 	if(strcmp("string", rec->type) == 0) {
-		rec->val = strdup(""); 
+		rec->val = strdup("");
 	}
 	if(strcmp("boolean", rec->type) == 0) {
 		rec->val = (int*) malloc(sizeof(int));
 		*((int*)(rec->val)) = 0;
 	}
 }
-	
+
 void check_is_integer(value* val) {
 	if(strcmp("integer", val->type) != 0) {
 		printf("Errore nel cast esplicito\n");
@@ -273,7 +285,7 @@ void check_function_arguments(value* func, value* args) {
 	if(temp_val != 0) {
 		printf("Numero argomenti inseriti maggiore di quelli richiesti dalla funzione\n");
 		exit(1);
-	}		
+	}
 }
 void copy_val_in_param(param* dst, value* src) {
 	if(strcmp(src->type, "integer") == 0) {
@@ -308,7 +320,7 @@ void check_matrix_arguments(value* id, value* val_1, value* val_2) {
 	if(*((int*)(val_1->val)) >=  *((int*)(rec->current_param->val))) {
 		printf("Indice oltre la matrice\n");
 		exit(1);
-	} 
+	}
 	//sposto il current_param
 	rec->current_param = rec->current_param->next;
 	//controllo il secondo parametro
@@ -321,7 +333,7 @@ void check_matrix_arguments(value* id, value* val_1, value* val_2) {
 void reset_current_param(value* val) {
 	//trovo il sym_rec
 	sym_rec* rec = get_sym_rec(val->type);
-	if(rec != 0) 
+	if(rec != 0)
 		rec->current_param = rec->par_list;
 }
 
@@ -351,7 +363,7 @@ void check_record_arguments(value* record, char* field) {
 	//se arrivo a questo punto, vuol dire che non ho trovato il record
 	exit(1);
 }
-			  
+
 void check_mem_alloc(value* val) {
 	//recupero il record corrispondente alla variabile
 	sym_rec* rec = get_sym_rec(val->name);
@@ -412,7 +424,7 @@ void check_type_definitions() {
 					exit(1);
 				}
 			}
-						
+
 		}
 	}
 }
@@ -420,7 +432,7 @@ void check_type_definitions() {
 //funzione per recuperare il field di un record
 value* get_record_field(value* record, char* field) {
 	//recupero il record corrispondente al record
-	sym_rec* rec = (sym_rec*) get_sym_rec(record->type);	
+	sym_rec* rec = (sym_rec*) get_sym_rec(record->type);
 	//cerco il field specifico
 	param* ret;
 	for(ret = rec->par_list; ret != 0; ret = ret->next) {
@@ -464,8 +476,8 @@ int check_recursive_definitions() {
 				}
 			}
 		}
-	
-			
+
+
 	}
 	printf("ritorno dalla funzione check_recursive_definitions\n");
 	return 1;
