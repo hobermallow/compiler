@@ -40,7 +40,12 @@ extern func* func_list;
 func[ ]+exec {if(check_recursive_definitions()== 1) {change_environment(); printf("Nuovo environment\n"); return FUNC_EXEC; } else { printf("Errore nelle definizioni ricorsive\n"); exit(1); }}
 ":" { return COLON; }
 "begin" {return BEG; }
-"end" {pop_environment();printf("Pop environment\n"); return END; }
+"end" {	
+	//se sono all'interno della definizione di una funzione, debbo controllare le dichiarazioni degli identificatori di variabile utilizzati
+	pop_environment();
+	printf("Pop environment\n");
+	return END; 
+	}
 "return" {return RETURN; }
 "{" {return OGP; }
 "}" {return CGP; }

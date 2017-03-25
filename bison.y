@@ -375,33 +375,42 @@ postfix_expression : primary_expression {
 									$$ = temp;
 								}
 	| postfix_expression OP exprlist CP {
-					//controllo se sia stato dichiarato l'identificatore
-					sym_rec* rec = get_sym_rec($1);
-					if(rec == 0 ) {
-						printf("Identificarore %s non trovato\n", $1);
-						exit(1);
+						//se sono in una sezione normale
+						if(functionDefinitions == 0) {
+							//controllo se sia stato dichiarato l'identificatore
+							sym_rec* rec = get_sym_rec($1);
+							printf("Record %s trovato\n", $1);
+							//creo il value
+							value* temp = (value*) malloc(sizeof(value));
+							//recupero il tipo dalla dichiarazione
+							temp->type = strdup(rec->type);
+							//overhead dovuto alla scarsa capacita' progettuale....
+							temp->custom_type = strdup(rec->type);
+							//recuper il nome
+							temp->name = strdup(rec->text);
+							//recuper il valore
+							temp->val = rec->val;
+							//ritorno il valore
+							$$ = temp;
+							//debbo controllare che i parametri inseriti corrispondano a quelli dichiarati nella func
+							//richiamo una routine che prende in input il nome della funzione e la lista di argomenti
+							check_function_arguments($1, $3);
+							//ritorno il value corrispondente alla funzione, che cosi ho il tipo
+							$$ = $1;
+						}
+						//altrimenti, salvo la funzione all'interno dell'apposita lista globale
+						else {
+							//creo elemento da aggiungere alla lista
+							func* temp = (func*) malloc(sizeof(func));
+							//recupero il nome della funzione utilizzata
+							temp->name = strdup($1->name);
+							//salvo la lista dei parametri utilizzati dalla funzione
+							temp->param_list = $3;
+							//aggiungo l'elemento in cima alla propria lista
+							temp->next = func_list;
+							func_list = temp;
+						}
 					}
-					else {
-						printf("Record %s trovato\n", $1);
-						//creo il value
-						value* temp = (value*) malloc(sizeof(value));
-						//recupero il tipo dalla dichiarazione
-						temp->type = strdup(rec->type);
-						//overhead dovuto alla scarsa capacita' progettuale....
-						temp->custom_type = strdup(rec->type);
-						//recuper il nome
-						temp->name = strdup(rec->text);
-						//recuper il valore
-						temp->val = rec->val;
-						//ritorno il valore
-						$$ = temp;
-						}
-						//debbo controllare che i parametri inseriti corrispondano a quelli dichiarati nella func
-						//richiamo una routine che prende in input il nome della funzione e la lista di argomenti
-						check_function_arguments($1, $3);
-						//ritorno il value corrispondente alla funzione, che cosi ho il tipo
-						$$ = $1;
-						}
 	| postfix_expression ARROW IDENTIFIER {
 						//debbo controllare che l'identificatore esista per quel tipo di record
 						check_record_arguments($1, $3);
@@ -432,27 +441,41 @@ exprlist_temp :
 				}
 	;
 
-primary_expression : IDENTIFIER { //controllo se sia stato dichiarato l'identificatore
-				sym_rec* rec = get_sym_rec($1);
-				if(rec == 0 ) {
-					printf("Identificarore %s non trovato\n", $1);
-					exit(1);
-				}
-				else {
-					printf("Record %s trovato\n", $1);
-					//creo il value
-					value* temp = (value*) malloc(sizeof(value));
-					//recupero il tipo dalla dichiarazione
-					temp->type = strdup(rec->type);
-					//overhead dovuto alla scarsa capacita' progettuale....
-					temp->custom_type = strdup(rec->type);
-					//recuper il nome
-					temp->name = strdup(rec->text);
-					//recuper il valore
-					temp->val = rec->val;
-					//ritorno il valore
-					$$ = temp;
-				}
+primary_expression : IDENTIFIER { 
+					//se non sono all'interno della definizione di una funzione
+					if(functionDefinitions == 0) {
+						//controllo se sia stato dichiarato l'identificatore
+						sym_rec* rec = get_sym_rec($1);
+						if(rec == 0 ) {
+							printf("Identificarore %s non trovato\n", $1);
+							exit(1);
+						}
+						else {
+							printf("Record %s trovato\n", $1);
+							//creo il value
+							value* temp = (value*) malloc(sizeof(value));
+							//recupero il tipo dalla dichiarazione
+							temp->type = strdup(rec->type);
+							//overhead dovuto alla scarsa capacita' progettuale....
+							temp->custom_type = strdup(rec->type);
+							//recuper il nome
+							temp->name = strdup(rec->text);
+							//recuper il valore
+							temp->val = rec->val;
+							//ritorno il valore
+							$$ = temp;
+						}
+					}
+					//altrimenti , non effettuo i normali controlli semantici
+					else {
+						//salvo l'identificatore trovato nella lista globale degli identificatori
+						func* temp = malloc(sizeof(func));
+						temp->name = strdup($1);
+						//salvo l'elemento in cima alla lista 
+						temp->next = identifier_list;
+						identifier_list = temp;
+					}
+				
 				}
 	| constant { $$ = $1; }
 	| STRING { //creo la stringa
@@ -724,9 +747,11 @@ main(int argc, char* argv[]) {
 	//inizializzo la lista delle definizioni di funzione
 	extern func* func_list;
 	func_list = (func*) malloc(sizeof(func));
+	func_list->next = 0;
 	//inizializzo la lista degli identificatori utilizzati all'interno delle definizioni di funzione
 	extern func* identifier_list;
 	identifier_list = (func*) malloc(sizeof(func));
+	identifier_list->next = 0;
 	top = (sym_table*) malloc(sizeof(sym_table));
         if(argc == 2) {
                 f = fopen(argv[1], "r");

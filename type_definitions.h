@@ -15,6 +15,7 @@ typedef struct func func;
 
 struct func {
         char* name;
+	value* param_list;
         struct func* next;
 };
 //struttura per la gestione di un nuovo tipo
