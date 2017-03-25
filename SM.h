@@ -461,31 +461,47 @@ void check_param_list_base_type(param* list) {
 void check_function_definition_identifiers() {
 	//itero sulla lista degli identificatori
 	func* temp;
-	for(temp = identifier_list; temp->next != 0; temp = temp->next) {
-		//recuper il nome e controllo che non sia un nome di funzione
-		if(find_function_definition(temp->name) == 0) {
-			//non e' una funzione, dunque cerco il record corrispondente nella symbol table
-			//se non viene trovato, la funzione get_sym_rec interrompe l'esecuzione
-			get_sym_rec(temp->name);
-		}	
+	temp = identifier_list;
+	//se la lista non e' vuota
+	if((int)(temp) != 0) {
+		printf("prima del do while\n");
+		do  {
+			//recuper il nome e controllo che non sia un nome di funzione
+			if(find_function_definition(temp->name) == 0) {
+				//non e' una funzione, dunque cerco il record corrispondente nella symbol table
+				//se non viene trovato, la funzione get_sym_rec interrompe l'esecuzione
+				sym_rec* rec = get_sym_rec(temp->name);
+				if((int)(rec) == 0) {
+					printf("Identificatore %s non dichiarato\n", temp->name);
+					exit(1);
+				}
+			}		
+			temp = temp->next;
+		}
+		while((int)(temp->next) != 0);
 	}
 	//merge delle liste degli utilizzi di funzione
+	printf("prima del merge\n");
 	merge_function_list();
+	printf("dopo merge\n");
 	//debbo reinizializzare la lista degli identificatori e quella temporanea delle funzioni
-	identifier_list = malloc(sizeof(func));
-	identifier_list->next = 0;
-	func_list = malloc(sizeof(func));
-	func_list->next = 0;
+	identifier_list = 0;
+	func_list = 0;
 }
 
 int find_function_definition(char* name) {
 	//itero sulla lista delle funzioni utilizzate  nelle dichiarazioni di funzione
 	func* temp;
-	for(temp = func_list; temp->next != 0; temp = temp->next) {
-		//verifico che il nome della funzione sia lo stesso di quello passato come argomento
-		if(strcmp(name, temp->name) == 0) {
-			return 1;
+	temp = func_list;
+	if((int)(temp) != 0) {
+		do {
+			//verifico che il nome della funzione sia lo stesso di quello passato come argomento
+			if(strcmp(name, temp->name) == 0) {
+				return 1;
+			}
+			temp = temp->next; 
 		}
+		while((int)(temp->next) != 0);
 	}
 	//se non trovo nulla, ritorno 0
 	return 0;
@@ -495,9 +511,15 @@ void merge_function_list() {
 	//debbo aggiunger func_list in fondo a func_list_total
 	//recupero l'ultimo elemento di func_list_global
 	func* temp;
-	while(temp->next != 0) {
-		temp = temp->next;
+	temp = func_list_total;
+	if((int)(temp) != 0) {
+		do {
+			temp = temp->next;
+		}
+		while((int)(temp->next) != 0);
 	}
 	//aggiungo func_list come elemento successivo di temp
-	temp->next = func_list;
+	if((int)(func_list) != 0) {
+		temp->next = func_list;
+	}
 }

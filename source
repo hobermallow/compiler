@@ -4,6 +4,8 @@ newtype miorecord record(miamatrice int, floating float);
 
 func stocazz(integer a, floating b): miamatrice
 begin
+	newvars integer a;
+	a = 2;
 end
 
 func daje(): null

@@ -37,7 +37,7 @@ extern func* func_list;
 "#" {return EXP; }
 "/" { return DIV; }
 "func" { functionDefinitions = 1; change_environment();printf("Nuovo environment\n"); return FUNC; }
-func[ ]+exec {if(check_recursive_definitions()== 1) {change_environment(); printf("Nuovo environment\n"); return FUNC_EXEC; } else { printf("Errore nelle definizioni ricorsive\n"); exit(1); }}
+func[ ]+exec {change_environment(); printf("Nuovo environment\n"); return FUNC_EXEC; }
 ":" { return COLON; }
 "begin" {return BEG; }
 "end" {	
