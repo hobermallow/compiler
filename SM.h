@@ -9,7 +9,7 @@ sym_table* top;
 //variabile globale per lista funzioni utilizzate all'interno di definizioni di funzioni
 func* func_list;
 //variabile per escludere dal normale controllo sugli identificatori di funzione la sezione deditcata alla definizioni di funzioni
-int functionDefinitions = 1;
+int functionDefinitions = 0;
 
 //funzione per lo swicht dell'environment ( scoping a blocchi del C)
 void change_environment() {

@@ -3,6 +3,8 @@
 	#include <stdlib.h>
 	#include "SM.h"
 	#include <string.h>
+	extern int functionDefinitions;
+	extern func* func_list;
 
 %}
 %union {
@@ -544,6 +546,9 @@ deffunc : FUNC IDENTIFIER OP params CP COLON type block { //inserisco nella symb
 							//inserisco il simbolo appena creato nella symbol table
 							insert_sym_rec(func);
 							printf("Inserito simbolo per la funzione %s\n", func->text);
+							//reimposto il flag per la sezione di normale parsing
+							//all'ultima definizione di funzione rimarra' 0
+							functionDefinitions = 0;
 							}
 
 
