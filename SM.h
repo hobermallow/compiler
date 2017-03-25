@@ -466,8 +466,10 @@ void check_function_definition_identifiers() {
 	if((int)(temp) != 0) {
 		printf("prima del do while\n");
 		do  {
+			printf("nome dell'identifier %s\n", temp->name);
 			//recuper il nome e controllo che non sia un nome di funzione
 			if(find_function_definition(temp->name) == 0) {
+				printf("dopo la find\n");
 				//non e' una funzione, dunque cerco il record corrispondente nella symbol table
 				//se non viene trovato, la funzione get_sym_rec interrompe l'esecuzione
 				sym_rec* rec = get_sym_rec(temp->name);
@@ -478,7 +480,7 @@ void check_function_definition_identifiers() {
 			}		
 			temp = temp->next;
 		}
-		while((int)(temp->next) != 0);
+		while((int)(temp) != 0);
 	}
 	//merge delle liste degli utilizzi di funzione
 	printf("prima del merge\n");
@@ -495,13 +497,14 @@ int find_function_definition(char* name) {
 	temp = func_list;
 	if((int)(temp) != 0) {
 		do {
+			printf("nome dell'identifier che confronto %s\n", temp->name);
 			//verifico che il nome della funzione sia lo stesso di quello passato come argomento
 			if(strcmp(name, temp->name) == 0) {
 				return 1;
 			}
 			temp = temp->next; 
 		}
-		while((int)(temp->next) != 0);
+		while((int)(temp) != 0);
 	}
 	//se non trovo nulla, ritorno 0
 	return 0;
@@ -512,14 +515,22 @@ void merge_function_list() {
 	//recupero l'ultimo elemento di func_list_global
 	func* temp;
 	temp = func_list_total;
-	if((int)(temp) != 0) {
-		do {
+		if((int)(temp) != 0) {
+		while ((int)(temp->next) != 0) {
+
 			temp = temp->next;
 		}
-		while((int)(temp->next) != 0);
 	}
+	printf("arrivato all'ultimo elemento della func_list_total\n");
 	//aggiungo func_list come elemento successivo di temp
 	if((int)(func_list) != 0) {
-		temp->next = func_list;
+		if((int)(temp) != 0) {
+			printf("merge con lista esistente \n");
+			temp->next = func_list;
+		}
+		else {
+			printf("merge con lista nuova\n");
+			func_list_total = func_list;
+		}
 	}
 }

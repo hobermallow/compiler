@@ -616,10 +616,14 @@ deffunclist_check : deffunclist {
 					if((int)(temp) != 0) {
 						do  {
 							//cerco il record nella symbol table corrispondente alla funzione utilizzata
-							get_sym_rec(temp->name);
+							sym_rec* rec = get_sym_rec(temp->name);
+							if((int)(rec) == 0) {
+								printf("Funzione %s non trovato\n", temp->name);
+								exit(1);
+							}
 							temp = temp->next;
 						}
-						while((int)(temp->next) != 0);
+						while((int)(temp) != 0);
 	
 					}
 				}

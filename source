@@ -6,6 +6,7 @@ func stocazz(integer a, floating b): miamatrice
 begin
 	newvars integer a;
 	a = 2;
+	dajeeeee();
 end
 
 func daje(): null
