@@ -1,5 +1,9 @@
 %{
 #include "bison.tab.h"	
+#include "type_definitions.h"
+//dichiaro le variabili globali per la gesstione delle definizioni di funzione
+extern int functionDefinitions;
+extern func* func_list;
 
 %}
 
