@@ -721,6 +721,12 @@ main(int argc, char* argv[]) {
 	extern FILE* yyin;
 	//inizializzo la symbol table
 	extern sym_table* top ;
+	//inizializzo la lista delle definizioni di funzione
+	extern func* func_list;
+	func_list = (func*) malloc(sizeof(func));
+	//inizializzo la lista degli identificatori utilizzati all'interno delle definizioni di funzione
+	extern func* identifier_list;
+	identifier_list = (func*) malloc(sizeof(func));
 	top = (sym_table*) malloc(sizeof(sym_table));
         if(argc == 2) {
                 f = fopen(argv[1], "r");

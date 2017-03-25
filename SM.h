@@ -8,6 +8,8 @@
 sym_table* top;
 //variabile globale per lista funzioni utilizzate all'interno di definizioni di funzioni
 func* func_list;
+//variabile globalle per la lista di identificatori utilizzati all'interno delle definizioni di funzione
+func* identifier_list;
 //variabile per escludere dal normale controllo sugli identificatori di funzione la sezione deditcata alla definizioni di funzioni
 int functionDefinitions = 0;
 
