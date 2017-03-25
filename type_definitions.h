@@ -10,14 +10,7 @@ struct param {
         void* val;
 } ;
 
-//struttura per la gestione della definizione di funzioni mututamente ricorsive
-typedef struct func func;
 
-struct func {
-        char* name;
-	value* param_list;
-        struct func* next;
-};
 //struttura per la gestione di un nuovo tipo
 typedef struct new_type new_type;
 
@@ -35,6 +28,16 @@ struct value {
         void* val;
         value* next;
 };
+
+//struttura per la gestione della definizione di funzioni mututamente ricorsive
+typedef struct func func;
+
+struct func {
+        char* name;
+	value* param_list;
+        struct func* next;
+};
+
 //record della symbol table
 typedef struct sym_rec sym_rec;
 

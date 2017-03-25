@@ -5,6 +5,7 @@
 	#include <string.h>
 	extern int functionDefinitions;
 	extern func* func_list;
+	extern func* func_list_total;
 
 %}
 %union {
@@ -80,7 +81,7 @@
 %%
 
 /* grammar starting symbol */
-S : declist deffunclist overloads varlistdecl main EOF_TOKEN  	{ printf("parsato !\n"); return 0; }
+S : declist deffunclist_check overloads varlistdecl main EOF_TOKEN  	{ printf("parsato !\n"); return 0; }
 	;
 declist :
 	/*empty */
@@ -311,28 +312,7 @@ unary_expression : postfix_expression {
 
 postfix_expression : primary_expression {
  					//controllo se sia stato dichiarato l'identificatore
-					sym_rec* rec = get_sym_rec($1);
-					if(rec == 0 ) {
-						printf("Identificarore %s non trovato\n", $1);
-						exit(1);
-					}
-					else {
-							printf("Record %s trovato\n", $1);
-							//creo il value
-							value* temp = (value*) malloc(sizeof(value));
-							//recupero il tipo dalla dichiarazione
-							temp->type = strdup(rec->type);
-							//overhead dovuto alla scarsa capacita' progettuale....
-							temp->custom_type = strdup(rec->type);
-							//recuper il nome
-							temp->name = strdup(rec->text);
-							//recuper il valore
-							temp->val = rec->val;
-							//ritorno il valore
-							$$ = temp;
-						}
-
-					  $$ = $1;
+					 $$ = $1;
 					 }
 	| postfix_expression OSP expression CSP {
 						//debbo controllare che l'espressione inserita sia compatibile con le espressioni inserite
@@ -474,6 +454,11 @@ primary_expression : IDENTIFIER {
 						//salvo l'elemento in cima alla lista 
 						temp->next = identifier_list;
 						identifier_list = temp;
+						//creo l'elemento da ritornare come primary_expression
+						//salvo solamente il nome
+						value* val = malloc(sizeof(value));
+						val->name= strdup($1);	
+						$$ = val;
 					}
 				
 				}
@@ -546,6 +531,15 @@ varlist :
 				$2->next = $1;
 				$$ = $2;
 			    }
+	;
+deffunclist_check : deffunclist {
+					//controllo alla fine delle dichiarazioni di tutte le funzioni , controllo che siano state tutte dichiarate
+					func* temp;
+					for(temp = func_list_total; temp->next != 0; temp = temp->next) {
+						//cerco il record nella symbol table corrispondente alla funzione utilizzata
+						get_sym_rec(temp->name);
+					}
+				}
 	;
 
 deffunclist :
@@ -748,6 +742,9 @@ main(int argc, char* argv[]) {
 	extern func* func_list;
 	func_list = (func*) malloc(sizeof(func));
 	func_list->next = 0;
+	extern func* func_list_global;
+	func_list_total = malloc(sizeof(func));
+	func_list_total->next = 0;
 	//inizializzo la lista degli identificatori utilizzati all'interno delle definizioni di funzione
 	extern func* identifier_list;
 	identifier_list = (func*) malloc(sizeof(func));

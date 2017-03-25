@@ -6,8 +6,10 @@
 
 //variabile globale contenente il riferimento alla symbol_table
 sym_table* top;
-//variabile globale per lista funzioni utilizzate all'interno di definizioni di funzioni
+//variabile globale per lista temporanea delle funzioni utilizzate all'interno della definizione di ciascuna funzione
 func* func_list;
+//variabile globale che tiene conto di tutte le funzioni utilizzate all'interno delle definizioni di funzione
+func* func_list_total;
 //variabile globalle per la lista di identificatori utilizzati all'interno delle definizioni di funzione
 func* identifier_list;
 //variabile per escludere dal normale controllo sugli identificatori di funzione la sezione deditcata alla definizioni di funzioni
@@ -452,4 +454,50 @@ void check_param_list_base_type(param* list) {
 			}
 		}
 	}
+}
+
+//funzione per controllare che tutti gli identificatori non di funzione utilizzati all'interno
+//di una definizione di funzione siano stati dichiarati
+void check_function_definition_identifiers() {
+	//itero sulla lista degli identificatori
+	func* temp;
+	for(temp = identifier_list; temp->next != 0; temp = temp->next) {
+		//recuper il nome e controllo che non sia un nome di funzione
+		if(find_function_definition(temp->name) == 0) {
+			//non e' una funzione, dunque cerco il record corrispondente nella symbol table
+			//se non viene trovato, la funzione get_sym_rec interrompe l'esecuzione
+			get_sym_rec(temp->name);
+		}	
+	}
+	//merge delle liste degli utilizzi di funzione
+	merge_function_list();
+	//debbo reinizializzare la lista degli identificatori e quella temporanea delle funzioni
+	identifier_list = malloc(sizeof(func));
+	identifier_list->next = 0;
+	func_list = malloc(sizeof(func));
+	func_list->next = 0;
+}
+
+int find_function_definition(char* name) {
+	//itero sulla lista delle funzioni utilizzate  nelle dichiarazioni di funzione
+	func* temp;
+	for(temp = func_list; temp->next != 0; temp = temp->next) {
+		//verifico che il nome della funzione sia lo stesso di quello passato come argomento
+		if(strcmp(name, temp->name) == 0) {
+			return 1;
+		}
+	}
+	//se non trovo nulla, ritorno 0
+	return 0;
+}	
+
+void merge_function_list() {
+	//debbo aggiunger func_list in fondo a func_list_total
+	//recupero l'ultimo elemento di func_list_global
+	func* temp;
+	while(temp->next != 0) {
+		temp = temp->next;
+	}
+	//aggiungo func_list come elemento successivo di temp
+	temp->next = func_list;
 }

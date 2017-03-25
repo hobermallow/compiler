@@ -42,6 +42,11 @@ func[ ]+exec {if(check_recursive_definitions()== 1) {change_environment(); print
 "begin" {return BEG; }
 "end" {	
 	//se sono all'interno della definizione di una funzione, debbo controllare le dichiarazioni degli identificatori di variabile utilizzati
+	if(functionDefinitions == 1) {
+		//controllo che, per tutti gli identificatori utilizzati che non siano identificatori di funzione
+		//sia presente un record nella symbol table
+		check_function_definition_identifiers();
+	}
 	pop_environment();
 	printf("Pop environment\n");
 	return END; 
