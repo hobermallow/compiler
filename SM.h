@@ -477,7 +477,7 @@ void check_function_definition_identifiers() {
 					printf("Identificatore %s non dichiarato\n", temp->name);
 					exit(1);
 				}
-			}		
+			}
 			temp = temp->next;
 		}
 		while((int)(temp) != 0);
@@ -502,13 +502,13 @@ int find_function_definition(char* name) {
 			if(strcmp(name, temp->name) == 0) {
 				return 1;
 			}
-			temp = temp->next; 
+			temp = temp->next;
 		}
 		while((int)(temp) != 0);
 	}
 	//se non trovo nulla, ritorno 0
 	return 0;
-}	
+}
 
 void merge_function_list() {
 	//debbo aggiunger func_list in fondo a func_list_total
@@ -533,4 +533,19 @@ void merge_function_list() {
 			func_list_total = func_list;
 		}
 	}
+}
+
+//funzione che imposta la prima stringa come prefisso della seconda
+char* prependString(char* first, char* second) {
+	//wrapper per concat
+	char* temp;
+	temp = strcat(first, second);
+	return temp;
+}
+
+//funzione che imposta la prima stringa come suffisso della seconda
+char* appendString(char* first, char* second) {
+	char* temp;
+	temp = strcat(second, first);
+	return temp;
 }

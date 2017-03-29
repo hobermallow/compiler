@@ -27,6 +27,7 @@ struct value {
         char* name;
         void* val;
         value* next;
+        char* code;
 };
 
 //struttura per la gestione della definizione di funzioni mututamente ricorsive
@@ -36,6 +37,7 @@ struct func {
         char* name;
 	value* param_list;
         struct func* next;
+        char* code;
 };
 
 //record della symbol table

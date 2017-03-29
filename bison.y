@@ -269,7 +269,7 @@ and_expression : equality_expression { $$ = $1; }
 	;
 
 equality_expression : relational_expression { $$ = $1; }
-	| equality_expression EQUAL relational_expression { 
+	| equality_expression EQUAL relational_expression {
 								value *temp = (value*) malloc(sizeof(value));
 								printf("tipo di $1 %s tipo di $3 %s \n", $1->type, $3->type);
 								if(strcmp($1->type, "unidentified") != 0 && strcmp($3->type, "unidentified") != 0)
@@ -279,7 +279,7 @@ equality_expression : relational_expression { $$ = $1; }
 								//*((int*)(temp->val)) = check_equal($1, $3);
 							 	$$ = temp;
 							 }
-	| equality_expression NOTEQUAL relational_expression   { 
+	| equality_expression NOTEQUAL relational_expression   {
 								value *temp = (value*) malloc(sizeof(value));
 								if(strcmp($1->type, "unidentified") != 0 && strcmp($3->type, "unidentified") != 0)
 									check_type($1, $3);
@@ -301,20 +301,20 @@ additive_expression : multiplicative_expression { $$ = $1; }
 	| additive_expression PLUS multiplicative_expression { value* temp = (value*) malloc(sizeof(value));
 								if(strcmp($1->type, "unidentified") != 0 && strcmp($3->type, "unidentified") != 0)
 									check_type($1, $3);
-								if(strcmp($3->type, "unidentified") == 0) 
+								if(strcmp($3->type, "unidentified") == 0)
 									temp->type = strdup($1->type);
-								else 
-									temp->type = strdup($3->type); 
-								//add_base_type(0, $1, $3, temp); 
+								else
+									temp->type = strdup($3->type);
+								//add_base_type(0, $1, $3, temp);
 								$$ = temp; }
 	| additive_expression MINUS multiplicative_expression   { value* temp = (value*) malloc(sizeof(value));
 								if(strcmp($1->type, "unidentified") != 0 && strcmp($3->type, "unidentified") != 0)
 									check_type($1, $3);
-								if(strcmp($3->type, "unidentified") == 0) 
+								if(strcmp($3->type, "unidentified") == 0)
 									temp->type = strdup($1->type);
-								else 
-									temp->type = strdup($3->type); 
-								//add_base_type(0, $1, $3, temp); 
+								else
+									temp->type = strdup($3->type);
+								//add_base_type(0, $1, $3, temp);
 								$$ = temp; }
 
 	;
@@ -322,21 +322,21 @@ multiplicative_expression : exp_expression { $$ = $1; }
 	| multiplicative_expression MUL exp_expression   { value* temp = (value*) malloc(sizeof(value));
 								if(strcmp($1->type, "unidentified") != 0 && strcmp($3->type, "unidentified") != 0)
 									check_type($1, $3);
-								if(strcmp($3->type, "unidentified") == 0) 
+								if(strcmp($3->type, "unidentified") == 0)
 									temp->type = strdup($1->type);
-								else 
-									temp->type = strdup($3->type); 
-								//mul_base_type(0, $1, $3, temp); 
+								else
+									temp->type = strdup($3->type);
+								//mul_base_type(0, $1, $3, temp);
 								$$ = temp; }
 
 	| multiplicative_expression DIV exp_expression    { value* temp = (value*) malloc(sizeof(value));
 								if(strcmp($1->type, "unidentified") != 0 && strcmp($3->type, "unidentified") != 0)
 									check_type($1, $3);
-								if(strcmp($3->type, "unidentified") == 0) 
+								if(strcmp($3->type, "unidentified") == 0)
 									temp->type = strdup($1->type);
-								else 
-									temp->type = strdup($3->type); 
-								//mul_base_type(1, $1, $3, temp); 
+								else
+									temp->type = strdup($3->type);
+								//mul_base_type(1, $1, $3, temp);
 								$$ = temp; }
 
 	;
@@ -474,7 +474,7 @@ exprlist_temp :
 				}
 	;
 
-primary_expression : IDENTIFIER { 
+primary_expression : IDENTIFIER {
 					//se non sono all'interno della definizione di una funzione
 					if(functionDefinitions == 0) {
 						//controllo se sia stato dichiarato l'identificatore
@@ -493,6 +493,8 @@ primary_expression : IDENTIFIER {
 							temp->custom_type = strdup(rec->type);
 							//recuper il nome
 							temp->name = strdup(rec->text);
+							//associo il pezzo di codice necessario
+							temp->code = strdup(rec->text);
 							//recuper il valore
 							temp->val = rec->val;
 							//ritorno il valore
@@ -508,13 +510,15 @@ primary_expression : IDENTIFIER {
 							//salvo l'identificatore trovato nella lista globale degli identificatori
 							func* temp = malloc(sizeof(func));
 							temp->name = strdup($1);
-							//salvo l'elemento in cima alla lista 
+							//associo il codice relativo
+							temp->code = strdup($1);
+							//salvo l'elemento in cima alla lista
 							temp->next = identifier_list;
 							identifier_list = temp;
 							//creo l'elemento da ritornare come primary_expression
 							//salvo solamente il nome
 							value* val = malloc(sizeof(value));
-							val->name= strdup($1);	
+							val->name= strdup($1);
 							val->type = "unidentified";
 							$$ = val;
 
@@ -531,12 +535,14 @@ primary_expression : IDENTIFIER {
 							temp->name = strdup(rec->text);
 							//recuper il valore
 							temp->val = rec->val;
+							//associo il codice relativo
+							temp->code = strdup(rec->text);
 							//ritorno il valore
 							$$ = temp;
 						}
 
 											}
-				
+
 				}
 	| constant { $$ = $1; }
 	| STRING { //creo la stringa
@@ -624,7 +630,7 @@ deffunclist_check : deffunclist {
 							temp = temp->next;
 						}
 						while((int)(temp) != 0);
-	
+
 					}
 				}
 	;
@@ -760,9 +766,9 @@ iteration_statement : LOOP OP expression CP BEG stmts END
 	;
 
 assignment_statement : unary_expression assignment_operator expression SEMI_COLON {
-											if(strcmp($1->type, "unidentified") != 0 && strcmp($3->type, "unidentified") != 0) 
-												check_type($1,$3); 
-											copy_val($1,$3); 
+											if(strcmp($1->type, "unidentified") != 0 && strcmp($3->type, "unidentified") != 0)
+												check_type($1,$3);
+											copy_val($1,$3);
 										}
 	| expression SEMI_COLON
 	/* eliminata statements fatta da solo SEMI_COLON */
