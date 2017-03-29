@@ -386,6 +386,8 @@ postfix_expression : primary_expression {
 							//recupero il record corrispondente al tipo dell'array
 							sym_rec* type = (sym_rec*)get_sym_rec($1->type);
 							$1->type = strdup(type->param_type);
+							//associo alla chiamata di funzione il codice relativo
+							$1->code = prependString($1->code, prependString("(",prependString($3->code, ")")));
 						}
 						//ritorno $1
 						$$ = $1;
@@ -405,6 +407,8 @@ postfix_expression : primary_expression {
 									//recupero il sym_rec del tipo della matrice
 									sym_rec* temp_rec = (sym_rec*) get_sym_rec($1->type);
 									temp->type = strdup(temp_rec->param_type);
+									//associo il codice relativo alla dereferenziazione della matrice
+									temp->code = prependString($1->code, prependString("[", prependString($3->code, prependString(",", prependString($5->code,"]")))));
 									$$ = temp;
 								}
 	| postfix_expression OP exprlist CP {
@@ -428,6 +432,8 @@ postfix_expression : primary_expression {
 							//debbo controllare che i parametri inseriti corrispondano a quelli dichiarati nella func
 							//richiamo una routine che prende in input il nome della funzione e la lista di argomenti
 							check_function_arguments($1, $3);
+							//associo al valore di ritorno il codice relativo
+							$1->code = prependString($1->code, prependString("(", prependString($3->code, ")")));
 							//ritorno il value corrispondente alla funzione, che cosi ho il tipo
 							$$ = $1;
 						}
@@ -442,6 +448,8 @@ postfix_expression : primary_expression {
 							//aggiungo l'elemento in cima alla propria lista
 							temp->next = func_list;
 							func_list = temp;
+							//associo il codice relativo all'uso della funzione
+							$1->code = prependString($1->code, prependString("(", prependString($3->code, ")")));
 						}
 					}
 	| postfix_expression ARROW IDENTIFIER {
@@ -452,7 +460,8 @@ postfix_expression : primary_expression {
 						check_mem_alloc($1);
 						//debbo passare come value quello corrispondente al campo del record
 						value* temp = get_record_field($1, $3);
-						exit;
+						//exit;
+						temp->code = prependString($1, prependString($2, $3));
 						$$ = temp;
 					      }
 	;
