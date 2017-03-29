@@ -319,34 +319,55 @@ additive_expression : multiplicative_expression { $$ = $1; }
 
 	;
 multiplicative_expression : exp_expression { $$ = $1; }
-	| multiplicative_expression MUL exp_expression   { value* temp = (value*) malloc(sizeof(value));
-								if(strcmp($1->type, "unidentified") != 0 && strcmp($3->type, "unidentified") != 0)
-									check_type($1, $3);
-								if(strcmp($3->type, "unidentified") == 0)
-									temp->type = strdup($1->type);
-								else
-									temp->type = strdup($3->type);
-								//mul_base_type(0, $1, $3, temp);
-								$$ = temp; }
+	| multiplicative_expression MUL exp_expression   {
+																											value* temp = (value*) malloc(sizeof(value));
+																											if(strcmp($1->type, "unidentified") != 0 && strcmp($3->type, "unidentified") != 0)
+																												check_type($1, $3);
+																											if(strcmp($3->type, "unidentified") == 0)
+																												temp->type = strdup($1->type);
+																											else
+																												temp->type = strdup($3->type);
+																											//mul_base_type(0, $1, $3, temp);
+																											// associo il codice
+																											temp->code = prependString($1, prependString("*", $3));
+																											$$ = temp;
+																											}
 
-	| multiplicative_expression DIV exp_expression    { value* temp = (value*) malloc(sizeof(value));
-								if(strcmp($1->type, "unidentified") != 0 && strcmp($3->type, "unidentified") != 0)
-									check_type($1, $3);
-								if(strcmp($3->type, "unidentified") == 0)
-									temp->type = strdup($1->type);
-								else
-									temp->type = strdup($3->type);
-								//mul_base_type(1, $1, $3, temp);
-								$$ = temp; }
+	| multiplicative_expression DIV exp_expression    {
+																											value* temp = (value*) malloc(sizeof(value));
+																											if(strcmp($1->type, "unidentified") != 0 && strcmp($3->type, "unidentified") != 0)
+																												check_type($1, $3);
+																											if(strcmp($3->type, "unidentified") == 0)
+																												temp->type = strdup($1->type);
+																											else
+																												temp->type = strdup($3->type);
+																											//mul_base_type(1, $1, $3, temp);
+																											//associo il codice
+																											temp->code = prependString($1, prependString("/", $3));
+																											$$ = temp;
+																											}
 
 	;
 
 exp_expression : cast_expression { $$ = $1; }
-	| exp_expression EXP cast_expression { value* temp = (value*) malloc(sizeof(value)); temp->type = strdup($3->type);  $$ = temp; }
+	| exp_expression EXP cast_expression {
+																					value* temp = (value*) malloc(sizeof(value));
+																					temp->type = strdup($3->type);
+																					temp->code = prependString($1, prependString("#", $3));
+																					$$ = temp;
+																					}
 	;
 
 cast_expression : unary_expression { $$ = $1; }
-	| FLOATING OP cast_expression CP { check_is_integer($3); value* temp = (value*) malloc(sizeof(value)); temp->type = "floating"; temp->val = (double*) malloc(sizeof(double)); *((double*)(temp->val)) = (double)(*((int*)($3->val))); $$ = temp; }
+	| FLOATING OP cast_expression CP {
+																		check_is_integer($3);
+																		value* temp = (value*) malloc(sizeof(value));
+																		temp->type = "floating";
+																		temp->val = (double*) malloc(sizeof(double));
+																		*((double*)(temp->val)) = (double)(*((int*)($3->val)));
+																		//associo il codice relativo alla espressione di cast
+																		temp->code = prependString("floating", prependString("(", prependString($3, ")")));
+																		$$ = temp; }
 	;
 
 
@@ -360,7 +381,12 @@ unary_expression : postfix_expression {
 					 $$ = $1;
 					reset_current_param($1);
 					}
-	| unary_operator cast_expression { change_sign($2); $$ = $2; }
+	| unary_operator cast_expression {
+																		change_sign($2);
+																		//associo al valore di ritorno il codice relativo
+																		$2->code = prependString("-", $2->code);
+																		$$ = $2;
+																		}
 	;
 
 postfix_expression : primary_expression {
@@ -553,19 +579,49 @@ primary_expression : IDENTIFIER {
 											}
 
 				}
-	| constant { $$ = $1; }
-	| STRING { //creo la stringa
-		value* temp = (value*) malloc(sizeof(value));
-		temp->val = strdup($1);
-		temp->type = "string";
-		$$ = temp;
+	| constant {
+	 						$$ = $1;
+							}
+	| STRING {
+						//creo la stringa
+						value* temp = (value*) malloc(sizeof(value));
+						temp->val = strdup($1);
+						//associo il codice
+						temp->code = strdup($1);
+						temp->type = "string";
+						$$ = temp;
 		}
-	| OP expression CP { $$ = $2; }
+	| OP expression CP {
+	 										//associo il codice associato alle parentesi
+											$2->code = prependString("(", prependString($2, ")"));
+											$$ = $2;
+											}
 	;
 
-constant : INTEGER_CONSTANT { value* temp = (value*) malloc(sizeof(value)); temp->val = malloc(sizeof(int)); *((int*)(temp->val)) = $1; temp->type = "integer";  $$ = temp; }
-	| CHARACTER_CONSTANT { value* temp = (value*) malloc(sizeof(value)); temp->val = strdup($1); temp->type = "character"; $$ = temp; }
-	| FLOATING_CONSTANT { value* temp = (value*) malloc(sizeof(value)); temp->val = malloc(sizeof(double));*((double*)(temp->val)) = $1; temp->type = "floating"; $$ = temp; }
+constant : INTEGER_CONSTANT {
+															value* temp = (value*) malloc(sizeof(value));
+															temp->val = malloc(sizeof(int)); *((int*)(temp->val)) = $1;
+															temp->type = "integer";
+															//associo il codice alla costante intera
+															sprintf(temp->code, "%d", $1);
+															$$ = temp;
+															}
+	| CHARACTER_CONSTANT {
+													value* temp = (value*) malloc(sizeof(value));
+													temp->val = strdup($1);
+													temp->code = strdup($1);
+													temp->type = "character";
+													$$ = temp;
+													}
+	| FLOATING_CONSTANT {
+												value* temp = (value*) malloc(sizeof(value));
+												temp->val = malloc(sizeof(double));
+												*((double*)(temp->val)) = $1;
+												temp->type = "floating";
+												//associo il codice al valore di ritorno
+												sprintf(temp->code, "%f", $1);
+												$$ = temp;
+												}
 	;
 
 
