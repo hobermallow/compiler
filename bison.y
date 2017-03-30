@@ -238,28 +238,40 @@ expression : conditional_expression { $$ = $1; }
 conditional_expression : logical_or_expression  { $$ = $1; }
 	;
 
-logical_or_expression : logical_and_expression { $$ = $1; }
-	| logical_or_expression OR logical_and_expression { value* temp = (value*) malloc(sizeof(value));
-							    temp->val = (int*) malloc(sizeof(int));
-							    *((int*)(temp->val)) = *((int*)($1->val)) || *((int*)($3->val));
-							    $$ = temp;
-							  }
+logical_or_expression : logical_and_expression {
+																								$$ = $1;
+																								}
+	| logical_or_expression OR logical_and_expression {
+																											value* temp = (value*) malloc(sizeof(value));
+							    																		temp->val = (int*) malloc(sizeof(int));
+							    																		*((int*)(temp->val)) = *((int*)($1->val)) || *((int*)($3->val));
+																											temp->code = prependString($1->code, prependString("||", $3->code));
+																											$$ = temp;
+							  																		}
 	;
 
-logical_and_expression : logical_not_expression  { $$ = $1; }
-	| logical_and_expression AND logical_not_expression { value* temp = (value*) malloc(sizeof(value));
-							      temp->val = (int*) malloc(sizeof(int));
-								*((int*)(temp->val)) = *((int*)($1->val)) && *((int*)($3->val));
-								$$ = temp;
-							    }
+logical_and_expression : logical_not_expression  {
+																										$$ = $1;
+																									}
+	| logical_and_expression AND logical_not_expression {
+																												value* temp = (value*) malloc(sizeof(value));
+							      																		temp->val = (int*) malloc(sizeof(int));
+																												*((int*)(temp->val)) = *((int*)($1->val)) && *((int*)($3->val));
+																												temp->code = prependString($1->code, prependString("&&", $3->code));
+																												$$ = temp;
+							    																		}
 	;
 
-logical_not_expression : exclusive_or_expression { $$ = $1; }
-	| NOT logical_not_expression { value* temp = (value*) malloc(sizeof(value));
-				       temp->val = (int*) malloc(sizeof(int));
-				       *((int*)(temp->val)) = ! *((int*)($2->val));
-					$$ = temp;
-				    }
+logical_not_expression : exclusive_or_expression {
+																									$$ = $1;
+																									}
+	| NOT logical_not_expression {
+																	value* temp = (value*) malloc(sizeof(value));
+				       										temp->val = (int*) malloc(sizeof(int));
+				       										*((int*)(temp->val)) = ! *((int*)($2->val));
+																	temp->code = prependString("!", $2->code);
+																	$$ = temp;
+				    									}
 	;
 
 exclusive_or_expression : and_expression { $$ = $1; }
@@ -277,7 +289,8 @@ equality_expression : relational_expression { $$ = $1; }
 								temp->type = "boolean";
 								//temp->val = (int*)malloc(sizeof(int));
 								//*((int*)(temp->val)) = check_equal($1, $3);
-							 	$$ = temp;
+								temp->code = prependString($1->code, prependString("==", $3->code));
+								$$ = temp;
 							 }
 	| equality_expression NOTEQUAL relational_expression   {
 								value *temp = (value*) malloc(sizeof(value));
@@ -286,6 +299,8 @@ equality_expression : relational_expression { $$ = $1; }
 								temp->type = "boolean";
 								//temp->val = (int*)malloc(sizeof(int));
 								//*((int*)(temp->val)) = check_equal($1, $3);
+								//aggiungo il codice al valore di ritorno
+								temp->code = prependString($1->code, prependString("!=", $3->code));
 							 	$$ = temp;
 							 }
 
@@ -298,24 +313,31 @@ shift_expression : additive_expression { $$ = $1; }
 	;
 
 additive_expression : multiplicative_expression { $$ = $1; }
-	| additive_expression PLUS multiplicative_expression { value* temp = (value*) malloc(sizeof(value));
-								if(strcmp($1->type, "unidentified") != 0 && strcmp($3->type, "unidentified") != 0)
-									check_type($1, $3);
-								if(strcmp($3->type, "unidentified") == 0)
-									temp->type = strdup($1->type);
-								else
-									temp->type = strdup($3->type);
-								//add_base_type(0, $1, $3, temp);
-								$$ = temp; }
-	| additive_expression MINUS multiplicative_expression   { value* temp = (value*) malloc(sizeof(value));
-								if(strcmp($1->type, "unidentified") != 0 && strcmp($3->type, "unidentified") != 0)
-									check_type($1, $3);
-								if(strcmp($3->type, "unidentified") == 0)
-									temp->type = strdup($1->type);
-								else
-									temp->type = strdup($3->type);
-								//add_base_type(0, $1, $3, temp);
-								$$ = temp; }
+	| additive_expression PLUS multiplicative_expression {
+																													value* temp = (value*) malloc(sizeof(value));
+																													if(strcmp($1->type, "unidentified") != 0 && strcmp($3->type, "unidentified") != 0)
+																														check_type($1, $3);
+																													if(strcmp($3->type, "unidentified") == 0)
+																														temp->type = strdup($1->type);
+																													else
+																														temp->type = strdup($3->type);
+																													//add_base_type(0, $1, $3, temp);
+																													//aggiungo il codice al valore di ritorno
+																													temp->code = prependString($1->code, prependString("+", $3->code));
+																													$$ = temp;
+																													}
+	| additive_expression MINUS multiplicative_expression   {
+																														value* temp = (value*) malloc(sizeof(value));
+																														if(strcmp($1->type, "unidentified") != 0 && strcmp($3->type, "unidentified") != 0)
+																															check_type($1, $3);
+																														if(strcmp($3->type, "unidentified") == 0)
+																															temp->type = strdup($1->type);
+																														else
+																															temp->type = strdup($3->type);
+																														//add_base_type(0, $1, $3, temp);
+																														temp->code = prependString($1->code, prependString("-", $3->code));
+																														$$ = temp;
+																														}
 
 	;
 multiplicative_expression : exp_expression { $$ = $1; }
@@ -329,7 +351,7 @@ multiplicative_expression : exp_expression { $$ = $1; }
 																												temp->type = strdup($3->type);
 																											//mul_base_type(0, $1, $3, temp);
 																											// associo il codice
-																											temp->code = prependString($1, prependString("*", $3));
+																											temp->code = prependString($1->code, prependString("*", $3->code));
 																											$$ = temp;
 																											}
 
@@ -343,7 +365,7 @@ multiplicative_expression : exp_expression { $$ = $1; }
 																												temp->type = strdup($3->type);
 																											//mul_base_type(1, $1, $3, temp);
 																											//associo il codice
-																											temp->code = prependString($1, prependString("/", $3));
+																											temp->code = prependString($1->code, prependString("/", $3->code));
 																											$$ = temp;
 																											}
 
@@ -353,7 +375,7 @@ exp_expression : cast_expression { $$ = $1; }
 	| exp_expression EXP cast_expression {
 																					value* temp = (value*) malloc(sizeof(value));
 																					temp->type = strdup($3->type);
-																					temp->code = prependString($1, prependString("#", $3));
+																					temp->code = prependString($1->code, prependString("#", $3->code));
 																					$$ = temp;
 																					}
 	;
@@ -366,7 +388,7 @@ cast_expression : unary_expression { $$ = $1; }
 																		temp->val = (double*) malloc(sizeof(double));
 																		*((double*)(temp->val)) = (double)(*((int*)($3->val)));
 																		//associo il codice relativo alla espressione di cast
-																		temp->code = prependString("floating", prependString("(", prependString($3, ")")));
+																		temp->code = prependString("floating", prependString("(", prependString($3->code, ")")));
 																		$$ = temp; }
 	;
 
