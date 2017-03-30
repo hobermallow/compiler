@@ -60,6 +60,7 @@ struct sym_rec {
         int memoryAllocated;
         //variabile per l'operando di eventuale overload
         char* operand;
+        char* code;
 };
 
 

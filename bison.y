@@ -98,6 +98,9 @@ decl : NEWTYPE IDENTIFIER typebuilder SEMI_COLON {
 						insert_sym_rec(sym);
 						//debug
 						//print_array_params(sym);
+						//finisco di creare e stampo il codice associato alla dichiarazione del nuovo tipo
+						$3->code = prependString("newtype ", prependString($2, prependString($3->code, " ;\n")))
+						printf("%s \n", $3->code);
 						}
 
 	;
@@ -112,6 +115,11 @@ typebuilder : RECORD OP fieldlist field CP {
 						temp->type = "record";
 						//imposto current_param
 						temp->current_param = temp->par_list;
+						//associo il codice
+						if($3 == 0)
+							temp->code = prependString("record ", prependString("(", prependString($4->code, ")")));
+						else
+							temp->code = prependString("record ", prependString("(", prependString($3->code, prependString($4->code, ")"))));
 						//ritorno il sym_rec
 						$$ = temp;
 					}
@@ -142,6 +150,8 @@ typebuilder : RECORD OP fieldlist field CP {
 						temp->param_type = strdup($3);
 						//setto current_param
 						temp->current_param = temp->par_list;
+						//aggiugo il codice al valore di ritorno
+						temp->code = prependString("matrix ", prependString(" ( ", prependString($3, prependString(", ", prependString($5->code, prependString(", ", prependString($7->code, " )"))))) ));
 						//ritorno il sym_rec
 						$$ = temp;
 					}
@@ -189,6 +199,13 @@ typebuilder : RECORD OP fieldlist field CP {
 							INVERT_PARAM_LIST(rec->par_list)
 							rec->current_param = rec->par_list;
 							rec->param_type = strdup($3);
+							//ritorno il codice associato al valore di ritorno
+							if($5 == 0) {
+								rec->code = prependString(" array ", prependString("(", prependString($3, prependString(" , ", prependString($6->code, " )")))));
+							}
+							else {
+								rec->code = prependString(" array ",  prependString("(", prependString($3, prependString(", ", prependString($5->code, prependString($6->code, ")"))))));
+							}
 							$$ = rec;
 							//print_array_params(rec);
 							}
@@ -201,10 +218,10 @@ arrayexpr :
 					$2->next = $1;
 					//associo il codice al valore di ritorno
 					if($1 == 0) {
-						$2->code = prependString(" ", prependString($2, ", "));
+						$2->code = prependString(" ", prependString($2->code, ", "));
 					}
 					else {
-						$2->code = prependString($1, prependString($2, ", "));
+						$2->code = prependString($1->code, prependString($2->code, ", "));
 					}
 					$$ = $2;
 				}
@@ -217,12 +234,11 @@ fieldlist :
 					$2->next = $1;
 					//associo il codice al valore di ritorno
 					if($1 == 0) {
-						$2->code = prependString(" ", prependString($2, ", "));
+						$2->code = prependString(" ", prependString($2->code, ", "));
 					}
 					else {
-						$2->code = prependString($1, prependString($2, ", "));
+						$2->code = prependString($1->code, prependString($2->code, ", "));
 					}
-					$2->code = prependString($)
 					$$ = $2;
 				}
 	;
@@ -232,7 +248,7 @@ field : type IDENTIFIER {
 				param* temp = malloc(sizeof(param));
 				temp->type = strdup($1);
 				temp->name = strdup($2);
-				temp->code = prependString($1, $2);
+				temp->code = prependString($1->code, $2->code);
 				$$ = temp;
 			}
 	;
