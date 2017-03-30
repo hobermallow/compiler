@@ -545,7 +545,7 @@ postfix_expression : primary_expression {
 						//debbo passare come value quello corrispondente al campo del record
 						value* temp = get_record_field($1, $3);
 						//exit;
-						temp->code = prependString($1, prependString($2, $3));
+						temp->code = prependString($1->code, prependString($2, $3));
 						$$ = temp;
 					      }
 	;
@@ -651,7 +651,7 @@ primary_expression : IDENTIFIER {
 		}
 	| OP expression CP {
 	 										//associo il codice associato alle parentesi
-											$2->code = prependString("(", prependString($2, ")"));
+											$2->code = prependString("(", prependString($2->code, ")"));
 											$$ = $2;
 											}
 	;
@@ -711,7 +711,10 @@ vardecl : NEWVARS type varlist var  SEMI_COLON  {
 
 						}
 						//inserico val
+						//aggiungo il codice da generare
 						symbol = (sym_rec*) malloc(sizeof(sym_rec));
+						symbol->code = prependString("newvars ", prependString($2, prependString($3, prependString($4, ";\n"))));
+						printf("%s ", symbol->code );
 						symbol->text = strdup($4->name);
 						symbol->type = strdup($2);
 						symbol->memoryAllocated = alloc;
@@ -725,6 +728,7 @@ var : IDENTIFIER {
 		//creo la lista di variabili come parametri
 		param* temp = (param*) malloc(sizeof(param));
 		temp->name = strdup($1);
+		temp->code = strdup($1);
 		$$ = temp;
 		}
 	;
@@ -734,6 +738,13 @@ varlist :
 	| varlist var COMMA {
 				//aggiungo la lista a var
 				$2->next = $1;
+				//aggiungo il codice generato
+				if($1 == 0) {
+					$2->code = prependString($2->code, ", ");
+				}
+				else {
+					$2->code = prependString($1, prependString($2, ", "));
+				}
 				$$ = $2;
 			    }
 	;
