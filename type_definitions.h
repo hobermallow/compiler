@@ -8,6 +8,7 @@ struct param {
         char* name;
         char* type;
         void* val;
+        char* code;
 } ;
 
 

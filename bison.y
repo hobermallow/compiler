@@ -199,6 +199,13 @@ arrayexpr :
 	| arrayexpr expression COMMA {
 					//aggiungo il valore alla lista
 					$2->next = $1;
+					//associo il codice al valore di ritorno
+					if($1 == 0) {
+						$2->code = prependString(" ", prependString($2, ", "));
+					}
+					else {
+						$2->code = prependString($1, prependString($2, ", "));
+					}
 					$$ = $2;
 				}
 	;
@@ -208,6 +215,14 @@ fieldlist :
 	| fieldlist field COMMA {
 					//recupero il parametro
 					$2->next = $1;
+					//associo il codice al valore di ritorno
+					if($1 == 0) {
+						$2->code = prependString(" ", prependString($2, ", "));
+					}
+					else {
+						$2->code = prependString($1, prependString($2, ", "));
+					}
+					$2->code = prependString($)
 					$$ = $2;
 				}
 	;
@@ -217,12 +232,17 @@ field : type IDENTIFIER {
 				param* temp = malloc(sizeof(param));
 				temp->type = strdup($1);
 				temp->name = strdup($2);
+				temp->code = prependString($1, $2);
 				$$ = temp;
 			}
 	;
 
-type : basetype { $$ = $1; }
-	| IDENTIFIER { $$ = $1; }
+type : basetype {
+									$$ = $1;
+									}
+	| IDENTIFIER {
+									$$ = $1;
+									}
 	;
 
 basetype : INTEGER  { $$ = $1; }
