@@ -2,14 +2,14 @@ newtype miamatrice matrix(integer, 4, 5);
 newtype mioarray array(miorecord, 3, 4);
 newtype miorecord record(miamatrice int, floating float);
 
-func stocazz(integer a, floating b): miamatrice
+func prova(integer a, floating b): miamatrice
 begin
 	newvars integer a;
 	a = 2;
-	dajeeeee();
+	b();
 end
 
-func daje(): null
+func b(): null
 begin
 end
 
