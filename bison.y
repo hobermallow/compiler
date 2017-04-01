@@ -99,7 +99,7 @@ decl : NEWTYPE IDENTIFIER typebuilder SEMI_COLON {
 						//debug
 						//print_array_params(sym);
 						//finisco di creare e stampo il codice associato alla dichiarazione del nuovo tipo
-						$3->code = prependString("newtype ", prependString($2, prependString($3->code, " ;\n")))
+						$3->code = prependString("newtype ", prependString($2, prependString($3->code, " ;\n")));
 						printf("%s \n", $3->code);
 						}
 
@@ -248,7 +248,7 @@ field : type IDENTIFIER {
 				param* temp = malloc(sizeof(param));
 				temp->type = strdup($1);
 				temp->name = strdup($2);
-				temp->code = prependString($1->code, $2->code);
+				temp->code = prependString($1, $2);
 				$$ = temp;
 			}
 	;
@@ -545,7 +545,7 @@ postfix_expression : primary_expression {
 						//debbo passare come value quello corrispondente al campo del record
 						value* temp = get_record_field($1, $3);
 						//exit;
-						temp->code = prependString($1->code, prependString($2, $3));
+						temp->code = prependString($1->code, prependString("->", $3));
 						$$ = temp;
 					      }
 	;
@@ -749,7 +749,7 @@ varlist :
 			    }
 	;
 deffunclist_check : deffunclist {
-					printf("controllo alla fine delle definizioni di funzione]\n");
+					printf("controllo alla fine delle definizioni di funzione\n");
 					//controllo alla fine delle dichiarazioni di tutte le funzioni , controllo che siano state tutte dichiarate
 					func* temp;
 					temp = func_list_total;
