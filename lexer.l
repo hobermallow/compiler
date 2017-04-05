@@ -9,6 +9,8 @@ extern func* func_list;
 
 %%
 
+"scanf" {printf("SCANF\n"); return SCANF; }
+"printf" {printf("PRINTF\n"); return PRINTF; }
 "matrix" {printf("MATRIX\n");return MATRIX;}
 ";" {printf("SEMI_COLON\n");return SEMI_COLON; }
 "newtype" {printf("NEWTYPE\n"); return NEWTYPE; }

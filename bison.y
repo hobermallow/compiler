@@ -19,6 +19,8 @@
 }
 
 %token MATRIX
+%token <str> PRINTF
+%token <str> SCANF
 %token SEMI_COLON
 %token NEWTYPE
 %token <id> IDENTIFIER
@@ -446,14 +448,17 @@ shift_expression : additive_expression { $$ = $1; }
 	;
 
 additive_expression : multiplicative_expression { $$ = $1; }
-	| additive_expression PLUS multiplicative_expression {																				value* temp = (value*) malloc(sizeof(value));														if(strcmp($1->type, "unidentified") != 0 && strcmp($3->type, "unidentified") != 0)
-																													value* temp = (value*) malloc(sizeof(value));
-																													if(strcmp($1->type, "unidentified") != 0 && strcmp($3->type, "unidentified") != 0)
-																														check_type($1, $3);
-																													if(strcmp($3->type, "unidentified") == 0)
+	| additive_expression PLUS multiplicative_expression {																				
+								value* temp = (value*) malloc(sizeof(value));
+																										if(strcmp($1->type, "unidentified") != 0 && strcmp($3->type, "unidentified") != 0) {										
+									check_type($1, $3);
+								}
+																													if(strcmp($3->type, "unidentified") == 0) {
 																														temp->type = strdup($1->type);
-																													else
+										}
+																													else {
 																														temp->type = strdup($3->type);
+										}
 																													//add_base_type(0, $1, $3, temp);
 																													//aggiungo il codice al valore di ritorno
 										char s[100] = " ";
@@ -1063,6 +1068,16 @@ stmt :	assignment_statement
 	| iteration_statement
 	| object_statement
 	| jump_statement
+	| printf_statement
+	| scanf_statement
+	;
+scanf_statement: SCANF OP STRING printf_temp CP SEMI_COLON
+
+printf_statement: PRINTF OP STRING  printf_temp CP SEMI_COLON
+
+printf_temp: 
+	| /* empty */
+	| COMMA  exprlist
 	;
 
 jump_statement : RETURN jump_temp SEMI_COLON
