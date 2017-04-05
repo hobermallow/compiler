@@ -22,14 +22,14 @@
 %token SEMI_COLON
 %token NEWTYPE
 %token <id> IDENTIFIER
-%token OP
-%token CP
-%token RECORD
-%token ARRAY
+%token <str> OP
+%token <str> CP
+%token <str> RECORD
+%token <str> ARRAY
 %token OSP
 %token CSP
 %token <str> STRING
-%token COMMA
+%token <str> COMMA
 %token ASSIGN
 %token <str> MINUS
 %token ARROW
@@ -104,22 +104,39 @@ decl : NEWTYPE IDENTIFIER typebuilder SEMI_COLON {
 						}
 
 	;
-typebuilder : RECORD OP fieldlist field CP {
+typebuilder : RECORD OP fieldlist field CP {    printf("record: %s %s %s %s %s\n", $1, $2, $3, $4, $5);
 						//unisco i field
 						$4->next = $3;
+						printf("dopo la next\n");
 						//creo il nuovo record
 						sym_rec* temp = (sym_rec*) malloc(sizeof(sym_rec));
+						printf("dopo il nuovo record\n");
 						//setto i parametri
 						temp->par_list = $4;
+						printf("dopo par_list\n");
 						//setto il tipo
 						temp->type = "record";
+						printf("dopo set del tipo \n");
 						//imposto current_param
 						temp->current_param = temp->par_list;
+						printf("dopo current param\n");
 						//associo il codice
-						if($3 == 0)
-							temp->code = prependString("record ", prependString("(", prependString($4->code, ")")));
-						else
+						if($3 == 0) {
+							printf("%s\n", $4->code);
+							char s[100] = "record ";  
+							strcat(s,  "(");
+							printf("primo strcat\n");
+							strcat( s, $4->code);
+							printf("secondo strcat\n");
+							strcat( s, ")");
+							printf("dopo prepend\n");
+							temp->code = s;
+							printf("%s\n", temp->code);
+						}else {
+							printf("%s\n", $3->code);
 							temp->code = prependString("record ", prependString("(", prependString($3->code, prependString($4->code, ")"))));
+						}
+						printf("dopo l'if \n");
 						//ritorno il sym_rec
 						$$ = temp;
 					}
@@ -156,7 +173,7 @@ typebuilder : RECORD OP fieldlist field CP {
 						$$ = temp;
 					}
 
-	| ARRAY OP type COMMA arrayexpr expression CP {
+	| ARRAY OP type COMMA arrayexpr expression CP { printf("%s %s %s %s %s %s %s\n", $1, $2,$3,$4, $5,$6, $7);
 							//creo il nuovo elemento per la symbol table
 							sym_rec* rec = malloc (sizeof(sym_rec));
 							rec->type = "array";
@@ -256,7 +273,7 @@ field : type IDENTIFIER {
 type : basetype {
 									$$ = $1;
 									}
-	| IDENTIFIER {
+	| IDENTIFIER {							//printf("%s\n", $1);
 									$$ = $1;
 									}
 	;
@@ -959,7 +976,7 @@ overloadable_operands : PLUS
 
 %%
 
-void yyerror (char const *s) {
+int yyerror (char const *s) {
 	printf("errore \n");
 }
 

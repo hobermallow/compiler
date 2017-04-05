@@ -1,5 +1,5 @@
-#ifndef __TYPE_DEFINITIONS.H__
-#define __TYPE_DEFINITIONS.H__
+#ifndef __TYPE_DEFINITIONS 
+#define __TYPE_DEFINITIONS 
 //struttura per la gestione di parametri (di funzione, di array, di matrici )
 typedef struct param param;
 
