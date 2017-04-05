@@ -99,7 +99,12 @@ decl : NEWTYPE IDENTIFIER typebuilder SEMI_COLON {
 						//debug
 						//print_array_params(sym);
 						//finisco di creare e stampo il codice associato alla dichiarazione del nuovo tipo
-						$3->code = prependString("newtype ", prependString($2, prependString($3->code, " ;\n")));
+						char s[100] = "newtype "; 
+						strcat(s, $2);
+						strcat(s, $3->code);
+						strcat(s, " ;\n");
+						$3->code = s;
+						//$3->code = prependString("newtype ", prependString($2, prependString($3->code, " ;\n")));
 						printf("%s \n", $3->code);
 						}
 
@@ -134,7 +139,13 @@ typebuilder : RECORD OP fieldlist field CP {    printf("record: %s %s %s %s %s\n
 							printf("%s\n", temp->code);
 						}else {
 							printf("%s\n", $3->code);
-							temp->code = prependString("record ", prependString("(", prependString($3->code, prependString($4->code, ")"))));
+							char s[100] = "record ";
+							strcat(s, "(");
+							strcat(s, $3->code);
+							strcat(s, $4->code);
+							strcat(s, ")");
+							temp->code = s;
+							//temp->code = prependString("record ", prependString("(", prependString($3->code, prependString($4->code, ")"))));
 						}
 						printf("dopo l'if \n");
 						//ritorno il sym_rec
@@ -168,7 +179,16 @@ typebuilder : RECORD OP fieldlist field CP {    printf("record: %s %s %s %s %s\n
 						//setto current_param
 						temp->current_param = temp->par_list;
 						//aggiugo il codice al valore di ritorno
-						temp->code = prependString("matrix ", prependString(" ( ", prependString($3, prependString(", ", prependString($5->code, prependString(", ", prependString($7->code, " )"))))) ));
+						char s[100] = "matrix ";
+						strcat(s, "(");
+						strcat(s, $3);
+						strcat(s, ", ");
+						strcat(s, $5->code);
+						strcat(s, ", ");
+						strcat(s, $7->code);
+						strcat(s, " )");
+						temp->code = s;
+						//temp->code = prependString("matrix ", prependString(" ( ", prependString($3, prependString(", ", prependString($5->code, prependString(", ", prependString($7->code, " )"))))) ));
 						//ritorno il sym_rec
 						$$ = temp;
 					}
@@ -218,10 +238,25 @@ typebuilder : RECORD OP fieldlist field CP {    printf("record: %s %s %s %s %s\n
 							rec->param_type = strdup($3);
 							//ritorno il codice associato al valore di ritorno
 							if($5 == 0) {
-								rec->code = prependString(" array ", prependString("(", prependString($3, prependString(" , ", prependString($6->code, " )")))));
+								char s[100] = " array ";
+								strcat(s, "(");
+								strcat(s, $3);
+								strcat(s, " , ");
+								strcat(s, $6->code);
+								strcat(s, " ) ");
+								rec->code = s; 
+								//rec->code = prependString(" array ", prependString("(", prependString($3, prependString(" , ", prependString($6->code, " )")))));
 							}
 							else {
-								rec->code = prependString(" array ",  prependString("(", prependString($3, prependString(", ", prependString($5->code, prependString($6->code, ")"))))));
+								char s[100] = " array ";
+								strcat(s, "(");
+								strcat(s, $3);
+								strcat(s, " , ");
+								strcat(s, $5->code);
+								strcat(s, $6->code);
+								strcat(s, " ) ");
+								rec->code = s; 
+								//rec->code = prependString(" array ",  prependString("(", prependString($3, prependString(", ", prependString($5->code, prependString($6->code, ")"))))));
 							}
 							$$ = rec;
 							//print_array_params(rec);
@@ -235,10 +270,19 @@ arrayexpr :
 					$2->next = $1;
 					//associo il codice al valore di ritorno
 					if($1 == 0) {
-						$2->code = prependString(" ", prependString($2->code, ", "));
+						char s[100] = " ";
+						strcat(s, $2->code);
+						strcat(s, ", ");
+						$2->code = s;
+						//$2->code = prependString(" ", prependString($2->code, ", "));
 					}
 					else {
-						$2->code = prependString($1->code, prependString($2->code, ", "));
+						char s[100] = " ";
+						strcat(s, $1->code);
+						strcat(s, $2->code);
+						strcat(s, ", ");
+						$2->code = s;	
+						//$2->code = prependString($1->code, prependString($2->code, ", "));
 					}
 					$$ = $2;
 				}
@@ -251,10 +295,19 @@ fieldlist :
 					$2->next = $1;
 					//associo il codice al valore di ritorno
 					if($1 == 0) {
-						$2->code = prependString(" ", prependString($2->code, ", "));
+						char s[100] = " ";
+						strcat(s, $2->code);
+						strcat(s, ", ");
+						$2->code = s;
+						//$2->code = prependString(" ", prependString($2->code, ", "));
 					}
 					else {
-						$2->code = prependString($1->code, prependString($2->code, ", "));
+						char s[100] = " ";
+						strcat(s, $1->code);
+						strcat(s, $2->code);
+						strcat(s, ", ");
+						$2->code = s;
+						//$2->code = prependString($1->code, prependString($2->code, ", "));
 					}
 					$$ = $2;
 				}
@@ -265,7 +318,11 @@ field : type IDENTIFIER {
 				param* temp = malloc(sizeof(param));
 				temp->type = strdup($1);
 				temp->name = strdup($2);
-				temp->code = prependString($1, $2);
+				char *s = malloc(sizeof(char));
+				strcat(s, $1);
+				strcat(s, $2);
+				temp->code = s;
+				//temp->code = prependString($1, $2);
 				$$ = temp;
 			}
 	;
@@ -298,7 +355,12 @@ logical_or_expression : logical_and_expression {
 																											value* temp = (value*) malloc(sizeof(value));
 							    																		temp->val = (int*) malloc(sizeof(int));
 							    																		*((int*)(temp->val)) = *((int*)($1->val)) || *((int*)($3->val));
-																											temp->code = prependString($1->code, prependString("||", $3->code));
+								char s[100] = " ";
+								strcat(s, $1->code);
+								strcat(s, "||");
+								strcat(s, $3->code);
+								temp->code = s;
+																											//temp->code = prependString($1->code, prependString("||", $3->code));
 																											$$ = temp;
 							  																		}
 	;
@@ -310,7 +372,12 @@ logical_and_expression : logical_not_expression  {
 																												value* temp = (value*) malloc(sizeof(value));
 							      																		temp->val = (int*) malloc(sizeof(int));
 																												*((int*)(temp->val)) = *((int*)($1->val)) && *((int*)($3->val));
-																												temp->code = prependString($1->code, prependString("&&", $3->code));
+									char s[100] = " ";
+									strcat(s, $1->code);
+									strcat(s, "&&");
+									strcat(s, $3->code);
+									temp->code = s;
+																												//temp->code = prependString($1->code, prependString("&&", $3->code));
 																												$$ = temp;
 							    																		}
 	;
@@ -319,12 +386,15 @@ logical_not_expression : exclusive_or_expression {
 																									$$ = $1;
 																									}
 	| NOT logical_not_expression {
-																	value* temp = (value*) malloc(sizeof(value));
-				       										temp->val = (int*) malloc(sizeof(int));
-				       										*((int*)(temp->val)) = ! *((int*)($2->val));
-																	temp->code = prependString("!", $2->code);
-																	$$ = temp;
-				    									}
+					value* temp = (value*) malloc(sizeof(value));
+					temp->val = (int*) malloc(sizeof(int));
+					*((int*)(temp->val)) = ! *((int*)($2->val));
+					char s[100] = "!";
+					strcat(s, $2->code);
+					temp->code = s;
+					//temp->code = prependString("!", $2->code);
+					$$ = temp;
+				}
 	;
 
 exclusive_or_expression : and_expression { $$ = $1; }
@@ -342,7 +412,12 @@ equality_expression : relational_expression { $$ = $1; }
 								temp->type = "boolean";
 								//temp->val = (int*)malloc(sizeof(int));
 								//*((int*)(temp->val)) = check_equal($1, $3);
-								temp->code = prependString($1->code, prependString("==", $3->code));
+								char s[100] = " ";
+								strcat(s, $1->code);
+								strcat(s, "==");
+								strcat(s, $3->code);
+								temp->code = s;
+								//temp->code = prependString($1->code, prependString("==", $3->code));
 								$$ = temp;
 							 }
 	| equality_expression NOTEQUAL relational_expression   {
@@ -353,7 +428,12 @@ equality_expression : relational_expression { $$ = $1; }
 								//temp->val = (int*)malloc(sizeof(int));
 								//*((int*)(temp->val)) = check_equal($1, $3);
 								//aggiungo il codice al valore di ritorno
-								temp->code = prependString($1->code, prependString("!=", $3->code));
+								char s[100] = " ";
+								strcat(s, $1->code);
+								strcat(s, "!=");
+								strcat(s, $3->code);
+								temp->code =  s;
+								//temp->code = prependString($1->code, prependString("!=", $3->code));
 							 	$$ = temp;
 							 }
 
@@ -366,7 +446,7 @@ shift_expression : additive_expression { $$ = $1; }
 	;
 
 additive_expression : multiplicative_expression { $$ = $1; }
-	| additive_expression PLUS multiplicative_expression {
+	| additive_expression PLUS multiplicative_expression {																				value* temp = (value*) malloc(sizeof(value));														if(strcmp($1->type, "unidentified") != 0 && strcmp($3->type, "unidentified") != 0)
 																													value* temp = (value*) malloc(sizeof(value));
 																													if(strcmp($1->type, "unidentified") != 0 && strcmp($3->type, "unidentified") != 0)
 																														check_type($1, $3);
@@ -376,7 +456,12 @@ additive_expression : multiplicative_expression { $$ = $1; }
 																														temp->type = strdup($3->type);
 																													//add_base_type(0, $1, $3, temp);
 																													//aggiungo il codice al valore di ritorno
-																													temp->code = prependString($1->code, prependString("+", $3->code));
+										char s[100] = " ";
+										strcat(s, $1->code);
+										strcat(s, "+");
+										strcat(s, $3->code);
+										temp->code = s;
+																													//temp->code = prependString($1->code, prependString("+", $3->code));
 																													$$ = temp;
 																													}
 	| additive_expression MINUS multiplicative_expression   {
@@ -388,7 +473,12 @@ additive_expression : multiplicative_expression { $$ = $1; }
 																														else
 																															temp->type = strdup($3->type);
 																														//add_base_type(0, $1, $3, temp);
-																														temp->code = prependString($1->code, prependString("-", $3->code));
+											 char s[100] = " ";
+											 strcat(s, $1->code);
+											 strcat(s, "-");
+											 strcat(s, $3->code);
+											 temp->code = s;
+																														//temp->code = prependString($1->code, prependString("-", $3->code));
 																														$$ = temp;
 																														}
 
@@ -404,7 +494,12 @@ multiplicative_expression : exp_expression { $$ = $1; }
 																												temp->type = strdup($3->type);
 																											//mul_base_type(0, $1, $3, temp);
 																											// associo il codice
-																											temp->code = prependString($1->code, prependString("*", $3->code));
+								 char s[100] = " ";
+								 strcat(s, $1->code);
+								 strcat(s, "*");
+								 strcat(s, $3->code);
+								 temp->code = s;
+																											//temp->code = prependString($1->code, prependString("*", $3->code));
 																											$$ = temp;
 																											}
 
@@ -418,7 +513,12 @@ multiplicative_expression : exp_expression { $$ = $1; }
 																												temp->type = strdup($3->type);
 																											//mul_base_type(1, $1, $3, temp);
 																											//associo il codice
-																											temp->code = prependString($1->code, prependString("/", $3->code));
+								 char s[100] = " ";
+								 strcat(s, $1->code);
+								 strcat(s, "/");
+								 strcat(s, $3->code);
+								 temp->code = s;
+																											//temp->code = prependString($1->code, prependString("/", $3->code));
 																											$$ = temp;
 																											}
 
@@ -428,7 +528,12 @@ exp_expression : cast_expression { $$ = $1; }
 	| exp_expression EXP cast_expression {
 																					value* temp = (value*) malloc(sizeof(value));
 																					temp->type = strdup($3->type);
-																					temp->code = prependString($1->code, prependString("#", $3->code));
+		  char s[100] = " ";
+		  strcat(s, $1->code);
+		  strcat(s, "#");
+		  strcat(s, $3->code);
+		  temp->code = s;
+																					//temp->code = prependString($1->code, prependString("#", $3->code));
 																					$$ = temp;
 																					}
 	;
@@ -441,7 +546,13 @@ cast_expression : unary_expression { $$ = $1; }
 																		temp->val = (double*) malloc(sizeof(double));
 																		*((double*)(temp->val)) = (double)(*((int*)($3->val)));
 																		//associo il codice relativo alla espressione di cast
-																		temp->code = prependString("floating", prependString("(", prependString($3->code, ")")));
+			char s[100] = " ";
+			strcat(s, "floating");
+			strcat(s, "(");
+			strcat(s, $3->code);
+			strcat(s, ")");
+			temp->code = s;
+																		//temp->code = prependString("floating", prependString("(", prependString($3->code, ")")));
 																		$$ = temp; }
 	;
 
@@ -459,7 +570,11 @@ unary_expression : postfix_expression {
 	| unary_operator cast_expression {
 																		change_sign($2);
 																		//associo al valore di ritorno il codice relativo
-																		$2->code = prependString("-", $2->code);
+				char s[100] = " ";
+				strcat(s, "-");
+				strcat(s, $2->code);
+				$2->code = s;
+					//													$2->code = prependString("-", $2->code);
 																		$$ = $2;
 																		}
 	;
@@ -488,7 +603,13 @@ postfix_expression : primary_expression {
 							sym_rec* type = (sym_rec*)get_sym_rec($1->type);
 							$1->type = strdup(type->param_type);
 							//associo alla chiamata di funzione il codice relativo
-							$1->code = prependString($1->code, prependString("(",prependString($3->code, ")")));
+							char s[100] = " ";
+							strcat(s, $1->code);
+							strcat(s, "(");
+							strcat(s, $3->code);
+							strcat(s, ")");
+							$1->code = s;
+							//$1->code = prependString($1->code, prependString("(",prependString($3->code, ")")));
 						}
 						//ritorno $1
 						$$ = $1;
@@ -509,7 +630,15 @@ postfix_expression : primary_expression {
 									sym_rec* temp_rec = (sym_rec*) get_sym_rec($1->type);
 									temp->type = strdup(temp_rec->param_type);
 									//associo il codice relativo alla dereferenziazione della matrice
-									temp->code = prependString($1->code, prependString("[", prependString($3->code, prependString(",", prependString($5->code,"]")))));
+									char s[100] = " ";
+									strcat(s, $1->code);
+									strcat(s, "[");
+									strcat(s, $3->code);
+									strcat(s, ", ");
+									strcat(s, $5->code);
+									strcat(s, "]");
+									temp->code = s;
+									//temp->code = prependString($1->code, prependString("[", prependString($3->code, prependString(",", prependString($5->code,"]")))));
 									$$ = temp;
 								}
 	| postfix_expression OP exprlist CP {
@@ -534,7 +663,13 @@ postfix_expression : primary_expression {
 							//richiamo una routine che prende in input il nome della funzione e la lista di argomenti
 							check_function_arguments($1, $3);
 							//associo al valore di ritorno il codice relativo
-							$1->code = prependString($1->code, prependString("(", prependString($3->code, ")")));
+							char s[100] = " ";
+							strcat(s, $1->code);
+							strcat(s, "(");
+							strcat(s, $3->code);
+							strcat(s, ")");
+							$1->code = s;
+							//$1->code = prependString($1->code, prependString("(", prependString($3->code, ")")));
 							//ritorno il value corrispondente alla funzione, che cosi ho il tipo
 							$$ = $1;
 						}
@@ -550,7 +685,13 @@ postfix_expression : primary_expression {
 							temp->next = func_list;
 							func_list = temp;
 							//associo il codice relativo all'uso della funzione
-							$1->code = prependString($1->code, prependString("(", prependString($3->code, ")")));
+							char s[100] = " ";
+							strcat(s, $1->code);
+							strcat(s, "(");
+							strcat(s, $3->code);
+							strcat(s, ")");
+							$1->code = s;
+							//$1->code = prependString($1->code, prependString("(", prependString($3->code, ")")));
 						}
 					}
 	| postfix_expression ARROW IDENTIFIER {
@@ -562,7 +703,12 @@ postfix_expression : primary_expression {
 						//debbo passare come value quello corrispondente al campo del record
 						value* temp = get_record_field($1, $3);
 						//exit;
-						temp->code = prependString($1->code, prependString("->", $3));
+						char s[100] = " ";
+						strcat(s, $1->code);
+						strcat(s, "->");
+						strcat(s, $3);
+						temp->code = s;
+						//temp->code = prependString($1->code, prependString("->", $3));
 						$$ = temp;
 					      }
 	;
@@ -668,7 +814,11 @@ primary_expression : IDENTIFIER {
 		}
 	| OP expression CP {
 	 										//associo il codice associato alle parentesi
-											$2->code = prependString("(", prependString($2->code, ")"));
+											char s[100] = "(";
+											strcat(s, $2->code);
+											strcat(s, ")");
+											$2->code = s;
+											//$2->code = prependString("(", prependString($2->code, ")"));
 											$$ = $2;
 											}
 	;
@@ -730,7 +880,13 @@ vardecl : NEWVARS type varlist var  SEMI_COLON  {
 						//inserico val
 						//aggiungo il codice da generare
 						symbol = (sym_rec*) malloc(sizeof(sym_rec));
-						symbol->code = prependString("newvars ", prependString($2, prependString($3, prependString($4, ";\n"))));
+						char s[100] = "newvars ";
+						strcat(s, $2);
+						strcat(s, $3);
+						strcat(s, $4);
+						strcat(s, ";\n");
+						symbol->code = s;
+						//symbol->code = prependString("newvars ", prependString($2, prependString($3, prependString($4, ";\n"))));
 						printf("%s ", symbol->code );
 						symbol->text = strdup($4->name);
 						symbol->type = strdup($2);
@@ -757,10 +913,19 @@ varlist :
 				$2->next = $1;
 				//aggiungo il codice generato
 				if($1 == 0) {
-					$2->code = prependString($2->code, ", ");
+					char s[100] = " ";
+					strcat(s, $2->code);
+					strcat(s, ", ");
+					$2->code = s;
+					//$2->code = prependString($2->code, ", ");
 				}
 				else {
-					$2->code = prependString($1, prependString($2, ", "));
+					char s[100] = " ";
+					strcat(s, $1);
+					strcat(s, $2);
+					strcat(s, ", ");
+					$2->code = s;
+					//$2->code = prependString($1, prependString($2, ", "));
 				}
 				$$ = $2;
 			    }
