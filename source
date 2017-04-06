@@ -1,4 +1,5 @@
 newtype mioarray array(miorecord, 3, 4);
+newtype miamatrice matrix(integer, 4, 4);
 newtype miorecord record(miamatrice int, floating float);
 
 func prova(integer a, floating b): miamatrice

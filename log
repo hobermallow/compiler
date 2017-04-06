@@ -1,0 +1,396 @@
+NEWTYPE
+IDENTIFIER
+mioarray
+ARRAY
+OP
+IDENTIFIER
+miorecord
+COMMA
+INTEGER_CONSTANT
+3
+COMMA
+inizio arrayexpr 
+dopo next
+fine arrayexpr
+INTEGER_CONSTANT
+4
+CP
+dentro la definizione dell'array
+SEMI_COLON
+newtype mioarraynewtype mioarray ;
+ 
+NEWTYPE
+IDENTIFIER
+miorecord
+RECORD
+OP
+IDENTIFIER
+miamatrice
+IDENTIFIER
+int
+COMMA
+FLOATING
+IDENTIFIER
+float
+CP
+record: miorecord miorecord   float
+dopo la next
+dopo il nuovo record
+dopo par_list
+dopo set del tipo 
+dopo current param
+ miamatriceint, 
+dopo l'if 
+SEMI_COLON
+newtype miorecordnewtype miorecordn ;
+ 
+FUNC
+Nuovo environment
+IDENTIFIER
+prova
+OP
+INTEGER
+IDENTIFIER
+a
+Inserito simbolo a di tipo integer
+COMMA
+FLOATING
+IDENTIFIER
+b
+Inserito simbolo b di tipo floating
+CP
+COLON
+IDENTIFIER
+miamatrice
+BEG
+NEWVARS
+INTEGER
+IDENTIFIER
+a
+SEMI_COLON
+Dentro la dichiarazione di nuove variabili
+dopo l'assegnamento
+newvars integer;
+ Inserisco simbolo a di tipo integer
+Fine dichiarazione nuove variabili
+IDENTIFIER
+a
+Sto analizzando record a
+Cerco l'identificatore a
+Record a trovato
+ASSIGN
+Sto analizzando record a
+Cerco l'identificatore integer
+Sto analizzando record b
+Cerco l'identificatore integer
+Sto analizzando record a
+Cerco l'identificatore integer
+Sto analizzando record miorecord
+Cerco l'identificatore integer
+Sto analizzando record mioarray
+Cerco l'identificatore integer
+INTEGER_CONSTANT
+2
+SEMI_COLON
+Sto analizzando record a
+Cerco l'identificatore integer
+Sto analizzando record b
+Cerco l'identificatore integer
+Sto analizzando record a
+Cerco l'identificatore integer
+Sto analizzando record miorecord
+Cerco l'identificatore integer
+Sto analizzando record mioarray
+Cerco l'identificatore integer
+Dentro l'assignment statement
+Fine dell'assignment statement
+IDENTIFIER
+b
+Sto analizzando record a
+Cerco l'identificatore b
+Sto analizzando record b
+Cerco l'identificatore b
+Record b trovato
+OP
+CP
+inizio della postfix da non controllare
+prima del primo strcat
+dopo il primo strcat
+dopo il secondo strcat
+dopo il terzo strcat
+fine della postfix
+SEMI_COLON
+Sto analizzando record a
+Cerco l'identificatore floating
+Sto analizzando record b
+Cerco l'identificatore floating
+Sto analizzando record a
+Cerco l'identificatore floating
+Sto analizzando record miorecord
+Cerco l'identificatore floating
+Sto analizzando record mioarray
+Cerco l'identificatore floating
+END
+prima del merge
+arrivato all'ultimo elemento della func_list_total
+merge con lista nuova
+dopo merge
+Pop environment
+controllo prima dell'inserimento della nuova funzione nella symbol table
+Sto analizzando record miorecord
+Cerco l'identificatore miamatrice
+Sto analizzando record mioarray
+Cerco l'identificatore miamatrice
+Inserito simbolo per la funzione prova
+FUNC
+Nuovo environment
+IDENTIFIER
+b
+OP
+CP
+COLON
+IDENTIFIER
+null
+BEG
+END
+prima del merge
+arrivato all'ultimo elemento della func_list_total
+dopo merge
+Pop environment
+controllo prima dell'inserimento della nuova funzione nella symbol table
+Inserito simbolo per la funzione b
+OVERLOAD
+Nuovo environment
+controllo alla fine delle definizioni di funzione
+Sto analizzando record b
+Cerco l'identificatore b
+OP
+PLUS
+COMMA
+IDENTIFIER
+mioarray
+CP
+BEG
+END
+Pop environment
+NEWVARS
+IDENTIFIER
+miamatrice
+IDENTIFIER
+mat
+SEMI_COLON
+Dentro la dichiarazione di nuove variabili
+dopo l'assegnamento
+newvars miamatrice;
+ Inserisco simbolo mat di tipo miamatrice
+Fine dichiarazione nuove variabili
+NEWVARS
+IDENTIFIER
+mioarray
+IDENTIFIER
+arra
+SEMI_COLON
+Dentro la dichiarazione di nuove variabili
+dopo l'assegnamento
+newvars mioarray;
+ Inserisco simbolo arra di tipo mioarray
+Fine dichiarazione nuove variabili
+NEWVARS
+IDENTIFIER
+miorecord
+IDENTIFIER
+acc
+SEMI_COLON
+Dentro la dichiarazione di nuove variabili
+dopo l'assegnamento
+newvars miorecord;
+ Inserisco simbolo acc di tipo miorecord
+Fine dichiarazione nuove variabili
+FUNC_EXEC
+Nuovo environment
+OP
+INTEGER
+IDENTIFIER
+x
+Inserito simbolo x di tipo integer
+CP
+COLON
+INTEGER
+BEG
+IDENTIFIER
+mat
+Sto analizzando record x
+Cerco l'identificatore mat
+Sto analizzando record acc
+Cerco l'identificatore mat
+Sto analizzando record arra
+Cerco l'identificatore mat
+Sto analizzando record mat
+Cerco l'identificatore mat
+Record mat trovato
+ASSIGN
+Sto analizzando record x
+Cerco l'identificatore miamatrice
+Sto analizzando record acc
+Cerco l'identificatore miamatrice
+Sto analizzando record arra
+Cerco l'identificatore miamatrice
+Sto analizzando record mat
+Cerco l'identificatore miamatrice
+Sto analizzando record 
+Cerco l'identificatore miamatrice
+Sto analizzando record b
+Cerco l'identificatore miamatrice
+Sto analizzando record prova
+Cerco l'identificatore miamatrice
+Sto analizzando record miorecord
+Cerco l'identificatore miamatrice
+Sto analizzando record mioarray
+Cerco l'identificatore miamatrice
+NEW
+OP
+IDENTIFIER
+miamatrice
+CP
+SEMI_COLON
+Sto analizzando record x
+Cerco l'identificatore mat
+Sto analizzando record acc
+Cerco l'identificatore mat
+Sto analizzando record arra
+Cerco l'identificatore mat
+Sto analizzando record mat
+Cerco l'identificatore mat
+IDENTIFIER
+arra
+Sto analizzando record x
+Cerco l'identificatore arra
+Sto analizzando record acc
+Cerco l'identificatore arra
+Sto analizzando record arra
+Cerco l'identificatore arra
+Record arra trovato
+ASSIGN
+Sto analizzando record x
+Cerco l'identificatore mioarray
+Sto analizzando record acc
+Cerco l'identificatore mioarray
+Sto analizzando record arra
+Cerco l'identificatore mioarray
+Sto analizzando record mat
+Cerco l'identificatore mioarray
+Sto analizzando record 
+Cerco l'identificatore mioarray
+Sto analizzando record b
+Cerco l'identificatore mioarray
+Sto analizzando record prova
+Cerco l'identificatore mioarray
+Sto analizzando record miorecord
+Cerco l'identificatore mioarray
+Sto analizzando record mioarray
+Cerco l'identificatore mioarray
+NEW
+OP
+IDENTIFIER
+mioarray
+CP
+SEMI_COLON
+Sto analizzando record x
+Cerco l'identificatore arra
+Sto analizzando record acc
+Cerco l'identificatore arra
+Sto analizzando record arra
+Cerco l'identificatore arra
+IDENTIFIER
+acc
+Sto analizzando record x
+Cerco l'identificatore acc
+Sto analizzando record acc
+Cerco l'identificatore acc
+Record acc trovato
+ASSIGN
+Sto analizzando record x
+Cerco l'identificatore miorecord
+Sto analizzando record acc
+Cerco l'identificatore miorecord
+Sto analizzando record arra
+Cerco l'identificatore miorecord
+Sto analizzando record mat
+Cerco l'identificatore miorecord
+Sto analizzando record 
+Cerco l'identificatore miorecord
+Sto analizzando record b
+Cerco l'identificatore miorecord
+Sto analizzando record prova
+Cerco l'identificatore miorecord
+Sto analizzando record miorecord
+Cerco l'identificatore miorecord
+NEW
+OP
+IDENTIFIER
+miorecord
+CP
+SEMI_COLON
+Sto analizzando record x
+Cerco l'identificatore acc
+Sto analizzando record acc
+Cerco l'identificatore acc
+IDENTIFIER
+mat
+Sto analizzando record x
+Cerco l'identificatore mat
+Sto analizzando record acc
+Cerco l'identificatore mat
+Sto analizzando record arra
+Cerco l'identificatore mat
+Sto analizzando record mat
+Cerco l'identificatore mat
+Record mat trovato
+OSP
+INTEGER_CONSTANT
+1
+COMMA
+Sto analizzando record x
+Cerco l'identificatore integer
+Sto analizzando record acc
+Cerco l'identificatore integer
+Sto analizzando record arra
+Cerco l'identificatore integer
+Sto analizzando record mat
+Cerco l'identificatore integer
+Sto analizzando record 
+Cerco l'identificatore integer
+Sto analizzando record b
+Cerco l'identificatore integer
+Sto analizzando record prova
+Cerco l'identificatore integer
+Sto analizzando record miorecord
+Cerco l'identificatore integer
+Sto analizzando record mioarray
+Cerco l'identificatore integer
+INTEGER_CONSTANT
+3
+CSP
+Sto analizzando record x
+Cerco l'identificatore integer
+Sto analizzando record acc
+Cerco l'identificatore integer
+Sto analizzando record arra
+Cerco l'identificatore integer
+Sto analizzando record mat
+Cerco l'identificatore integer
+Sto analizzando record 
+Cerco l'identificatore integer
+Sto analizzando record b
+Cerco l'identificatore integer
+Sto analizzando record prova
+Cerco l'identificatore integer
+Sto analizzando record miorecord
+Cerco l'identificatore integer
+Sto analizzando record mioarray
+Cerco l'identificatore integer
+inizio della postfix della matrice
+dopo i controlli sul tipo delle espressioni
+prima del recupero del symrec della matrice
+Sto analizzando record x
+Cerco l'ident

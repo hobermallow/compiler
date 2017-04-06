@@ -258,6 +258,7 @@ void check_array_arguments(value* id, value* val) {
 }
 
 void check_matrix_arguments(value* id, value* val_1, value* val_2) {
+	printf("prima del recupero del symrec della matrice\n");
 	//recupero il sym_rec corrispondente al tipo della matrice
 	sym_rec* rec = get_sym_rec(id->type);
 	//controllo i due valori

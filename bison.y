@@ -625,11 +625,14 @@ postfix_expression : primary_expression {
 						$$ = $1;
 						}
 	| postfix_expression OSP expression COMMA expression CSP {
+									printf("inizio della postfix della matrice\n");
 									//controllo che le espressioni siano di tipo intero
 									check_is_integer($3);
 									check_is_integer($5);
+									printf("dopo i controlli sul tipo delle espressioni\n");
 									//controllo che il valore delle espressioni sia compreso nei parametri della matrice
 									check_matrix_arguments($1, $3, $5);
+									printf("dopo il controllo sugli argomenti della matrice\n");
 									//controllo sia stata allocata memoria per la matrice
 									check_mem_alloc($1);
 									//ritorno un oggetto di tipo value con tipo settato al
@@ -640,6 +643,7 @@ postfix_expression : primary_expression {
 									sym_rec* temp_rec = (sym_rec*) get_sym_rec($1->type);
 									temp->type = strdup(temp_rec->param_type);
 									//associo il codice relativo alla dereferenziazione della matrice
+									printf("prima delle strcat\n");
 									char s[100] = " ";
 									strcat(s, $1->code);
 									strcat(s, "[");
@@ -648,8 +652,10 @@ postfix_expression : primary_expression {
 									strcat(s, $5->code);
 									strcat(s, "]");
 									temp->code = s;
+									printf("dopo le strcat\n");
 									//temp->code = prependString($1->code, prependString("[", prependString($3->code, prependString(",", prependString($5->code,"]")))));
 									$$ = temp;
+									printf("fine della postfix della matrice\n");
 								}
 	| postfix_expression OP exprlist CP {
 						//se sono in una sezione normale
@@ -676,7 +682,8 @@ postfix_expression : primary_expression {
 							char s[100] = " ";
 							strcat(s, $1->code);
 							strcat(s, "(");
-							strcat(s, $3->code);
+							if($3 != 0) 
+								strcat(s, $3->code);
 							strcat(s, ")");
 							$1->code = s;
 							//$1->code = prependString($1->code, prependString("(", prependString($3->code, ")")));
@@ -685,6 +692,7 @@ postfix_expression : primary_expression {
 						}
 						//altrimenti, salvo la funzione all'interno dell'apposita lista globale
 						else {
+							printf("inizio della postfix da non controllare\n");
 							//creo elemento da aggiungere alla lista
 							func* temp = (func*) malloc(sizeof(func));
 							//recupero il nome della funzione utilizzata
@@ -695,12 +703,18 @@ postfix_expression : primary_expression {
 							temp->next = func_list;
 							func_list = temp;
 							//associo il codice relativo all'uso della funzione
-							char s[100] = " ";
+							char s[100] = "";
+							printf("prima del primo strcat\n");
 							strcat(s, $1->code);
+							printf("dopo il primo strcat\n");
 							strcat(s, "(");
-							strcat(s, $3->code);
+							printf("dopo il secondo strcat\n");
+							if($3 != 0)
+								strcat(s, $3->code);
+							printf("dopo il terzo strcat\n");
 							strcat(s, ")");
 							$1->code = s;
+							printf("fine della postfix\n");
 							//$1->code = prependString($1->code, prependString("(", prependString($3->code, ")")));
 						}
 					}
