@@ -894,13 +894,10 @@ vardecl : NEWVARS type varlist var  SEMI_COLON  {
 						symbol = (sym_rec*) malloc(sizeof(sym_rec));
 						char s[100] = "newvars ";
 						strcat(s, $2);
-						printf("dopo il primo strcat\n");
-						strcat(s, $3->code);
-						printf("dopo il secondo strcat\n");
+						if($3 != 0) 
+							strcat(s, $3->code);
 						strcat(s, $4);
-						printf("prima dell'ultimo strcat\n");
 						strcat(s, ";\n");
-						printf("prima dell'assegnamento \n");
 						symbol->code = s;
 						printf("dopo l'assegnamento\n");
 						//symbol->code = prependString("newvars ", prependString($2, prependString($3, prependString($4, ";\n"))));
