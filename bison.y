@@ -1106,10 +1106,11 @@ selection_statement : IF OP expression CP BEG stmts END
 iteration_statement : LOOP OP expression CP BEG stmts END
 	;
 
-assignment_statement : unary_expression assignment_operator expression SEMI_COLON {
+assignment_statement : unary_expression assignment_operator expression SEMI_COLON { printf("Dentro l'assignment statement\n");
 											if(strcmp($1->type, "unidentified") != 0 && strcmp($3->type, "unidentified") != 0)
 												check_type($1,$3);
 											copy_val($1,$3);
+											printf("Fine dell'assignment statement\n");
 										}
 	| expression SEMI_COLON
 	/* eliminata statements fatta da solo SEMI_COLON */
