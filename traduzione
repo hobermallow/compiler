@@ -1,0 +1,37 @@
+TRADUZIONE
+
+matrici -> traduzione in puntatoti di puntatori
+
+es.
+newtype miamatrice matrix(integer, 4, 5);
+newtype mioarray array(integer, 4, 5, 6);
+mat = new(miamatrice);
+arr = new(mioarray);
+
+traduzione
+
+mat = calloc(4, sizeof(*mat));
+{
+	int i;
+	for(i=0; i<5; i++) mat[i] = calloc(5, sizeof(**mat));
+}
+printf("%d\n mat[1, 3]", mat[1][3]);
+...
+free(mat);
+
+
+arr = calloc(4, sizeof(*arr));
+{
+	int i;
+	for(i=0; i<5; i++) arr[i] = calloc(5, sizeof(**arr));
+}
+{
+	int i, j;
+	for(i=0; i<4;i++) {
+		for(j=0; j<5; j++)
+			arr[i][j] = calloc(6,sizeof(***arr));
+	}
+}
+
+
+cicli loop -> while

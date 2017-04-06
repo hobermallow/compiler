@@ -1,3 +1,4 @@
 - stampare ciascun token DONE
-- riguardare tutti gli utilizzi di strcat 
-- fare printf e scanf
+- riguardare tutti gli utilizzi di strcat  DONE
+- fare printf e scanf DONE
+- errore nella conversione da intero ad ascii (sprintf)

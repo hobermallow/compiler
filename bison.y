@@ -1,8 +1,9 @@
 %{
 	#include <stdio.h>
 	#include <stdlib.h>
-	#include "SM.h"
 	#include <string.h>
+	#include "SM.h"
+
 	extern int functionDefinitions;
 	extern func* func_list;
 	extern func* func_list_total;
@@ -195,7 +196,8 @@ typebuilder : RECORD OP fieldlist field CP {    printf("record: %s %s %s %s %s\n
 						$$ = temp;
 					}
 
-	| ARRAY OP type COMMA arrayexpr expression CP { printf("%s %s %s %s %s %s %s\n", $1, $2,$3,$4, $5,$6, $7);
+	| ARRAY OP type COMMA arrayexpr expression CP { 
+							printf("dentro la definizione dell'array\n");
 							//creo il nuovo elemento per la symbol table
 							sym_rec* rec = malloc (sizeof(sym_rec));
 							rec->type = "array";
@@ -268,18 +270,20 @@ typebuilder : RECORD OP fieldlist field CP {    printf("record: %s %s %s %s %s\n
 arrayexpr :
 	 /* empty */ { $$ = 0; }
 	| arrayexpr expression COMMA {
+					printf("inizio arrayexpr \n");
 					//aggiungo il valore alla lista
 					$2->next = $1;
+					printf("dopo next\n");
 					//associo il codice al valore di ritorno
 					if($1 == 0) {
-						char s[100] = " ";
+						char s[1] = "";
 						strcat(s, $2->code);
 						strcat(s, ", ");
 						$2->code = s;
 						//$2->code = prependString(" ", prependString($2->code, ", "));
 					}
 					else {
-						char s[100] = " ";
+						char s[100] = "";
 						strcat(s, $1->code);
 						strcat(s, $2->code);
 						strcat(s, ", ");
@@ -287,6 +291,7 @@ arrayexpr :
 						//$2->code = prependString($1->code, prependString($2->code, ", "));
 					}
 					$$ = $2;
+					printf("fine arrayexpr\n");
 				}
 	;
 
@@ -829,13 +834,14 @@ primary_expression : IDENTIFIER {
 	;
 
 constant : INTEGER_CONSTANT {
-															value* temp = (value*) malloc(sizeof(value));
-															temp->val = malloc(sizeof(int)); *((int*)(temp->val)) = $1;
-															temp->type = "integer";
-															//associo il codice alla costante intera
-															sprintf(temp->code, "%d", $1);
-															$$ = temp;
-															}
+				value* temp = (value*) malloc(sizeof(value));
+				temp->val = malloc(sizeof(int)); *((int*)(temp->val)) = $1;
+				temp->type = "integer";
+				//associo il codice alla costante intera
+				temp->code = malloc(sizeof(char)*10);
+				sprintf(temp->code, "%d", $1);
+				$$ = temp;
+			}
 	| CHARACTER_CONSTANT {
 													value* temp = (value*) malloc(sizeof(value));
 													temp->val = strdup($1);
@@ -861,6 +867,7 @@ varlistdecl :
 	;
 
 vardecl : NEWVARS type varlist var  SEMI_COLON  {
+						printf("Dentro la dichiarazione di nuove variabili\n");
 						//variabile utility per l'allocazione
 						int alloc = 0;
 						if(is_base_type($2) == 1) {
@@ -887,10 +894,15 @@ vardecl : NEWVARS type varlist var  SEMI_COLON  {
 						symbol = (sym_rec*) malloc(sizeof(sym_rec));
 						char s[100] = "newvars ";
 						strcat(s, $2);
-						strcat(s, $3);
+						printf("dopo il primo strcat\n");
+						strcat(s, $3->code);
+						printf("dopo il secondo strcat\n");
 						strcat(s, $4);
+						printf("prima dell'ultimo strcat\n");
 						strcat(s, ";\n");
+						printf("prima dell'assegnamento \n");
 						symbol->code = s;
+						printf("dopo l'assegnamento\n");
 						//symbol->code = prependString("newvars ", prependString($2, prependString($3, prependString($4, ";\n"))));
 						printf("%s ", symbol->code );
 						symbol->text = strdup($4->name);
@@ -899,6 +911,7 @@ vardecl : NEWVARS type varlist var  SEMI_COLON  {
 						initialize_value(symbol);
 						insert_sym_rec(symbol);
 						printf("Inserisco simbolo %s di tipo %s\n", symbol->text, symbol->type);
+						printf("Fine dichiarazione nuove variabili\n");
 						}
 	;
 

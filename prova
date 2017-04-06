@@ -1,0 +1,10 @@
+newtype miorecord record(integer x);
+newtype mioarray array(miorecord, 3, 4 );
+
+newvars mioarray arra;
+
+
+func exec (integer x) :  integer
+begin
+	arra = new(mioarray);
+end
