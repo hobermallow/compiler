@@ -758,6 +758,7 @@ primary_expression : IDENTIFIER {
 					//se non sono all'interno della definizione di una funzione
 					if(functionDefinitions == 0) {
 						//controllo se sia stato dichiarato l'identificatore
+						printf("controllo l'identificatore \n");
 						sym_rec* rec = get_sym_rec($1);
 						if(rec == 0 ) {
 							printf("Identificarore %s non trovato\n", $1);
@@ -887,6 +888,15 @@ vardecl : NEWVARS type varlist var  SEMI_COLON  {
 						if(is_base_type($2) == 1) {
 							alloc = 1;
 						}
+						else {
+							//controllo che il tipo sia stato definito
+							sym_rec* r = get_sym_rec($2);
+							if(r == 0) {
+								printf("Tipo %s non trovato\n", $2);
+								exit(1);
+							}
+						}
+			
 						//per ciascun paramentro aggiungo simbolo
 						sym_rec* symbol;
 						param* temp;
