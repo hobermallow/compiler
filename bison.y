@@ -84,7 +84,17 @@
 %%
 
 /* grammar starting symbol */
-S : declist deffunclist_check overloads varlistdecl main EOF_TOKEN  	{ printf("parsato !\n"); return 0; }
+S : declist_check deffunclist_check overloads varlistdecl main EOF_TOKEN  	{ printf("parsato !\n"); return 0; }
+	;
+
+declist_check : declist {	
+				printf("//bison.y: all'inizio della declist_check\n");
+				int a = check_recursive_definitions();
+				if( a== 0) {
+					printf("//bison.y: errore nella definizione delle funzioni ricorsive\n");
+					exit(1);
+				}
+			}
 	;
 declist :
 	/*empty */
@@ -109,6 +119,7 @@ decl : NEWTYPE IDENTIFIER typebuilder SEMI_COLON {
 						$3->code = s;
 						//$3->code = prependString("newtype ", prependString($2, prependString($3->code, " ;\n")));
 						printf("%s \n", $3->code);
+						printf("//bison.y: alla fine della dichiarazione del nuovo tipo \n");
 						}
 
 	;
@@ -1089,7 +1100,7 @@ param : type IDENTIFIER {//prova di aggiunta di simbolo
 block : BEG body END
 	;
 
-body : declist varlistdecl stmts
+body : declist_check varlistdecl stmts
 	;
 
 stmts :

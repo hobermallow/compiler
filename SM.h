@@ -360,10 +360,11 @@ void check_type_definitions() {
 			//dovrei essere sicuro , al momento dell'invocazione della funzione, che i record presenti corrispondono solamente a
 			//dichiarazioni di tipo
 			//DEBUG
-			printf("record di nome %s\n", temp_rec->text);
+			printf("record di nome %s tipo %s\n", temp_rec->text, temp_rec->type);
 			for(temp_param = temp_rec->par_list; temp_param != 0; temp_param = temp_param->next) {
 				//cerco nella symbol table il record corrispondente al tipo del parametro
-				printf("cerco il tipo %s (nome %s) \n", temp_param->name, temp_param->type);
+				printf("cerco il tipo %s (nome %s) \n", temp_param->type, temp_param->name);
+				if(is_base_type(temp_param->type)) continue;	
 				if(get_sym_rec(temp_param->type) == 0) {
 					printf("Tipo non trovato: %s\n", temp_param->type);
 					exit(1);
@@ -400,15 +401,17 @@ int check_recursive_definitions() {
 	//a partire dalla symbol table, per ogni record di tipo
 	//array, matrice o record , controlla la lista dei parametri, cercando
 	//per ciascun tipo custom il corrispondente record nella symbol table
+	printf("//SM.h: all'inizio della check_recursive_definitions\n");
 	sym_rec* temp_rec;
 	param* temp_param;
 	for(temp_rec = top->entries; (int)temp_rec != 0; temp_rec = temp_rec->next) {
 		//se e' record corrispondente a typebuilder
+		printf("//SM.h: record in analisi nome: %s tipo: %s\n", temp_rec->text, temp_rec->type);
 		if(is_recursive_type_builder(temp_rec->type)) {
-			printf("nome del record %s\n", temp_rec->text);
+			printf("//SM.h: nome del record %s\n", temp_rec->text);
 			//itero sui parametri e controllo che il tipo di ciascun parametro sia esistente
 			for(temp_param = temp_rec->par_list; (int) temp_param != 0; temp_param = temp_param->next) {
-				printf("puntatore prossimo elemento %d\n", temp_param->next);
+				printf("//SM.h: puntatore prossimo elemento %d\n", temp_param->next);
 				//controllo che esista un record corrispondente al tipo del parametro se non e' base type
 				if(is_base_type(temp_param->type) == 0) {
 					//cerco il record corrispondente al tipo del parametro
@@ -416,8 +419,6 @@ int check_recursive_definitions() {
 					if((int)aaaa == 0) {
 						return 0;
 					}
-					printf("ciao\n");
-					//se non esiste si genera in automatico un errore e la compilazione fallisce
 				}
 			}
 		}

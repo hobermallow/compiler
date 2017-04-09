@@ -39,11 +39,17 @@ extern func* func_list;
 "#" {printf("EXP\n"); return EXP; }
 "/" {printf("DIV\n");  return DIV; }
 "func" {printf("FUNC\n");  functionDefinitions = 1; change_environment();printf("Nuovo environment\n"); return FUNC; }
-func[ ]+exec {printf("FUNC_EXEC\n"); change_environment(); printf("Nuovo environment\n"); return FUNC_EXEC; }
+func[ ]+exec {int a = check_recursive_definitions(); if(a==0) { printf("Errore nelle definizioni ricorsive dei tipi\n"); exit(1); } printf("FUNC_EXEC\n"); change_environment(); printf("Nuovo environment\n"); return FUNC_EXEC; }
 ":" {printf("COLON\n");  return COLON; }
 "begin" {printf("BEG\n"); return BEG; }
 "end" {	
 	printf("END\n"); 
+	//controllo le definizioni ricorsive di tipo
+	int a =	check_recursive_definitions();
+	if(a == 0) {
+		printf("lexer.l: errore nelle definizioi ricorsive di tipo\n");
+		exit(1);
+	}
 	//se sono all'interno della definizione di una funzione, debbo controllare le dichiarazioni degli identificatori di variabile utilizzati
 	if(functionDefinitions == 1) {
 		//controllo che, per tutti gli identificatori utilizzati che non siano identificatori di funzione
