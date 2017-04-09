@@ -112,15 +112,17 @@ decl : NEWTYPE IDENTIFIER typebuilder SEMI_COLON {
 						//debug
 						//print_array_params(sym);
 						//finisco di creare e stampo il codice associato alla dichiarazione del nuovo tipo
-						char s[100] = ""; 
-						strcat(s, " ");
+						char *s = calloc(1, sizeof(char)); 
+						strcat(s, "typedef ");
 						strcat(s, $3->code);
+						printf("//bison.y: madonna ladra %s\n", $3->code);
 						strcat(s, " ");
+						printf("//bison.y: codice del secondo field %s\n", $2);
 						strcat(s, $2);
 						strcat(s, " ;\n");
 						//$3->code = prependString("newtype ", prependString($2, prependString($3->code, " ;\n")));
 						printf("//bison.y: codice del typebuilder\n");
-						printf("%s \n",$3->code );
+						printf("%s \n",s );
 						printf("//bison.y: alla fine della dichiarazione del nuovo tipo \n");
 						}
 
@@ -147,14 +149,12 @@ typebuilder : RECORD OP fieldlist field CP {    printf("//bison.y: record: %s %s
 							strcat(s, "struct { ");
 							printf("//bison.y: primo strcat\n");
 							strcat( s, $4->code);
-							printf("//bison.y: porco dio ladro %s\n", s);
 							strcat( s, "\n}\n");
 							temp->code = s;
 
 						}else {
 							strcat(s, "struct { ");
 							strcat(s, $3->code);
-							printf("//bison.y: porco dio ladro %s\n", s );
 							strcat(s, "\n");
 							strcat(s, $4->code);
 							strcat(s, "\n}\n");
@@ -164,6 +164,8 @@ typebuilder : RECORD OP fieldlist field CP {    printf("//bison.y: record: %s %s
 						printf("//bison.y: dopo l'if \n");
 						//ritorno il sym_rec
 						$$ = temp;
+						printf("//bison.y: codice del typebuilder del record %s\n", $$->code);
+
 					}
 	| MATRIX OP basetype COMMA expression COMMA expression CP {
 						//controllo che il tipo delle espressioni sia intero
@@ -193,7 +195,7 @@ typebuilder : RECORD OP fieldlist field CP {    printf("//bison.y: record: %s %s
 						//setto current_param
 						temp->current_param = temp->par_list;
 						//aggiugo il codice al valore di ritorno
-						char s[100] = "matrix ";
+						char s = "matrix ";
 						strcat(s, "(");
 						strcat(s, $3);
 						strcat(s, ", ");
@@ -253,7 +255,8 @@ typebuilder : RECORD OP fieldlist field CP {    printf("//bison.y: record: %s %s
 							rec->param_type = strdup($3);
 							//ritorno il codice associato al valore di ritorno
 							if($5 == 0) {
-								char s[100] = " array ";
+								char *s = calloc(1, sizeof(char));
+								strcat(s, " array ");
 								strcat(s, "(");
 								strcat(s, $3);
 								strcat(s, " , ");
@@ -263,7 +266,8 @@ typebuilder : RECORD OP fieldlist field CP {    printf("//bison.y: record: %s %s
 								//rec->code = prependString(" array ", prependString("(", prependString($3, prependString(" , ", prependString($6->code, " )")))));
 							}
 							else {
-								char s[100] = " array ";
+								char *s = calloc(1, sizeof(char));
+								strcat(s, " array ");
 								strcat(s, "(");
 								strcat(s, $3);
 								strcat(s, " , ");
@@ -287,14 +291,14 @@ arrayexpr :
 					printf("dopo next\n");
 					//associo il codice al valore di ritorno
 					if($1 == 0) {
-						char s[1] = "";
+						char *s = calloc(1, sizeof(char));
 						strcat(s, $2->code);
 						strcat(s, ", ");
 						$2->code = s;
 						//$2->code = prependString(" ", prependString($2->code, ", "));
 					}
 					else {
-						char s[100] = "";
+						char *s = calloc(1, sizeof(char));
 						strcat(s, $1->code);
 						strcat(s, $2->code);
 						strcat(s, ", ");
@@ -313,13 +317,13 @@ fieldlist :
 					$2->next = $1;
 					//associo il codice al valore di ritorno
 					if($1 == 0) {
-						char s[100] = " ";
+						char *s = calloc(1, sizeof(char));
 						strcat(s, $2->code);
 						$2->code = s;
 						//$2->code = prependString(" ", prependString($2->code, ", "));
 					}
 					else {
-						char s[100] = " ";
+						char *s = calloc(1, sizeof(char));
 						strcat(s, $1->code);
 						strcat(s, $2->code);
 						$2->code = s;
@@ -373,7 +377,7 @@ logical_or_expression : logical_and_expression {
 																											value* temp = (value*) malloc(sizeof(value));
 							    																		temp->val = (int*) malloc(sizeof(int));
 							    																		*((int*)(temp->val)) = *((int*)($1->val)) || *((int*)($3->val));
-								char s[100] = " ";
+								char *s = calloc(1, sizeof(char));
 								strcat(s, $1->code);
 								strcat(s, "||");
 								strcat(s, $3->code);
@@ -390,7 +394,7 @@ logical_and_expression : logical_not_expression  {
 																												value* temp = (value*) malloc(sizeof(value));
 							      																		temp->val = (int*) malloc(sizeof(int));
 																												*((int*)(temp->val)) = *((int*)($1->val)) && *((int*)($3->val));
-									char s[100] = " ";
+									char *s = calloc(1, sizeof(char));
 									strcat(s, $1->code);
 									strcat(s, "&&");
 									strcat(s, $3->code);
@@ -407,7 +411,8 @@ logical_not_expression : exclusive_or_expression {
 					value* temp = (value*) malloc(sizeof(value));
 					temp->val = (int*) malloc(sizeof(int));
 					*((int*)(temp->val)) = ! *((int*)($2->val));
-					char s[100] = "!";
+					char *s = calloc(1, sizeof(char));
+					strcat(s, "!");
 					strcat(s, $2->code);
 					temp->code = s;
 					//temp->code = prependString("!", $2->code);
@@ -430,7 +435,7 @@ equality_expression : relational_expression { $$ = $1; }
 								temp->type = "boolean";
 								//temp->val = (int*)malloc(sizeof(int));
 								//*((int*)(temp->val)) = check_equal($1, $3);
-								char s[100] = " ";
+								char *s = calloc(1, sizeof(char));
 								strcat(s, $1->code);
 								strcat(s, "==");
 								strcat(s, $3->code);
@@ -446,7 +451,7 @@ equality_expression : relational_expression { $$ = $1; }
 								//temp->val = (int*)malloc(sizeof(int));
 								//*((int*)(temp->val)) = check_equal($1, $3);
 								//aggiungo il codice al valore di ritorno
-								char s[100] = " ";
+								char *s = calloc(1, sizeof(char));
 								strcat(s, $1->code);
 								strcat(s, "!=");
 								strcat(s, $3->code);
@@ -477,7 +482,7 @@ additive_expression : multiplicative_expression { $$ = $1; }
 										}
 																													//add_base_type(0, $1, $3, temp);
 																													//aggiungo il codice al valore di ritorno
-										char s[100] = " ";
+										char *s = calloc(1, sizeof(char));
 										strcat(s, $1->code);
 										strcat(s, "+");
 										strcat(s, $3->code);
@@ -494,7 +499,7 @@ additive_expression : multiplicative_expression { $$ = $1; }
 																														else
 																															temp->type = strdup($3->type);
 																														//add_base_type(0, $1, $3, temp);
-											 char s[100] = " ";
+											 char *s = calloc(1, sizeof(char));
 											 strcat(s, $1->code);
 											 strcat(s, "-");
 											 strcat(s, $3->code);
@@ -515,7 +520,7 @@ multiplicative_expression : exp_expression { $$ = $1; }
 																												temp->type = strdup($3->type);
 																											//mul_base_type(0, $1, $3, temp);
 																											// associo il codice
-								 char s[100] = " ";
+								 char *s = calloc(1, sizeof(char));
 								 strcat(s, $1->code);
 								 strcat(s, "*");
 								 strcat(s, $3->code);
@@ -534,7 +539,7 @@ multiplicative_expression : exp_expression { $$ = $1; }
 																												temp->type = strdup($3->type);
 																											//mul_base_type(1, $1, $3, temp);
 																											//associo il codice
-								 char s[100] = " ";
+								 char *s = calloc(1, sizeof(char));
 								 strcat(s, $1->code);
 								 strcat(s, "/");
 								 strcat(s, $3->code);
@@ -549,7 +554,7 @@ exp_expression : cast_expression { $$ = $1; }
 	| exp_expression EXP cast_expression {
 																					value* temp = (value*) malloc(sizeof(value));
 																					temp->type = strdup($3->type);
-		  char s[100] = " ";
+		  char *s = calloc(1, sizeof(char));
 		  strcat(s, $1->code);
 		  strcat(s, "#");
 		  strcat(s, $3->code);
@@ -567,7 +572,7 @@ cast_expression : unary_expression { $$ = $1; }
 																		temp->val = (double*) malloc(sizeof(double));
 																		*((double*)(temp->val)) = (double)(*((int*)($3->val)));
 																		//associo il codice relativo alla espressione di cast
-			char s[100] = " ";
+			char *s = calloc(1, sizeof(char));
 			strcat(s, "floating");
 			strcat(s, "(");
 			strcat(s, $3->code);
@@ -591,7 +596,7 @@ unary_expression : postfix_expression {
 	| unary_operator cast_expression {
 																		change_sign($2);
 																		//associo al valore di ritorno il codice relativo
-				char s[100] = " ";
+				char *s = calloc(1, sizeof(char));
 				strcat(s, "-");
 				strcat(s, $2->code);
 				$2->code = s;
@@ -624,7 +629,7 @@ postfix_expression : primary_expression {
 							sym_rec* type = (sym_rec*)get_sym_rec($1->type);
 							$1->type = strdup(type->param_type);
 							//associo alla chiamata di funzione il codice relativo
-							char s[100] = " ";
+							char s = calloc(1, sizeof(char));
 							strcat(s, $1->code);
 							strcat(s, "(");
 							strcat(s, $3->code);
@@ -655,7 +660,7 @@ postfix_expression : primary_expression {
 									temp->type = strdup(temp_rec->param_type);
 									//associo il codice relativo alla dereferenziazione della matrice
 									printf("prima delle strcat\n");
-									char s[100] = " ";
+									char *s = calloc(1, sizeof(char));
 									strcat(s, $1->code);
 									strcat(s, "[");
 									strcat(s, $3->code);
@@ -690,7 +695,7 @@ postfix_expression : primary_expression {
 							//richiamo una routine che prende in input il nome della funzione e la lista di argomenti
 							check_function_arguments($1, $3);
 							//associo al valore di ritorno il codice relativo
-							char s[100] = " ";
+							char *s = calloc(1, sizeof(char));
 							strcat(s, $1->code);
 							strcat(s, "(");
 							if($3 != 0) 
@@ -714,7 +719,7 @@ postfix_expression : primary_expression {
 							temp->next = func_list;
 							func_list = temp;
 							//associo il codice relativo all'uso della funzione
-							char s[100] = "";
+							char *s = calloc(1, sizeof(char));
 							printf("prima del primo strcat\n");
 							strcat(s, $1->code);
 							printf("dopo il primo strcat\n");
@@ -738,7 +743,7 @@ postfix_expression : primary_expression {
 						//debbo passare come value quello corrispondente al campo del record
 						value* temp = get_record_field($1, $3);
 						//exit;
-						char s[100] = " ";
+						char *s = calloc(1, sizeof(char));
 						strcat(s, $1->code);
 						strcat(s, "->");
 						strcat(s, $3);
@@ -851,7 +856,8 @@ primary_expression : IDENTIFIER {
 		}
 	| OP expression CP {
 	 										//associo il codice associato alle parentesi
-											char s[100] = "(";
+											char *s = calloc(1, sizeof(char));
+											strcat(s, "(");
 											strcat(s, $2->code);
 											strcat(s, ")");
 											$2->code = s;
@@ -928,7 +934,8 @@ vardecl : NEWVARS type varlist var  SEMI_COLON  {
 						//inserico val
 						//aggiungo il codice da generare
 						symbol = (sym_rec*) malloc(sizeof(sym_rec));
-						char s[100] = "newvars ";
+						char *s = calloc(1, sizeof(char));
+						strcat(s, "newvars ");
 						strcat(s, $2);
 						if($3 != 0) 
 							strcat(s, $3->code);
@@ -964,14 +971,14 @@ varlist :
 				$2->next = $1;
 				//aggiungo il codice generato
 				if($1 == 0) {
-					char s[100] = " ";
+					char *s = calloc(1, sizeof(char));
 					strcat(s, $2->code);
 					strcat(s, ", ");
 					$2->code = s;
 					//$2->code = prependString($2->code, ", ");
 				}
 				else {
-					char s[100] = " ";
+					char *s = calloc(1, sizeof(char));
 					strcat(s, $1);
 					strcat(s, $2);
 					strcat(s, ", ");
