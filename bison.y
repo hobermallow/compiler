@@ -801,6 +801,7 @@ primary_expression : IDENTIFIER {
 							value* val = malloc(sizeof(value));
 							val->name= strdup($1);
 							val->type = "unidentified";
+							val->code = strdup($1);
 							$$ = val;
 
 						}

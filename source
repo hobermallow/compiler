@@ -6,7 +6,7 @@ func prova(integer a, floating b): miamatrice
 begin
 	newvars integer a;
 	a = 2;
-	b();
+	c();
 end
 
 func b(): null
