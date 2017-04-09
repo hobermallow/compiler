@@ -1,12 +1,13 @@
-newtype miorecord record(miamatrice int, floating float);
+newtype miorecord record(miamatricess int, floating float);
 newtype miamatrice matrix(integer, 5, 5);
 newtype mioarray array(integer, 6, 6, 6);
 
 func prova(integer a, floating b): miamatrice
 begin
+	newtype miorecord2 record(miamatrice mat, miorecord rec);
 	newvars integer a;
 	a = 2;
-	c();
+	b;
 end
 
 func b(): null
