@@ -112,56 +112,56 @@ decl : NEWTYPE IDENTIFIER typebuilder SEMI_COLON {
 						//debug
 						//print_array_params(sym);
 						//finisco di creare e stampo il codice associato alla dichiarazione del nuovo tipo
-						char s[100] = "newtype "; 
-						strcat(s, $2);
+						char s[100] = ""; 
+						strcat(s, " ");
 						strcat(s, $3->code);
+						strcat(s, " ");
+						strcat(s, $2);
 						strcat(s, " ;\n");
-						$3->code = s;
 						//$3->code = prependString("newtype ", prependString($2, prependString($3->code, " ;\n")));
-						printf("%s \n", $3->code);
+						printf("//bison.y: codice del typebuilder\n");
+						printf("%s \n",$3->code );
 						printf("//bison.y: alla fine della dichiarazione del nuovo tipo \n");
 						}
 
 	;
-typebuilder : RECORD OP fieldlist field CP {    printf("record: %s %s %s %s %s\n", $1, $2, $3, $4, $5);
+typebuilder : RECORD OP fieldlist field CP {    printf("//bison.y: record: %s %s %s %s %s\n", $1, $2, $3, $4, $5);
 						//unisco i field
 						$4->next = $3;
-						printf("dopo la next\n");
+						printf("//bison.y: dopo la next\n");
 						//creo il nuovo record
 						sym_rec* temp = (sym_rec*) malloc(sizeof(sym_rec));
-						printf("dopo il nuovo record\n");
+						printf("//bison.y: dopo il nuovo record\n");
 						//setto i parametri
 						temp->par_list = $4;
-						printf("dopo par_list\n");
+						printf("//bison.y: dopo par_list\n");
 						//setto il tipo
 						temp->type = "record";
-						printf("dopo set del tipo \n");
+						printf("//bison.y: dopo set del tipo \n");
 						//imposto current_param
 						temp->current_param = temp->par_list;
-						printf("dopo current param\n");
+						printf("//bison.y: dopo current param\n");
 						//associo il codice
+						char* s = calloc(1, sizeof(char));
 						if($3 == 0) {
-							printf("%s\n", $4->code);
-							char s[100] = "record ";  
-							strcat(s,  "(");
-							printf("primo strcat\n");
+							strcat(s, "struct { ");
+							printf("//bison.y: primo strcat\n");
 							strcat( s, $4->code);
-							printf("secondo strcat\n");
-							strcat( s, ")");
-							printf("dopo prepend\n");
+							printf("//bison.y: porco dio ladro %s\n", s);
+							strcat( s, "\n}\n");
 							temp->code = s;
-							printf("%s\n", temp->code);
+
 						}else {
-							printf("%s\n", $3->code);
-							char s[100] = "record ";
-							strcat(s, "(");
+							strcat(s, "struct { ");
 							strcat(s, $3->code);
+							printf("//bison.y: porco dio ladro %s\n", s );
+							strcat(s, "\n");
 							strcat(s, $4->code);
-							strcat(s, ")");
+							strcat(s, "\n}\n");
 							temp->code = s;
-							//temp->code = prependString("record ", prependString("(", prependString($3->code, prependString($4->code, ")"))));
+
 						}
-						printf("dopo l'if \n");
+						printf("//bison.y: dopo l'if \n");
 						//ritorno il sym_rec
 						$$ = temp;
 					}
@@ -315,7 +315,6 @@ fieldlist :
 					if($1 == 0) {
 						char s[100] = " ";
 						strcat(s, $2->code);
-						strcat(s, ", ");
 						$2->code = s;
 						//$2->code = prependString(" ", prependString($2->code, ", "));
 					}
@@ -323,7 +322,6 @@ fieldlist :
 						char s[100] = " ";
 						strcat(s, $1->code);
 						strcat(s, $2->code);
-						strcat(s, ", ");
 						$2->code = s;
 						//$2->code = prependString($1->code, prependString($2->code, ", "));
 					}
@@ -338,7 +336,9 @@ field : type IDENTIFIER {
 				temp->name = strdup($2);
 				char *s = malloc(sizeof(char));
 				strcat(s, $1);
+				strcat(s, " ");
 				strcat(s, $2);
+				strcat(s, " ;\n");
 				temp->code = s;
 				//temp->code = prependString($1, $2);
 				$$ = temp;

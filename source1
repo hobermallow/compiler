@@ -1,9 +1,6 @@
-newtype miorecord record(miamatrice int, floating float);
-newtype miamatrice matrix(integer, 5, 5);
-newtype mioarray array(miorecord, 6, 6, 6);
+newtype miorecord record(integer int, floating float);
 
 func exec() : integer 
 begin 
-	newtype miorecord1 record(miamatrice mat, floating float);
 	
 end

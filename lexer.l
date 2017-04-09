@@ -47,7 +47,7 @@ func[ ]+exec {int a = check_recursive_definitions(); if(a==0) { printf("Errore n
 	//controllo le definizioni ricorsive di tipo
 	int a =	check_recursive_definitions();
 	if(a == 0) {
-		printf("lexer.l: errore nelle definizioi ricorsive di tipo\n");
+		printf("//lexer.l: errore nelle definizioi ricorsive di tipo\n");
 		exit(1);
 	}
 	//se sono all'interno della definizione di una funzione, debbo controllare le dichiarazioni degli identificatori di variabile utilizzati
