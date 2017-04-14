@@ -551,3 +551,30 @@ char* appendString(char* first, char* second) {
 	temp = strcat(second, first);
 	return temp;
 }
+
+char* insert_after_struct(char* dst, char* toInsert) {
+	printf("//SM.h : stringa sorgente insert_after_struct %s\n", dst);
+	printf("//SM.h : stringa  da inserire insert_after_struct %s\n", toInsert);
+	//recupero la prima occorrenza di struct
+	char* structPosition = strstr(dst, "struct");
+	printf("//SM.h : porca madonna puttana %s %s \n" , dst, structPosition);
+	printf("//SM.h : dio canaja de dio %s\n", structPosition);
+	//creo la stringa temporanea da ritornare
+	char* temp = calloc(strlen(dst), sizeof(char));
+	printf("//SM.h : insert_after_struct temp %s\n", temp);
+	printf("//SM.h : dio canaja de dio %s\n", structPosition);
+	//inizializzo la stringa con typedef struct
+	strcat(temp, "typedef struct ");
+	printf("//SM.h : dio canaja de dio %s\n", structPosition);
+	printf("//SM.h : insert_after_struct temp %s\n", temp);
+	//appendo la stringa toInsert
+	strcat(temp, toInsert);
+	printf("//SM.h : dio canaja de dio %s\n", structPosition);
+	printf("//SM.h : insert_after_struct temp %s\n", temp);
+	//appendo il resto della stringa originale
+	printf("//SM.h : dio canaja de dio %s\n", structPosition);
+	strcat(temp, (structPosition+6));
+	//ritorno la stringa creata
+	printf("//SM.h : porco dio ladro %s \n" , temp);
+	return temp;
+}

@@ -114,14 +114,21 @@ decl : NEWTYPE IDENTIFIER typebuilder SEMI_COLON {
 						//finisco di creare e stampo il codice associato alla dichiarazione del nuovo tipo
 						char *s = calloc(1, sizeof(char)); 
 						strcat(s, "typedef ");
+						printf("//bison.y : codice di s %s\n", s);
+						//controllo se debbo inserire il nome della struttura dopo la keyword struct
+						printf("//bison.y valore di strstr($3->code) : %d\n", strstr($3->code, "struct"));
 						strcat(s, $3->code);
-						printf("//bison.y: madonna ladra %s\n", $3->code);
+						printf("//bison.y: codice di s %s\n", s);
+						if(strstr(s, "struct") != 0 ) {
+							s = insert_after_struct(s, $2);
+						}
+						printf("//bison.y: codice di s  %s\n", s);
 						strcat(s, " ");
-						printf("//bison.y: codice del secondo field %s\n", $2);
+						printf("//bison.y: codice di s  %s\n", s);
 						strcat(s, $2);
 						strcat(s, " ;\n");
 						//$3->code = prependString("newtype ", prependString($2, prependString($3->code, " ;\n")));
-						printf("//bison.y: codice del typebuilder\n");
+						printf("//bison.y: codice del nuovo tipo ");
 						printf("%s \n",s );
 						printf("//bison.y: alla fine della dichiarazione del nuovo tipo \n");
 						}
@@ -150,7 +157,12 @@ typebuilder : RECORD OP fieldlist field CP {    printf("//bison.y: record: %s %s
 							printf("//bison.y: primo strcat\n");
 							strcat( s, $4->code);
 							strcat( s, "\n}\n");
-							temp->code = s;
+							//allocating size for the string plus 1
+							temp->code = calloc(strlen(s)+1, sizeof(char));
+							//copying string s into temp->code
+							memcpy(temp->code, s, strlen(s));
+							//null terminating string
+							temp->code[strlen(s)-1] = '\0';
 
 						}else {
 							strcat(s, "struct { ");
@@ -158,13 +170,19 @@ typebuilder : RECORD OP fieldlist field CP {    printf("//bison.y: record: %s %s
 							strcat(s, "\n");
 							strcat(s, $4->code);
 							strcat(s, "\n}\n");
-							temp->code = s;
+							//allocating size for the string plus 1
+							temp->code = calloc(strlen(s)+1, sizeof(char));
+							//copying string s into temp->code
+							memcpy(temp->code, s, strlen(s));
+							//null terminating string
+							temp->code[strlen(s)-1] = '\0';
 
 						}
 						printf("//bison.y: dopo l'if \n");
 						//ritorno il sym_rec
 						$$ = temp;
 						printf("//bison.y: codice del typebuilder del record %s\n", $$->code);
+						//qui e' corretto , ma nella riduzione del nuovo tipo il codice viene tagliato
 
 					}
 	| MATRIX OP basetype COMMA expression COMMA expression CP {
