@@ -1097,6 +1097,29 @@ main : FUNC_EXEC OP params CP COLON type block  { //inserisco nella symbol table
 							//inserisco il simbolo appena creato nella symbol table
 							insert_sym_rec(func);
 							printf("Inserito simbolo per la funzione %s\n", func->text);
+							//creo il codice per la funzione main
+							char* s = calloc(1, sizeof(char));
+							if(strcmp($6, "integer") == 0 || strcmp($6, "boolean") == 0) {
+								prependString(s, "int ");
+							}
+							else if(strcmp($6, "floating") == 0) {
+								prependString(s, "double ");
+							}
+							else if(strcmp($6, "void") == 0) {
+								prependString(s, "void ");
+							}
+							else {
+								prependString(s, $6);
+							}
+							printf("//bison.y : dopo il tipo della main\n");
+							prependString(s, "main(");
+							if($3 != 0)
+								prependString(s, $3->code);
+							printf("//bison.y : dopo il codice dei parametri\n");
+							prependString(s, ")\n");
+							prependString(s, $7->code);
+							printf("//bison.y : codice del main \n");
+							printf("%s", s);
 							}
 
 	;
@@ -1104,10 +1127,15 @@ main : FUNC_EXEC OP params CP COLON type block  { //inserisco nella symbol table
 params :
 	/* empty */ { $$ = 0; }
 	| parlist param {
+			printf("//bison.y : inizio della sezione di params\n");
 			$2->next = $1;
+			printf("//bison.y : dopo assegnazione dell'elemento della lista\n");
+			if($1 != 0)
+				$2->code = prependString($2->code, $1->code);
+			printf("//bison.y : dopo il prepend\n");
 			$$ = $2;
 			//stampo tutti i parametri
-			param* temp;
+			printf("//bison.y : fine della sezione di params\n");
 			}
 	;
 
@@ -1116,6 +1144,8 @@ parlist :
 	| parlist param COMMA {//provo cosi. salvo il valore di ritorno di parlist come next element di param
 				printf("//bison.y : inzio della sezione della lista delle parametri\n");
 				$2->next = $1;
+				if($1 != 0 ) 
+					$2->code = prependString($2->code, $1->code);
 				//ritorno la lista completa
 				$$ = $2;
 				}
@@ -1128,6 +1158,12 @@ param : type IDENTIFIER {//prova di aggiunta di simbolo
 			//associo i valori
 			temp->name = strdup($2);
 			temp->type = strdup($1);
+			//inserisco il codice per il parametro
+			char* s = calloc(1, sizeof(char));
+			prependString(s, $1);
+			prependString(s, " ");
+			prependString(s, $2);
+			temp->code = s;
 			//ritorno il parametro
 			$$ = temp;
 			//inserisco il simbolo nella symbol table
@@ -1137,7 +1173,8 @@ param : type IDENTIFIER {//prova di aggiunta di simbolo
 			rec->memoryAllocated = 0;
 			initialize_value(rec);
 			insert_sym_rec(rec);
-			printf("Inserito simbolo %s di tipo %s\n", rec->text, rec->type);
+			printf("//bison.y : Inserito simbolo %s di tipo %s\n", rec->text, rec->type);
+			
 			}
 	;
 
@@ -1171,8 +1208,6 @@ body : declist_check varlistdecl stmts {
 						prependString(s, "\n");
 						temp->code = s;
 						$$ = temp;
-						printf("//bison.y : codice derivato dal body \n");
-						printf("%s\n", temp->code);
 						printf("//bison.y : fine della sezione relativa al body\n");
 					}
 	;
