@@ -84,14 +84,13 @@
 %%
 
 /* grammar starting symbol */
-S : declist_check deffunclist_check overloads varlistdecl main EOF_TOKEN  	{ printf("parsato !\n"); return 0; }
+S : declist_check deffunclist_check overloads varlistdecl main EOF_TOKEN  	{ printf("//bison.y : parsato !\n"); return 0; }
 	;
 
 declist_check : declist {	
-				printf("//bison.y: all'inizio della declist_check\n");
 				int a = check_recursive_definitions();
 				if( a== 0) {
-					printf("//bison.y: errore nella definizione delle funzioni ricorsive\n");
+					printf("bison.y: errore nella definizione delle funzioni ricorsive\n");
 					exit(1);
 				}
 			}
@@ -113,50 +112,38 @@ decl : NEWTYPE IDENTIFIER typebuilder SEMI_COLON {
 						//print_array_params(sym);
 						//finisco di creare e stampo il codice associato alla dichiarazione del nuovo tipo
 						char *s = calloc(1, sizeof(char)); 
-						strcat(s, "typedef ");
-						printf("//bison.y : codice di s %s\n", s);
+						prependString(s, "typedef ");
 						//controllo se debbo inserire il nome della struttura dopo la keyword struct
-						printf("//bison.y valore di strstr($3->code) : %d\n", strstr($3->code, "struct"));
-						strcat(s, $3->code);
-						printf("//bison.y: codice di s %s\n", s);
+						prependString(s, $3->code);
 						if(strstr(s, "struct") != 0 ) {
 							s = insert_after_struct(s, $2);
 						}
-						printf("//bison.y: codice di s  %s\n", s);
-						strcat(s, " ");
-						printf("//bison.y: codice di s  %s\n", s);
-						strcat(s, $2);
-						strcat(s, " ;\n");
-						//$3->code = prependString("newtype ", prependString($2, prependString($3->code, " ;\n")));
+						prependString(s, " ");
+						prependString(s, $2);
+						prependString(s, " ;\n");
 						printf("//bison.y: codice del nuovo tipo ");
 						printf("%s \n",s );
 						printf("//bison.y: alla fine della dichiarazione del nuovo tipo \n");
 						}
 
 	;
-typebuilder : RECORD OP fieldlist field CP {    printf("//bison.y: record: %s %s %s %s %s\n", $1, $2, $3, $4, $5);
+typebuilder : RECORD OP fieldlist field CP {    
 						//unisco i field
 						$4->next = $3;
-						printf("//bison.y: dopo la next\n");
 						//creo il nuovo record
 						sym_rec* temp = (sym_rec*) malloc(sizeof(sym_rec));
-						printf("//bison.y: dopo il nuovo record\n");
 						//setto i parametri
 						temp->par_list = $4;
-						printf("//bison.y: dopo par_list\n");
 						//setto il tipo
 						temp->type = "record";
-						printf("//bison.y: dopo set del tipo \n");
 						//imposto current_param
 						temp->current_param = temp->par_list;
-						printf("//bison.y: dopo current param\n");
 						//associo il codice
 						char* s = calloc(1, sizeof(char));
 						if($3 == 0) {
-							strcat(s, "struct { ");
-							printf("//bison.y: primo strcat\n");
-							strcat( s, $4->code);
-							strcat( s, "\n}\n");
+							prependString(s, "struct { ");
+							prependString( s, $4->code);
+							prependString( s, "\n}\n");
 							//allocating size for the string plus 1
 							temp->code = calloc(strlen(s)+1, sizeof(char));
 							//copying string s into temp->code
@@ -165,11 +152,11 @@ typebuilder : RECORD OP fieldlist field CP {    printf("//bison.y: record: %s %s
 							temp->code[strlen(s)-1] = '\0';
 
 						}else {
-							strcat(s, "struct { ");
-							strcat(s, $3->code);
-							strcat(s, "\n");
-							strcat(s, $4->code);
-							strcat(s, "\n}\n");
+							prependString(s, "struct { ");
+							prependString(s, $3->code);
+							prependString(s, "\n");
+							prependString(s, $4->code);
+							prependString(s, "\n}\n");
 							//allocating size for the string plus 1
 							temp->code = calloc(strlen(s)+1, sizeof(char));
 							//copying string s into temp->code
@@ -187,6 +174,7 @@ typebuilder : RECORD OP fieldlist field CP {    printf("//bison.y: record: %s %s
 					}
 	| MATRIX OP basetype COMMA expression COMMA expression CP {
 						//controllo che il tipo delle espressioni sia intero
+						printf("//bison.y : all'inizio della riduzione del typebuilder della matrice\n");
 						check_is_integer($5);
 						check_is_integer($7);
 						//controllo che il tipo degli elementi della matrice sia intero o floating
@@ -202,8 +190,10 @@ typebuilder : RECORD OP fieldlist field CP {    printf("//bison.y: record: %s %s
 						temp_1 = (param*) malloc(sizeof(param));
 						temp_2 = (param*) malloc(sizeof(param));
 						//copio i valori nei due parametri
+						printf("//bison.y : prima del salvataggio dei valori dei parametri della matrice \n");
 						copy_val_in_param(temp_1, $5);
 						copy_val_in_param(temp_2, $7);
+						printf("//bison.y : dopo il salvataggio dei valori dei parametri della matrice\n");
 						//unisco i parametri
 						temp_1->next = temp_2;
 						//salvo i parametri
@@ -213,18 +203,16 @@ typebuilder : RECORD OP fieldlist field CP {    printf("//bison.y: record: %s %s
 						//setto current_param
 						temp->current_param = temp->par_list;
 						//aggiugo il codice al valore di ritorno
-						char s = "matrix ";
-						strcat(s, "(");
-						strcat(s, $3);
-						strcat(s, ", ");
-						strcat(s, $5->code);
-						strcat(s, ", ");
-						strcat(s, $7->code);
-						strcat(s, " )");
+						char* s = calloc(1, sizeof(char));
+						printf("//bison.y : prima dell'aggiunta del tipo della matrice \n");
+						if(strcmp($3, "integer")== 0) 
+							prependString(s, "int** ");
+						else
+							prependString(s, "double** ");
 						temp->code = s;
-						//temp->code = prependString("matrix ", prependString(" ( ", prependString($3, prependString(", ", prependString($5->code, prependString(", ", prependString($7->code, " )"))))) ));
 						//ritorno il sym_rec
 						$$ = temp;
+						printf("//bison.y : alla fine del typebuilder della matrice \n");
 					}
 
 	| ARRAY OP type COMMA arrayexpr expression CP { 
@@ -232,6 +220,9 @@ typebuilder : RECORD OP fieldlist field CP {    printf("//bison.y: record: %s %s
 							//creo il nuovo elemento per la symbol table
 							sym_rec* rec = malloc (sizeof(sym_rec));
 							rec->type = "array";
+							//inizializzo la stringa che conterra' il codice corrispondente alla dichiarazione
+							//del nuovo tipo array
+							char* s = calloc(1, sizeof(char));
 							//per ciacun valore, debbo creare il parametro
 							value* temp;
 							param* parlist = (param*) malloc(sizeof(param));
@@ -241,6 +232,8 @@ typebuilder : RECORD OP fieldlist field CP {    printf("//bison.y: record: %s %s
 							//assegno anche il tipo del parametro
 							//serve per controllo di definizioni ricorsive dei tipi
 							parlist->type = strdup($3);
+							prependString(s, $3);
+							prependString(s, "*");
 							//segnaposto
 							parlisttemp = parlist;
 							for(temp = $5; temp != 0; temp = temp->next) {
@@ -251,6 +244,7 @@ typebuilder : RECORD OP fieldlist field CP {    printf("//bison.y: record: %s %s
 								//aggiungo il parametro alla lista
 								parlisttemp->next = tem;
 								parlisttemp = tem;
+								prependString(s, "*");
 							}
 							//parlisttemp e' alias di parlist
 							parlisttemp->next = 0;
@@ -272,29 +266,7 @@ typebuilder : RECORD OP fieldlist field CP {    printf("//bison.y: record: %s %s
 							rec->current_param = rec->par_list;
 							rec->param_type = strdup($3);
 							//ritorno il codice associato al valore di ritorno
-							if($5 == 0) {
-								char *s = calloc(1, sizeof(char));
-								strcat(s, " array ");
-								strcat(s, "(");
-								strcat(s, $3);
-								strcat(s, " , ");
-								strcat(s, $6->code);
-								strcat(s, " ) ");
-								rec->code = s; 
-								//rec->code = prependString(" array ", prependString("(", prependString($3, prependString(" , ", prependString($6->code, " )")))));
-							}
-							else {
-								char *s = calloc(1, sizeof(char));
-								strcat(s, " array ");
-								strcat(s, "(");
-								strcat(s, $3);
-								strcat(s, " , ");
-								strcat(s, $5->code);
-								strcat(s, $6->code);
-								strcat(s, " ) ");
-								rec->code = s; 
-								//rec->code = prependString(" array ",  prependString("(", prependString($3, prependString(", ", prependString($5->code, prependString($6->code, ")"))))));
-							}
+							rec->code = s; 
 							$$ = rec;
 							//print_array_params(rec);
 							}
@@ -310,16 +282,16 @@ arrayexpr :
 					//associo il codice al valore di ritorno
 					if($1 == 0) {
 						char *s = calloc(1, sizeof(char));
-						strcat(s, $2->code);
-						strcat(s, ", ");
+						prependString(s, $2->code);
+						prependString(s, ", ");
 						$2->code = s;
 						//$2->code = prependString(" ", prependString($2->code, ", "));
 					}
 					else {
 						char *s = calloc(1, sizeof(char));
-						strcat(s, $1->code);
-						strcat(s, $2->code);
-						strcat(s, ", ");
+						prependString(s, $1->code);
+						prependString(s, $2->code);
+						prependString(s, ", ");
 						$2->code = s;	
 						//$2->code = prependString($1->code, prependString($2->code, ", "));
 					}
@@ -336,14 +308,14 @@ fieldlist :
 					//associo il codice al valore di ritorno
 					if($1 == 0) {
 						char *s = calloc(1, sizeof(char));
-						strcat(s, $2->code);
+						prependString(s, $2->code);
 						$2->code = s;
 						//$2->code = prependString(" ", prependString($2->code, ", "));
 					}
 					else {
 						char *s = calloc(1, sizeof(char));
-						strcat(s, $1->code);
-						strcat(s, $2->code);
+						prependString(s, $1->code);
+						prependString(s, $2->code);
 						$2->code = s;
 						//$2->code = prependString($1->code, prependString($2->code, ", "));
 					}
@@ -357,10 +329,10 @@ field : type IDENTIFIER {
 				temp->type = strdup($1);
 				temp->name = strdup($2);
 				char *s = malloc(sizeof(char));
-				strcat(s, $1);
-				strcat(s, " ");
-				strcat(s, $2);
-				strcat(s, " ;\n");
+				prependString(s, $1);
+				prependString(s, " ");
+				prependString(s, $2);
+				prependString(s, " ;\n");
 				temp->code = s;
 				//temp->code = prependString($1, $2);
 				$$ = temp;
@@ -396,9 +368,9 @@ logical_or_expression : logical_and_expression {
 							    																		temp->val = (int*) malloc(sizeof(int));
 							    																		*((int*)(temp->val)) = *((int*)($1->val)) || *((int*)($3->val));
 								char *s = calloc(1, sizeof(char));
-								strcat(s, $1->code);
-								strcat(s, "||");
-								strcat(s, $3->code);
+								prependString(s, $1->code);
+								prependString(s, "||");
+								prependString(s, $3->code);
 								temp->code = s;
 																											//temp->code = prependString($1->code, prependString("||", $3->code));
 																											$$ = temp;
@@ -413,9 +385,9 @@ logical_and_expression : logical_not_expression  {
 							      																		temp->val = (int*) malloc(sizeof(int));
 																												*((int*)(temp->val)) = *((int*)($1->val)) && *((int*)($3->val));
 									char *s = calloc(1, sizeof(char));
-									strcat(s, $1->code);
-									strcat(s, "&&");
-									strcat(s, $3->code);
+									prependString(s, $1->code);
+									prependString(s, "&&");
+									prependString(s, $3->code);
 									temp->code = s;
 																												//temp->code = prependString($1->code, prependString("&&", $3->code));
 																												$$ = temp;
@@ -430,8 +402,8 @@ logical_not_expression : exclusive_or_expression {
 					temp->val = (int*) malloc(sizeof(int));
 					*((int*)(temp->val)) = ! *((int*)($2->val));
 					char *s = calloc(1, sizeof(char));
-					strcat(s, "!");
-					strcat(s, $2->code);
+					prependString(s, "!");
+					prependString(s, $2->code);
 					temp->code = s;
 					//temp->code = prependString("!", $2->code);
 					$$ = temp;
@@ -454,9 +426,9 @@ equality_expression : relational_expression { $$ = $1; }
 								//temp->val = (int*)malloc(sizeof(int));
 								//*((int*)(temp->val)) = check_equal($1, $3);
 								char *s = calloc(1, sizeof(char));
-								strcat(s, $1->code);
-								strcat(s, "==");
-								strcat(s, $3->code);
+								prependString(s, $1->code);
+								prependString(s, "==");
+								prependString(s, $3->code);
 								temp->code = s;
 								//temp->code = prependString($1->code, prependString("==", $3->code));
 								$$ = temp;
@@ -470,9 +442,9 @@ equality_expression : relational_expression { $$ = $1; }
 								//*((int*)(temp->val)) = check_equal($1, $3);
 								//aggiungo il codice al valore di ritorno
 								char *s = calloc(1, sizeof(char));
-								strcat(s, $1->code);
-								strcat(s, "!=");
-								strcat(s, $3->code);
+								prependString(s, $1->code);
+								prependString(s, "!=");
+								prependString(s, $3->code);
 								temp->code =  s;
 								//temp->code = prependString($1->code, prependString("!=", $3->code));
 							 	$$ = temp;
@@ -501,9 +473,9 @@ additive_expression : multiplicative_expression { $$ = $1; }
 																													//add_base_type(0, $1, $3, temp);
 																													//aggiungo il codice al valore di ritorno
 										char *s = calloc(1, sizeof(char));
-										strcat(s, $1->code);
-										strcat(s, "+");
-										strcat(s, $3->code);
+										prependString(s, $1->code);
+										prependString(s, "+");
+										prependString(s, $3->code);
 										temp->code = s;
 																													//temp->code = prependString($1->code, prependString("+", $3->code));
 																													$$ = temp;
@@ -518,9 +490,9 @@ additive_expression : multiplicative_expression { $$ = $1; }
 																															temp->type = strdup($3->type);
 																														//add_base_type(0, $1, $3, temp);
 											 char *s = calloc(1, sizeof(char));
-											 strcat(s, $1->code);
-											 strcat(s, "-");
-											 strcat(s, $3->code);
+											 prependString(s, $1->code);
+											 prependString(s, "-");
+											 prependString(s, $3->code);
 											 temp->code = s;
 																														//temp->code = prependString($1->code, prependString("-", $3->code));
 																														$$ = temp;
@@ -539,9 +511,9 @@ multiplicative_expression : exp_expression { $$ = $1; }
 																											//mul_base_type(0, $1, $3, temp);
 																											// associo il codice
 								 char *s = calloc(1, sizeof(char));
-								 strcat(s, $1->code);
-								 strcat(s, "*");
-								 strcat(s, $3->code);
+								 prependString(s, $1->code);
+								 prependString(s, "*");
+								 prependString(s, $3->code);
 								 temp->code = s;
 																											//temp->code = prependString($1->code, prependString("*", $3->code));
 																											$$ = temp;
@@ -558,9 +530,9 @@ multiplicative_expression : exp_expression { $$ = $1; }
 																											//mul_base_type(1, $1, $3, temp);
 																											//associo il codice
 								 char *s = calloc(1, sizeof(char));
-								 strcat(s, $1->code);
-								 strcat(s, "/");
-								 strcat(s, $3->code);
+								 prependString(s, $1->code);
+								 prependString(s, "/");
+								 prependString(s, $3->code);
 								 temp->code = s;
 																											//temp->code = prependString($1->code, prependString("/", $3->code));
 																											$$ = temp;
@@ -573,9 +545,9 @@ exp_expression : cast_expression { $$ = $1; }
 																					value* temp = (value*) malloc(sizeof(value));
 																					temp->type = strdup($3->type);
 		  char *s = calloc(1, sizeof(char));
-		  strcat(s, $1->code);
-		  strcat(s, "#");
-		  strcat(s, $3->code);
+		  prependString(s, $1->code);
+		  prependString(s, "#");
+		  prependString(s, $3->code);
 		  temp->code = s;
 																					//temp->code = prependString($1->code, prependString("#", $3->code));
 																					$$ = temp;
@@ -591,10 +563,10 @@ cast_expression : unary_expression { $$ = $1; }
 																		*((double*)(temp->val)) = (double)(*((int*)($3->val)));
 																		//associo il codice relativo alla espressione di cast
 			char *s = calloc(1, sizeof(char));
-			strcat(s, "floating");
-			strcat(s, "(");
-			strcat(s, $3->code);
-			strcat(s, ")");
+			prependString(s, "floating");
+			prependString(s, "(");
+			prependString(s, $3->code);
+			prependString(s, ")");
 			temp->code = s;
 																		//temp->code = prependString("floating", prependString("(", prependString($3->code, ")")));
 																		$$ = temp; }
@@ -615,8 +587,8 @@ unary_expression : postfix_expression {
 																		change_sign($2);
 																		//associo al valore di ritorno il codice relativo
 				char *s = calloc(1, sizeof(char));
-				strcat(s, "-");
-				strcat(s, $2->code);
+				prependString(s, "-");
+				prependString(s, $2->code);
 				$2->code = s;
 					//													$2->code = prependString("-", $2->code);
 																		$$ = $2;
@@ -648,10 +620,10 @@ postfix_expression : primary_expression {
 							$1->type = strdup(type->param_type);
 							//associo alla chiamata di funzione il codice relativo
 							char s = calloc(1, sizeof(char));
-							strcat(s, $1->code);
-							strcat(s, "(");
-							strcat(s, $3->code);
-							strcat(s, ")");
+							prependString(s, $1->code);
+							prependString(s, "(");
+							prependString(s, $3->code);
+							prependString(s, ")");
 							$1->code = s;
 							//$1->code = prependString($1->code, prependString("(",prependString($3->code, ")")));
 						}
@@ -677,16 +649,16 @@ postfix_expression : primary_expression {
 									sym_rec* temp_rec = (sym_rec*) get_sym_rec($1->type);
 									temp->type = strdup(temp_rec->param_type);
 									//associo il codice relativo alla dereferenziazione della matrice
-									printf("prima delle strcat\n");
+									printf("prima delle prependString\n");
 									char *s = calloc(1, sizeof(char));
-									strcat(s, $1->code);
-									strcat(s, "[");
-									strcat(s, $3->code);
-									strcat(s, ", ");
-									strcat(s, $5->code);
-									strcat(s, "]");
+									prependString(s, $1->code);
+									prependString(s, "[");
+									prependString(s, $3->code);
+									prependString(s, ", ");
+									prependString(s, $5->code);
+									prependString(s, "]");
 									temp->code = s;
-									printf("dopo le strcat\n");
+									printf("dopo le prependString\n");
 									//temp->code = prependString($1->code, prependString("[", prependString($3->code, prependString(",", prependString($5->code,"]")))));
 									$$ = temp;
 									printf("fine della postfix della matrice\n");
@@ -714,11 +686,11 @@ postfix_expression : primary_expression {
 							check_function_arguments($1, $3);
 							//associo al valore di ritorno il codice relativo
 							char *s = calloc(1, sizeof(char));
-							strcat(s, $1->code);
-							strcat(s, "(");
+							prependString(s, $1->code);
+							prependString(s, "(");
 							if($3 != 0) 
-								strcat(s, $3->code);
-							strcat(s, ")");
+								prependString(s, $3->code);
+							prependString(s, ")");
 							$1->code = s;
 							//$1->code = prependString($1->code, prependString("(", prependString($3->code, ")")));
 							//ritorno il value corrispondente alla funzione, che cosi ho il tipo
@@ -738,15 +710,15 @@ postfix_expression : primary_expression {
 							func_list = temp;
 							//associo il codice relativo all'uso della funzione
 							char *s = calloc(1, sizeof(char));
-							printf("prima del primo strcat\n");
-							strcat(s, $1->code);
-							printf("dopo il primo strcat\n");
-							strcat(s, "(");
-							printf("dopo il secondo strcat\n");
+							printf("prima del primo prependString\n");
+							prependString(s, $1->code);
+							printf("dopo il primo prependString\n");
+							prependString(s, "(");
+							printf("dopo il secondo prependString\n");
 							if($3 != 0)
-								strcat(s, $3->code);
-							printf("dopo il terzo strcat\n");
-							strcat(s, ")");
+								prependString(s, $3->code);
+							printf("dopo il terzo prependString\n");
+							prependString(s, ")");
 							$1->code = s;
 							printf("fine della postfix\n");
 							//$1->code = prependString($1->code, prependString("(", prependString($3->code, ")")));
@@ -762,9 +734,9 @@ postfix_expression : primary_expression {
 						value* temp = get_record_field($1, $3);
 						//exit;
 						char *s = calloc(1, sizeof(char));
-						strcat(s, $1->code);
-						strcat(s, "->");
-						strcat(s, $3);
+						prependString(s, $1->code);
+						prependString(s, "->");
+						prependString(s, $3);
 						temp->code = s;
 						//temp->code = prependString($1->code, prependString("->", $3));
 						$$ = temp;
@@ -875,9 +847,9 @@ primary_expression : IDENTIFIER {
 	| OP expression CP {
 	 										//associo il codice associato alle parentesi
 											char *s = calloc(1, sizeof(char));
-											strcat(s, "(");
-											strcat(s, $2->code);
-											strcat(s, ")");
+											prependString(s, "(");
+											prependString(s, $2->code);
+											prependString(s, ")");
 											$2->code = s;
 											//$2->code = prependString("(", prependString($2->code, ")"));
 											$$ = $2;
@@ -953,12 +925,12 @@ vardecl : NEWVARS type varlist var  SEMI_COLON  {
 						//aggiungo il codice da generare
 						symbol = (sym_rec*) malloc(sizeof(sym_rec));
 						char *s = calloc(1, sizeof(char));
-						strcat(s, "newvars ");
-						strcat(s, $2);
+						prependString(s, "newvars ");
+						prependString(s, $2);
 						if($3 != 0) 
-							strcat(s, $3->code);
-						strcat(s, $4);
-						strcat(s, ";\n");
+							prependString(s, $3->code);
+						prependString(s, $4);
+						prependString(s, ";\n");
 						symbol->code = s;
 						printf("dopo l'assegnamento\n");
 						//symbol->code = prependString("newvars ", prependString($2, prependString($3, prependString($4, ";\n"))));
@@ -990,16 +962,16 @@ varlist :
 				//aggiungo il codice generato
 				if($1 == 0) {
 					char *s = calloc(1, sizeof(char));
-					strcat(s, $2->code);
-					strcat(s, ", ");
+					prependString(s, $2->code);
+					prependString(s, ", ");
 					$2->code = s;
 					//$2->code = prependString($2->code, ", ");
 				}
 				else {
 					char *s = calloc(1, sizeof(char));
-					strcat(s, $1);
-					strcat(s, $2);
-					strcat(s, ", ");
+					prependString(s, $1);
+					prependString(s, $2);
+					prependString(s, ", ");
 					$2->code = s;
 					//$2->code = prependString($1, prependString($2, ", "));
 				}
