@@ -684,17 +684,20 @@ char* output_allocation_code_array(char* variable, char* type) {
 
 char* generate_allocation_code(value* val, char* type) {
 	//recupero il record corrispondente alla variabile
+	printf("//SM.h : dentro la generate_allocation_code\n");
 	sym_rec* temp = get_sym_rec(type);
 	char* s = calloc(1, sizeof(char));
+	printf("//SM.h : tipo della variabile che si sta allocando %s \n", temp->type);
 	//controllo il tipo
-	if(strcmp(temp->type, "record")) {
+	if(strcmp(temp->type, "record") == 0) {
+		printf("//SM.h : dentro la sezione della generate_allocation_code relativa ai record\n");
 		prependString(s, val->name);
 		prependString(s, " = ");
 		prependString(s, "calloc(1, sizeof(");
 		prependString(s, type);
 		prependString(s, "));");
 	}
-	else if(strcmp(temp->type, "matrix")) {
+	else if(strcmp(temp->type, "matrix") == 0) {
 		//richiamo funzione specifica per allocazione della matrice
 		s = output_allocation_code_matrix(val->name, type);
 	}

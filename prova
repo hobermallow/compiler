@@ -7,8 +7,9 @@ begin
 end
 
 newvars mioarray arra;
+newvars miorecord rec;
 
 func exec (integer x) :  integer
 begin
-	arra = new(mioarray);
+	rec = new(miorecord);
 end

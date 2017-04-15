@@ -1336,6 +1336,8 @@ object_statement : FREE OP IDENTIFIER CP SEMI_COLON {
 									//codice corrispondente all'allocazione di memoria
 									char* s = generate_allocation_code($1, $5);
 									$1->code = s;
+									printf("//bison.y : codice derivato da un'operazione d'allocazione \n");
+									printf("%s\n", $1->code);
 									$$ = $1;
 								   }
 	;
