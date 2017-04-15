@@ -890,7 +890,7 @@ varlistdecl :
 	;
 
 vardecl : NEWVARS type varlist var  SEMI_COLON  {
-						printf("Dentro la dichiarazione di nuove variabili\n");
+						printf("//bison.y : Dentro la dichiarazione di nuove variabili\n");
 						//variabile utility per l'allocazione
 						int alloc = 0;
 						if(is_base_type($2) == 1) {
@@ -917,7 +917,7 @@ vardecl : NEWVARS type varlist var  SEMI_COLON  {
 								symbol->memoryAllocated = alloc;
 								//inserisco il simbolo nella symbol table
 								insert_sym_rec(symbol);
-								printf("Inserisco simbolo %s di tipo %s\n", symbol->text, symbol->type);
+								printf("//bison.y : Inserisco simbolo %s di tipo %s\n", symbol->text, symbol->type);
 							}
 
 						}
@@ -925,14 +925,16 @@ vardecl : NEWVARS type varlist var  SEMI_COLON  {
 						//aggiungo il codice da generare
 						symbol = (sym_rec*) malloc(sizeof(sym_rec));
 						char *s = calloc(1, sizeof(char));
-						prependString(s, "newvars ");
 						prependString(s, $2);
+						prependString(s, " ");
 						if($3 != 0) 
 							prependString(s, $3->code);
-						prependString(s, $4);
+						prependString(s, $4->code);
+						printf("//bison.y : dopo agigunta delle variabili al codice della dichiarazione \n");
+						printf("//bison.y : valori delle variabili da dichiarare %s \n" , $4->code);
 						prependString(s, ";\n");
 						symbol->code = s;
-						printf("dopo l'assegnamento\n");
+						printf("// bison.y : dopo l'assegnamento\n");
 						//symbol->code = prependString("newvars ", prependString($2, prependString($3, prependString($4, ";\n"))));
 						printf("%s ", symbol->code );
 						symbol->text = strdup($4->name);
@@ -940,8 +942,9 @@ vardecl : NEWVARS type varlist var  SEMI_COLON  {
 						symbol->memoryAllocated = alloc;
 						initialize_value(symbol);
 						insert_sym_rec(symbol);
-						printf("Inserisco simbolo %s di tipo %s\n", symbol->text, symbol->type);
-						printf("Fine dichiarazione nuove variabili\n");
+						printf("//bison.y : codice della dichiarazione delle variabili \n");
+						printf("%s\n", s);
+						printf("//bison.y : Fine dichiarazione nuove variabili\n");
 						}
 	;
 
@@ -965,7 +968,6 @@ varlist :
 					prependString(s, $2->code);
 					prependString(s, ", ");
 					$2->code = s;
-					//$2->code = prependString($2->code, ", ");
 				}
 				else {
 					char *s = calloc(1, sizeof(char));
@@ -973,9 +975,9 @@ varlist :
 					prependString(s, $2);
 					prependString(s, ", ");
 					$2->code = s;
-					//$2->code = prependString($1, prependString($2, ", "));
 				}
 				$$ = $2;
+				printf("//bison.y : fine della reduce della varlist \n");
 			    }
 	;
 deffunclist_check : deffunclist {

@@ -2,7 +2,7 @@ newtype miorecord record(integer x);
 newtype miamatrice matrix(integer, 3, 4 );
 newtype mioarray array(miamatrice, 3, 5, 4, 6);
 
-newvars mioarray arra;
+newvars mioarray arra, arra2 ;
 
 
 func exec (integer x) :  integer
