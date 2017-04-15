@@ -364,7 +364,7 @@ void check_type_definitions() {
 			for(temp_param = temp_rec->par_list; temp_param != 0; temp_param = temp_param->next) {
 				//cerco nella symbol table il record corrispondente al tipo del parametro
 				printf("cerco il tipo %s (nome %s) \n", temp_param->type, temp_param->name);
-				if(is_base_type(temp_param->type)) continue;	
+				if(is_base_type(temp_param->type)) continue;
 				if(get_sym_rec(temp_param->type) == 0) {
 					printf("Tipo non trovato: %s\n", temp_param->type);
 					exit(1);
@@ -562,28 +562,39 @@ char* insert_after_struct(char* dst, char* toInsert) {
 	return res;
 }
 
-char* generate_allocation_code(value* val, char* type) {
-	//recupero il record corrispondente alla variabile
-	sym_rec* temp = get_sym_rec(type);
+
+char* recursive_array_allocation(char* qualifiedId, param* par_list, char* type) {
+	//caso base
+	if(par_list->next == 0) {
+		char* temp = calloc(1, sizeof(char));
+		return temp;
+	}
+	//prendo la size della dimensione attuale
+	int count = *((int*)(par_list->val));
+	//size della dimensione successiva
+	int toAlloc = *((int*)(par_list->next->val));
+	char* s_temp = calloc(10, sizeof(char));
 	char* s = calloc(1, sizeof(char));
-	//controllo il tipo
-	if(strcmp(temp->type, "record")) {
-		prependString(s, val->name);
-		prependString(s, " = ");
-		prependString(s, "calloc(1, sizeof(");
+	char* s_next;
+	int i = 0;
+	for(i = 0; i < count; i++) {
+		//creo il pezzo di output
+		sprintf(s_temp, "%s[%d]", qualifiedId, i);
+		prependString(s, s_temp);
+		prependString(s, " = calloc(");
+		sprintf(s_temp, "%d", toAlloc);
+		prependString(s, s_temp);
+		prependString(s, ", sizeof(");
 		prependString(s, type);
-		prependString(s, "));");
+		prependString(s, "));\n");
+		//ricreo il qualifier da passare
+		sprintf(s_temp, "%s[%d]", qualifiedId, i);
+		//chiamata ricorsiva
+		s_next = recursive_array_allocation(s_temp, par_list->next, type);
+		prependString(s, s_next);
 	}
-	else if(strcmp(temp->type, "matrix") {
-		//richiamo funzione specifica per allocazione della matrice
-		s = output_allocation_code_matrix(val->name, type);
-	}
-	else {
-		//richiamo funzione specifica per allocazione dell'array
-		s = output_allocation_code_array(val->name, type);
-	}
+
 	return s;
-	
 }
 
 char* output_allocation_code_matrix(char* variable, char* type) {
@@ -630,17 +641,17 @@ char* output_allocation_code_matrix(char* variable, char* type) {
 		prependString(s, ", sizeof(");
 		if(flag == 0)
 			prependString(s, "int));\n");
-		else 
+		else
 			prependString(s, "double));\n");
 	}
 	//ritorno s
-	return s;		
+	return s;
 }
 
 char* output_allocation_code_array(char* variable, char* type) {
 	char* s = calloc(1, sizeof(char));
 	char* s_temp = calloc(10, sizeof(char));
-	//recupero il sym_rec corrispondente al tipo 
+	//recupero il sym_rec corrispondente al tipo
 	sym_rec* temp = get_sym_rec(type);
 	//flag per tipo int o double della matrice
 	char* typeToPass;
@@ -667,40 +678,30 @@ char* output_allocation_code_array(char* variable, char* type) {
 	if(temp_param->next != 0) {
 		recursive_array_allocation(variable, temp_param, typeToPass);
 	}
-		
+
 
 }
 
-char* recursive_array_allocation(char* qualifiedId, param* par_list, char* type) {
-	//caso base
-	if(par_list->next == 0) {
-		char* temp = calloc(1, sizeof(char));
-		return temp;
-	}	
-	//prendo la size della dimensione attuale
-	int count = *((int*)(par_list->val));
-	//size della dimensione successiva
-	int toAlloc = *((int*)(par_list->next->val));
-	char* s_temp = calloc(10, sizeof(char));
+char* generate_allocation_code(value* val, char* type) {
+	//recupero il record corrispondente alla variabile
+	sym_rec* temp = get_sym_rec(type);
 	char* s = calloc(1, sizeof(char));
-	char* s_next;
-	int i = 0;
-	for(i = 0; i < count; i++) {
-		//creo il pezzo di output
-		sprintf(s_temp, "%s[%d]", qualifiedId, i);
-		prependString(s, s_temp);
-		prependString(s, " = calloc(");
-		sprintf(s_temp, "%d", toAlloc);
-		prependString(s, s_temp);
-		prependString(s, ", sizeof(");
+	//controllo il tipo
+	if(strcmp(temp->type, "record")) {
+		prependString(s, val->name);
+		prependString(s, " = ");
+		prependString(s, "calloc(1, sizeof(");
 		prependString(s, type);
-		prependString(s, "));\n");
-		//ricreo il qualifier da passare
-		sprintf(s_temp, "%s[%d]", qualifiedId, i);
-		//chiamata ricorsiva
-		s_next = recursive_array_allocation(s_temp, par_list->next, type);
-		prependString(s, s_next);
+		prependString(s, "));");
 	}
-
+	else if(strcmp(temp->type, "matrix")) {
+		//richiamo funzione specifica per allocazione della matrice
+		s = output_allocation_code_matrix(val->name, type);
+	}
+	else {
+		//richiamo funzione specifica per allocazione dell'array
+		s = output_allocation_code_array(val->name, type);
+	}
 	return s;
+
 }

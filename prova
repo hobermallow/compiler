@@ -2,13 +2,11 @@ newtype miorecord record(integer x);
 newtype miamatrice matrix(integer, 3, 4 );
 newtype mioarray array(miamatrice, 3, 5, 4, 6);
 
-func ciao() : integer
+func ciao() : integer 
 begin
 end
 
-newvars mioarray arra, arra2 ;
-
-
+newvars mioarray arra;
 
 func exec (integer x) :  integer
 begin
