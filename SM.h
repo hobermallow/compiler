@@ -695,7 +695,7 @@ char* generate_allocation_code(value* val, char* type) {
 		prependString(s, " = ");
 		prependString(s, "calloc(1, sizeof(");
 		prependString(s, type);
-		prependString(s, "));");
+		prependString(s, "));\n");
 	}
 	else if(strcmp(temp->type, "matrix") == 0) {
 		//richiamo funzione specifica per allocazione della matrice

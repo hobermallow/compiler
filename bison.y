@@ -1171,6 +1171,8 @@ body : declist_check varlistdecl stmts {
 						prependString(s, "\n");
 						temp->code = s;
 						$$ = temp;
+						printf("//bison.y : codice derivato dal body \n");
+						printf("%s\n", temp->code);
 						printf("//bison.y : fine della sezione relativa al body\n");
 					}
 	;
@@ -1183,6 +1185,7 @@ stmts :
 				}
 				else {
 					$1->next = $2;
+					$1->code = prependString($1->code, $2->code);
 					$$ = $1;
 				}
 			}
@@ -1336,8 +1339,6 @@ object_statement : FREE OP IDENTIFIER CP SEMI_COLON {
 									//codice corrispondente all'allocazione di memoria
 									char* s = generate_allocation_code($1, $5);
 									$1->code = s;
-									printf("//bison.y : codice derivato da un'operazione d'allocazione \n");
-									printf("%s\n", $1->code);
 									$$ = $1;
 								   }
 	;
