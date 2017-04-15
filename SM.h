@@ -561,3 +561,131 @@ char* insert_after_struct(char* dst, char* toInsert) {
 	//ritorno la stringa appena creata
 	return res;
 }
+
+char* generate_allocation_code(value* val, char* type) {
+	//recupero il record corrispondente alla variabile
+	sym_rec* temp = get_sym_rec(type);
+	char* s = calloc(1, sizeof(char));
+	//controllo il tipo
+	if(strcmp(temp->type, "record")) {
+		prependString(s, val->name);
+		prependString(s, " = ");
+		prependString(s, "calloc(1, sizeof(");
+		prependString(s, type);
+		prependString(s, "));");
+	}
+	else if(strcmp(temp->type, "matrix") {
+		//richiamo funzione specifica per allocazione della matrice
+		s = output_allocation_code_matrix(val->name, type);
+	}
+	else {
+		//richiamo funzione specifica per allocazione dell'array
+		s = output_allocation_code_array(val->name, type);
+	}
+	
+}
+
+char* output_allocation_code_matrix(char* variable, char* type) {
+	char* s = calloc(1, sizeof(char));
+	//recupero il sym_rec del tipo
+	sym_rec* temp = get_sym_rec(type);
+	//flag per tipo int o double della matrice
+	int flag;
+	if(strcmp(temp->param_type, "integer") == 0) {
+		flag = 0;
+	}
+	else {
+		flag = 1;
+	}
+	//recupero il numero delle righe
+	param* temp_param = temp->par_list;
+	int rows = *((int*)(temp_param->val));
+	//alloco lo spazio per le righe
+	prependString(s, variable);
+	prependString(s, " = ");
+	prependString(s, "calloc(");
+	char* s_temp = calloc(1, sizeof(char));
+	sprintf(s_temp, "%d", rows);
+	prependString(s, s_temp);
+	prependString(s, ", sizeof(");
+	if(flag == 0)
+		prependString(s, "int));\n");
+	else
+		prependString(s, "double));\n");
+	//alloco lo spazio per le colonne, recuperando il numero delle colonne
+	temp_param = temp_param->next;
+	int cols = *((int*)(temp_param->val));
+	char* ind = calloc(10, sizeof(char));
+	sprintf(s_temp, "%d", cols);
+	//itero sulle righe
+	int i_temp;
+	for(i_temp = 0; i_temp < rows; i_temp++) {
+		sprintf(ind, "%d", i_temp);
+		prependString(s, variable);
+		prependString(s, "[");
+		prependString(s, ind);
+		prependString(s, "] = calloc(");
+		prependString(s, s_temp);
+		prependString(s, ", sizeof(");
+		if(flag == 0)
+			prependString(s, "int));\n");
+		else 
+			prependString(s, "double));\n");
+	}
+	//ritorno s
+	return s;		
+}
+
+char* output_allocation_code_array(char* variable, char* type) {
+	//recupero il sym_rec corrispondente al tipo 
+	sym_rec* temp = get_sym_rec(type);
+	//flag per tipo int o double della matrice
+	int flag;
+	if(strcmp(temp->param_type, "integer") == 0) {
+		flag = 0;
+	}
+	else {
+		flag = 1;
+	}
+	//itero sulle varie dimensioni dell'array
+	param* temp_param = temp->par_list;
+	for(; temp_param != 0; temp_param = temp_param->next) {
+		
+	}
+	int dimension = *((int*)(temp_param->val));
+	//alloco lo spazio per le righe
+	prependString(s, variable);
+	prependString(s, " = ");
+	prependString(s, "calloc(");
+	char* s_temp = calloc(1, sizeof(char));
+	sprintf(s_temp, "%d", rows);
+	prependString(s, s_temp);
+	prependString(s, ", sizeof(");
+	if(flag == 0)
+		prependString(s, "int));\n");
+	else
+		prependString(s, "double));\n");
+	//alloco lo spazio per le colonne, recuperando il numero delle colonne
+	temp_param = temp_param->next;
+	int cols = *((int*)(temp_param->val));
+	char* ind = calloc(10, sizeof(char));
+	sprintf(s_temp, "%d", cols);
+	//itero sulle righe
+	int i_temp;
+	for(i_temp = 0; i_temp < rows; i_temp++) {
+		sprintf(ind, "%d", i_temp);
+		prependString(s, variable);
+		prependString(s, "[");
+		prependString(s, ind);
+		prependString(s, "] = calloc(");
+		prependString(s, s_temp);
+		prependString(s, ", sizeof(");
+		if(flag == 0)
+			prependString(s, "int));\n");
+		else 
+			prependString(s, "double));\n");
+	}
+	//ritorno s
+	return s;
+
+}
