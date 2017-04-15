@@ -1305,6 +1305,9 @@ object_statement : FREE OP IDENTIFIER CP SEMI_COLON {
 									//alloco memoria per il valore dell'unary_expression
 									alloc_mem($1);
 									//codice corrispondente all'allocazione di memoria
+									char* s = generate_allocation_code($1, $5);
+									$1->code = s;
+									$$ = $1;
 								   }
 	;
 
