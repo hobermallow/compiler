@@ -75,7 +75,7 @@
 %type <str> type
 %type <str> basetype
 %type <par> param parlist params var varlist field fieldlist
-%type <val> constant primary_expression expression conditional_expression logical_or_expression logical_and_expression logical_not_expression exclusive_or_expression and_expression equality_expression relational_expression shift_expression additive_expression multiplicative_expression exp_expression cast_expression unary_expression postfix_expression exprlist exprlist_temp arrayexpr
+%type <val> constant primary_expression expression conditional_expression logical_or_expression logical_and_expression logical_not_expression exclusive_or_expression and_expression equality_expression relational_expression shift_expression additive_expression multiplicative_expression exp_expression cast_expression unary_expression postfix_expression exprlist exprlist_temp arrayexpr block body stmt stmts varlistdecl vardecl declist_check
 %type <symrec> typebuilder
 %type <str> overloadable_operands
 
@@ -1007,7 +1007,7 @@ deffunclist :
 	;
 
 deffunc : FUNC IDENTIFIER OP params CP COLON type block { //inserisco nella symbol table il simbolo corrispondente alla funzione
-							printf("controllo prima dell'inserimento della nuova funzione nella symbol table\n");
+							printf("//bison.y : controllo prima dell'inserimento della nuova funzione nella symbol table\n");
 							sym_rec *func = (sym_rec*) malloc(sizeof(sym_rec));
 							//inserisco nome della funzione
 							func->text = strdup($2);
@@ -1022,10 +1022,35 @@ deffunc : FUNC IDENTIFIER OP params CP COLON type block { //inserisco nella symb
 							func->par_list = $4;
 							//inserisco il simbolo appena creato nella symbol table
 							insert_sym_rec(func);
-							printf("Inserito simbolo per la funzione %s\n", func->text);
+							printf("//bison.y : Inserito simbolo per la funzione %s\n", func->text);
 							//reimposto il flag per la sezione di normale parsing
 							//all'ultima definizione di funzione rimarra' 0
 							functionDefinitions = 0;
+							//inserisco il codice C corrispondente alla funzione
+							printf("//bison.y : prima della costruzione del codice della funzione\n");
+							char* s = calloc(1, sizeof(char));
+							if(strcmp($7, "integer") == 0 )
+								prependString(s, "int ");
+							else if(strcmp($7, "floating ") == 0) 
+								prependString(s, "double ");
+							else if(strcmp($7, "boolean ") == 0)
+								prependString(s, "int ");
+							else 
+								prependString(s, $7);
+							printf("//bison.y : dopo inserimento del tipo di ritorno della funzione\n");
+							prependString(s, $2);
+							printf("//bison.y : dopo inserimento del nome della funzione\n");
+							prependString(s, " ( ");
+							if($4 != 0) 
+								prependString(s, $4->code);
+							printf("//bison.y : dopo inserimento del codice per i parametri della funzione\n");
+							prependString(s, " ) ");
+							prependString(s, $8->code);
+							printf("//bison.y : dopo inserimento del codice per il body della funzione\n");
+							//stampo il codice relativo alla definizione della nuova funzione
+							printf("//bison.y : codice della definizione della nuova funzione\n");
+							printf("%s\n", s);
+
 							}
 
 
@@ -1096,58 +1121,160 @@ param : type IDENTIFIER {//prova di aggiunta di simbolo
 			}
 	;
 
-block : BEG body END
+block : BEG body END {
+			char* s = calloc(1, sizeof(char));
+			prependString(s, "{\n");
+			prependString(s, $2->code);
+			prependString(s, "\n}\n");
+			$2->code = s;
+			$$ = $2;
+			}
 	;
 
-body : declist_check varlistdecl stmts
+body : declist_check varlistdecl stmts {
+						value* temp = calloc(1, sizeof(value));
+						char* s = calloc(1, sizeof(char));
+						prependString(s, $1->code);
+						prependString(s, "\n "); 
+						prependString(s, $2->code);
+						prependString(s, "\n");
+						prependString(s, $3->code);
+						prependString(s, "\n");
+					}
 	;
 
 stmts :
-	/* empty */
-	| stmts stmt
+	/* empty */  { $$ = 0; }
+	| stmts stmt  {
+				if($1 == 0) {
+					$$ = $2;
+				}
+				else {
+					$1->next = $2; 
+					$$ = $1;
+				}
+			}
 	;
 
-stmt :	assignment_statement
-	| block
-	| selection_statement
-	| iteration_statement
-	| object_statement
-	| jump_statement
-	| printf_statement
-	| scanf_statement
+stmt :	assignment_statement { $$ = $1; }
+	| block { $$ = $1; }
+	| selection_statement { $$ = $1; }
+	| iteration_statement  { $$ = $1; }
+	| object_statement  { $$ = $1; }
+	| jump_statement  { $$ = $1; }
+	| printf_statement   { $$ = $1; }
+	| scanf_statement  { $$ = $1; }
 	;
-scanf_statement: SCANF OP STRING printf_temp CP SEMI_COLON
+scanf_statement: SCANF OP STRING printf_temp CP SEMI_COLON { 
+								value* val = calloc(1, sizeof(value));
+								char* s = calloc(1, sizeof(char));
+								prependString(s, "scanf(");
+								prependString(s, $3);
+								if($4 != 0)
+									prependString(s, $4->code);
+								prependString(s, ");\n");
+								val->code = s;
+								$$ = val;
+							   }
 
-printf_statement: PRINTF OP STRING  printf_temp CP SEMI_COLON
+printf_statement: PRINTF OP STRING  printf_temp CP SEMI_COLON	{
+									value* val = calloc(1,sizeof(value));
+									char* s = calloc(1, sizeof(char));
+									prependString(s, "printf(");
+									prependString(s, $3);
+									if($4 != 0)
+										prependString(s, $4->code);
+									prependString(s, ");\n");
+									val->code = s;
+									$$ = val;		
+								}
+	
 
 printf_temp: 
-	| /* empty */
-	| COMMA  exprlist
+	| /* empty */  { $$ = 0; }
+	| COMMA  exprlist { 
+				char* s = calloc(1, sizeof(char));
+				prependString(s, ", ");
+				prependString(s, $2->code);
+				$2->code = s;
+				$$ = $2;
+			}
 	;
 
-jump_statement : RETURN jump_temp SEMI_COLON
+jump_statement : RETURN jump_temp SEMI_COLON {
+						char* s = calloc(1, sizeof(char));
+						prependString(s, "return ");
+						if($2 != 0)
+							prependString(s, $2->code);
+						prependString(s, " ; ");
+						$2->code = s;
+						$$ = $2;
+						}
 	;
 
 jump_temp :
-	/* empty */
-	| expression
+	/* empty */ { $$ = 0; }
+	| expression { $$ = $1; }
 	;
 
 
-selection_statement : IF OP expression CP BEG stmts END
-	| IF OP expression CP BEG stmts END ELSE BEG stmts END
+selection_statement : IF OP expression CP BEG stmts END {
+								char* s = calloc(1, sizeof(char));
+								prependString(s, "if (");
+								prependString(s, $3->code);
+								prependString(s, ") \n {");
+								prependString(s, $6);
+								prependString(s, "\n}\n");	
+								$3->code = s;
+								$$ = $3;
+							}
+	| IF OP expression CP BEG stmts END ELSE BEG stmts END {
+								char* s = calloc(1, sizeof(char));
+								prependString(s, "if (");
+								prependString(s, $3->code);
+								prependString(s, ") \n {");
+								prependString(s, $6);
+								prependString(s, "\n} else {\n");
+								prependString(s, $10->code);
+								prependString(s, "\n}\n");	
+								$3->code = s;
+								$$ = $3;
+								}
 	;
 
-iteration_statement : LOOP OP expression CP BEG stmts END
+iteration_statement : LOOP OP expression CP BEG stmts END {
+								char* s = calloc(1, sizeof(char));
+								prependString(s, "while(");
+								prependString(s, $3->code);
+								prependString(s ") {\n");
+								prependString(s, $6->code);
+								prependString(s, "\n}\n");
+								$3->code = s;
+								$$ = $3;
+							}
 	;
 
-assignment_statement : unary_expression assignment_operator expression SEMI_COLON { printf("Dentro l'assignment statement\n");
+assignment_statement : unary_expression assignment_operator expression SEMI_COLON { printf("//bison.y : Dentro l'assignment statement\n");
 											if(strcmp($1->type, "unidentified") != 0 && strcmp($3->type, "unidentified") != 0)
 												check_type($1,$3);
 											copy_val($1,$3);
-											printf("Fine dell'assignment statement\n");
+											printf("//bison.y : Fine dell'assignment statement\n");
+											char* s = calloc(1, sizeof(char));
+											prependString(s, $1->code);
+											prependString(s, " ");
+											prependString(s ,$2->code);
+											prependString(s, " ");
+											prependString(s, $3->code);
+											$1->code = s;
+											$$ = $1;
 										}
-	| expression SEMI_COLON
+	| expression SEMI_COLON {
+					char* s = calloc(1, sizeof(char));
+					prependString(s, $1->code);
+					prependString(s, " ; ");
+					$1->code = s;
+					$$ = $1;
+				}
 	/* eliminata statements fatta da solo SEMI_COLON */
 	;
 
@@ -1157,6 +1284,13 @@ object_statement : FREE OP IDENTIFIER CP SEMI_COLON {
 							val->name = strdup($3);
 							//dealloco la memoria
 							dealloc_mem(val);
+							//codice della deallocazione
+							char* s = calloc(1, sizeof(char));
+							prependString(s, "free(");
+							prependString(s, $3);
+							prependString(s, ") ;");
+							val->code = s;
+							$$ = val;
 						    }
 	| unary_expression ASSIGN  NEW OP IDENTIFIER CP SEMI_COLON {
 									//debbo controllare che l'unary_expression sia dello stesso tipo
@@ -1167,6 +1301,7 @@ object_statement : FREE OP IDENTIFIER CP SEMI_COLON {
 									check_type($1, temp);
 									//alloco memoria per il valore dell'unary_expression
 									alloc_mem($1);
+									//codice corrispondente all'allocazione di memoria
 								   }
 	;
 
