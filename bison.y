@@ -119,6 +119,9 @@ decl : NEWTYPE IDENTIFIER typebuilder SEMI_COLON {
 							s = insert_after_struct(s, $2);
 						}
 						prependString(s, " ");
+						if(strstr(s, "struct") != 0) {
+							prependString(s, "*");
+						}
 						prependString(s, $2);
 						prependString(s, " ;\n");
 						printf("//bison.y: codice del nuovo tipo ");
