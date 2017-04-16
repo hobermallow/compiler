@@ -571,7 +571,7 @@ char* insert_after_struct(char* dst, char* toInsert) {
 	return res;
 }
 
-
+//funzione per la ricorsione necessaria all'allocazione di un array
 char* recursive_array_allocation(char* qualifiedId, param* par_list, char* type) {
 	//caso base
 	printf("//SM.h : dentro la recursive_array_allocation\n");
@@ -602,7 +602,11 @@ char* recursive_array_allocation(char* qualifiedId, param* par_list, char* type)
 		sprintf(s_temp, "%d", toAlloc);
 		s = prependString(s,  s_temp);
 		s = prependString(s, ", sizeof(");
-		s = prependString(s,  type);
+		//alloco puntatori fino all'ultima passata
+		if(par_list->next->next == 0)
+			s = prependString(s,  type);
+		else 
+			s = prependString(s, "void*");
 		s = prependString(s,  "));\n");
 		//ricreo il qualifier da passare
 		sprintf(s_temp, "%s[%d]", qualifiedId, i);
@@ -689,12 +693,18 @@ char* output_allocation_code_array(char* variable, char* type) {
 	sprintf(s_temp, "%d", count);
 	s = prependString(s,  s_temp);
 	s = prependString(s, ", sizeof(");
-	s = prependString(s,  typeToPass);
+	if(temp_param->next == 0)
+		s = prependString(s,  typeToPass);
+	else 
+		s = prependString(s, "void*");
 	s = prependString(s,  "));\n");
 	//chiamata alla funzione che allochera' il resto dell'array
 	if(temp_param->next != 0) {
-		recursive_array_allocation(variable, temp_param, typeToPass);
+		char* s_rec;
+		s_rec = recursive_array_allocation(variable, temp_param, typeToPass);
+		s = prependString(s, s_rec);
 	}
+	return s;
 
 
 }
