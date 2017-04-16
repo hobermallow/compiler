@@ -587,7 +587,7 @@ char* recursive_array_allocation(char* qualifiedId, param* par_list, char* type)
 	char* s_temp = calloc(10, sizeof(char));
 	printf("//SM.h : dopo allocazione di s_temp\n");
 	char *s;
-	s = (char*)malloc(1);
+	s = (char*)calloc(1, sizeof(char));
 	printf("//SM.h : dopo allocazione di s\n");
 	char *s_next;
 	printf("//SM.h : dopo allocazione di s_next\n");
@@ -605,7 +605,7 @@ char* recursive_array_allocation(char* qualifiedId, param* par_list, char* type)
 		//alloco puntatori fino all'ultima passata
 		if(par_list->next->next == 0)
 			s = prependString(s,  type);
-		else 
+		else
 			s = prependString(s, "void*");
 		s = prependString(s,  "));\n");
 		//ricreo il qualifier da passare
@@ -695,7 +695,7 @@ char* output_allocation_code_array(char* variable, char* type) {
 	s = prependString(s, ", sizeof(");
 	if(temp_param->next == 0)
 		s = prependString(s,  typeToPass);
-	else 
+	else
 		s = prependString(s, "void*");
 	s = prependString(s,  "));\n");
 	//chiamata alla funzione che allochera' il resto dell'array
