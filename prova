@@ -13,4 +13,5 @@ func exec (integer x) :  integer
 begin
 	rec = new(miorecord);
 	rec2 = new(miorecord);
+	arra = new(mioarray);
 end
