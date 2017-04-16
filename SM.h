@@ -564,9 +564,9 @@ char* insert_after_struct(char* dst, char* toInsert) {
 	//inizializzo la prima parte della stringa
 	strcpy(res, "typedef struct ");
 	//aggiungo il nome della struct
-	prependString(res, toInsert);
+	res = prependString(res,  toInsert);
 	//aggiungo il resto dell struct
-	prependString(res, structPosition+6);
+	res = prependString(res,  structPosition+6);
 	//ritorno la stringa appena creata
 	return res;
 }
@@ -597,18 +597,18 @@ char* recursive_array_allocation(char* qualifiedId, param* par_list, char* type)
 		printf("//SM.h : prima della creazione del qualified identifier\n");
 		sprintf(s_temp, "%s[%d]", qualifiedId, i);
 		printf("//SM.h : dopo la creazione del qualified identifier\n");
-		prependString(s, s_temp);
-		prependString(s, " = calloc(");
+		s = prependString(s,  s_temp);
+		s = prependString(s,  " = calloc(");
 		sprintf(s_temp, "%d", toAlloc);
-		prependString(s, s_temp);
-		prependString(s, ", sizeof(");
-		prependString(s, type);
-		prependString(s, "));\n");
+		s = prependString(s,  s_temp);
+		s = prependString(s, ", sizeof(");
+		s = prependString(s,  type);
+		s = prependString(s,  "));\n");
 		//ricreo il qualifier da passare
 		sprintf(s_temp, "%s[%d]", qualifiedId, i);
 		//chiamata ricorsiva
 		s_next = recursive_array_allocation(s_temp, par_list->next, type);
-		prependString(s, s_next);
+		s = prependString(s,  s_next);
 	}
 
 	return s;
@@ -630,17 +630,17 @@ char* output_allocation_code_matrix(char* variable, char* type) {
 	param* temp_param = temp->par_list;
 	int rows = *((int*)(temp_param->val));
 	//alloco lo spazio per le righe
-	prependString(s, variable);
-	prependString(s, " = ");
-	prependString(s, "calloc(");
+	s = prependString(s,  variable);
+	s = prependString(s,  " = ");
+	s = prependString(s,  "calloc(");
 	char* s_temp = calloc(1, sizeof(char));
 	sprintf(s_temp, "%d", rows);
-	prependString(s, s_temp);
-	prependString(s, ", sizeof(");
+	s = prependString(s,  s_temp);
+	s = prependString(s, ", sizeof(");
 	if(flag == 0)
 		prependString(s, "int));\n");
 	else
-		prependString(s, "double));\n");
+		s = prependString(s,  "double));\n");
 	//alloco lo spazio per le colonne, recuperando il numero delle colonne
 	temp_param = temp_param->next;
 	int cols = *((int*)(temp_param->val));
@@ -650,16 +650,16 @@ char* output_allocation_code_matrix(char* variable, char* type) {
 	int i_temp;
 	for(i_temp = 0; i_temp < rows; i_temp++) {
 		sprintf(ind, "%d", i_temp);
-		prependString(s, variable);
-		prependString(s, "[");
-		prependString(s, ind);
-		prependString(s, "] = calloc(");
-		prependString(s, s_temp);
-		prependString(s, ", sizeof(");
+		s = prependString(s,  variable);
+		s = prependString(s,  "[");
+		s = prependString(s,  ind);
+		s = prependString(s,  "] = calloc(");
+		s = prependString(s,  s_temp);
+		s = prependString(s, ", sizeof(");
 		if(flag == 0)
-			prependString(s, "int));\n");
+			s = prependString(s,  "int));\n");
 		else
-			prependString(s, "double));\n");
+			s = prependString(s,  "double));\n");
 	}
 	//ritorno s
 	return s;
@@ -684,13 +684,13 @@ char* output_allocation_code_array(char* variable, char* type) {
 	//prima allocazione dell'array
 	param* temp_param = temp->par_list;
 	int count = *((int*)(temp_param->val));
-	prependString(s, variable);
-	prependString(s, " = calloc(");
+	s = prependString(s,  variable);
+	s = prependString(s,  " = calloc(");
 	sprintf(s_temp, "%d", count);
-	prependString(s, s_temp);
-	prependString(s, ", sizeof(");
-	prependString(s, typeToPass);
-	prependString(s, "));\n");
+	s = prependString(s,  s_temp);
+	s = prependString(s, ", sizeof(");
+	s = prependString(s,  typeToPass);
+	s = prependString(s,  "));\n");
 	//chiamata alla funzione che allochera' il resto dell'array
 	if(temp_param->next != 0) {
 		recursive_array_allocation(variable, temp_param, typeToPass);
@@ -708,11 +708,11 @@ char* generate_allocation_code(value* val, char* type) {
 	//controllo il tipo
 	if(strcmp(temp->type, "record") == 0) {
 		printf("//SM.h : dentro la sezione della generate_allocation_code relativa ai record\n");
-		prependString(s, val->name);
-		prependString(s, " = ");
-		prependString(s, "calloc(1, sizeof(");
-		prependString(s, type);
-		prependString(s, "));\n");
+		s = prependString(s,  val->name);
+		s = prependString(s,  " = ");
+		s = prependString(s, "calloc(1, sizeof(");
+		s = prependString(s, type);
+		s = prependString(s, "));\n");
 	}
 	else if(strcmp(temp->type, "matrix") == 0) {
 		//richiamo funzione specifica per allocazione della matrice

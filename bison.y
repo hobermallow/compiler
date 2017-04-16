@@ -125,18 +125,18 @@ decl : NEWTYPE IDENTIFIER typebuilder SEMI_COLON {
 						//print_array_params(sym);
 						//finisco di creare e stampo il codice associato alla dichiarazione del nuovo tipo
 						char *s = calloc(1, sizeof(char));
-						prependString(s, "typedef ");
+						s = prependString(s,  "typedef ");
 						//controllo se debbo inserire il nome della struttura dopo la keyword struct
-						prependString(s, $3->code);
+						s = prependString(s,  $3->code);
 						if(strstr(s, "struct") != 0 ) {
 							s = insert_after_struct(s, $2);
 						}
-						prependString(s, " ");
+						s = prependString(s,  " ");
 						if(strstr(s, "struct") != 0) {
-							prependString(s, "*");
+							s = prependString(s,  "*");
 						}
-						prependString(s, $2);
-						prependString(s, " ;\n");
+						s = prependString(s,  $2);
+						s = prependString(s,  " ;\n");
 						printf("//bison.y: codice del nuovo tipo ");
 						//printf("%s \n",s );
 						printf("//bison.y: alla fine della dichiarazione del nuovo tipo \n");
@@ -161,9 +161,9 @@ typebuilder : RECORD OP fieldlist field CP {
 						//associo il codice
 						char* s = calloc(1, sizeof(char));
 						if($3 == 0) {
-							prependString(s, "struct { ");
-							prependString( s, $4->code);
-							prependString( s, "\n}\n");
+							s = prependString(s,  "struct { ");
+							 s = prependString( s,  $4->code);
+							 s = prependString( s,  "\n}\n");
 							//allocating size for the string plus 1
 							temp->code = calloc(strlen(s)+1, sizeof(char));
 							//copying string s into temp->code
@@ -172,11 +172,11 @@ typebuilder : RECORD OP fieldlist field CP {
 							temp->code[strlen(s)-1] = '\0';
 
 						}else {
-							prependString(s, "struct { ");
-							prependString(s, $3->code);
-							prependString(s, "\n");
-							prependString(s, $4->code);
-							prependString(s, "\n}\n");
+							s = prependString(s,  "struct { ");
+							s = prependString(s,  $3->code);
+							s = prependString(s,  "\n");
+							s = prependString(s,  $4->code);
+							s = prependString(s,  "\n}\n");
 							//allocating size for the string plus 1
 							temp->code = calloc(strlen(s)+1, sizeof(char));
 							//copying string s into temp->code
@@ -226,9 +226,9 @@ typebuilder : RECORD OP fieldlist field CP {
 						char* s = calloc(1, sizeof(char));
 						printf("//bison.y : prima dell'aggiunta del tipo della matrice \n");
 						if(strcmp($3, "integer")== 0)
-							prependString(s, "int** ");
+							s = prependString(s,  "int** ");
 						else
-							prependString(s, "double** ");
+							s = prependString(s,  "double** ");
 						temp->code = s;
 						//ritorno il sym_rec
 						$$ = temp;
@@ -252,8 +252,8 @@ typebuilder : RECORD OP fieldlist field CP {
 							//assegno anche il tipo del parametro
 							//serve per controllo di definizioni ricorsive dei tipi
 							parlist->type = strdup($3);
-							prependString(s, $3);
-							prependString(s, "*");
+							s = prependString(s,  $3);
+							s = prependString(s,  "*");
 							//segnaposto
 							parlisttemp = parlist;
 							for(temp = $5; temp != 0; temp = temp->next) {
@@ -264,7 +264,7 @@ typebuilder : RECORD OP fieldlist field CP {
 								//aggiungo il parametro alla lista
 								parlisttemp->next = tem;
 								parlisttemp = tem;
-								prependString(s, "*");
+								s = prependString(s,  "*");
 							}
 							//parlisttemp e' alias di parlist
 							parlisttemp->next = 0;
@@ -302,16 +302,16 @@ arrayexpr :
 					//associo il codice al valore di ritorno
 					if($1 == 0) {
 						char *s = calloc(1, sizeof(char));
-						prependString(s, $2->code);
-						prependString(s, ", ");
+						s = prependString(s,  $2->code);
+						s = prependString(s, ", ");
 						$2->code = s;
 						//$2->code = prependString(" ", prependString($2->code, ", "));
 					}
 					else {
 						char *s = calloc(1, sizeof(char));
-						prependString(s, $1->code);
-						prependString(s, $2->code);
-						prependString(s, ", ");
+						s = prependString(s, $1->code);
+						s = prependString(s, $2->code);
+						s = prependString(s, ", ");
 						$2->code = s;
 						//$2->code = prependString($1->code, prependString($2->code, ", "));
 					}
@@ -328,14 +328,14 @@ fieldlist :
 					//associo il codice al valore di ritorno
 					if($1 == 0) {
 						char *s = calloc(1, sizeof(char));
-						prependString(s, $2->code);
+						s = prependString(s,  $2->code);
 						$2->code = s;
 						//$2->code = prependString(" ", prependString($2->code, ", "));
 					}
 					else {
 						char *s = calloc(1, sizeof(char));
-						prependString(s, $1->code);
-						prependString(s, $2->code);
+						s = prependString(s,  $1->code);
+						s = prependString(s,  $2->code);
 						$2->code = s;
 						//$2->code = prependString($1->code, prependString($2->code, ", "));
 					}
@@ -349,10 +349,10 @@ field : type IDENTIFIER {
 				temp->type = strdup($1);
 				temp->name = strdup($2);
 				char *s = malloc(sizeof(char));
-				prependString(s, $1);
-				prependString(s, " ");
-				prependString(s, $2);
-				prependString(s, " ;\n");
+				s = prependString(s,  $1);
+				s = prependString(s,  " ");
+				s = prependString(s,  $2);
+				s = prependString(s,  " ;\n");
 				temp->code = s;
 				//temp->code = prependString($1, $2);
 				$$ = temp;
@@ -388,9 +388,9 @@ logical_or_expression : logical_and_expression {
 							    																		temp->val = (int*) malloc(sizeof(int));
 							    																		*((int*)(temp->val)) = *((int*)($1->val)) || *((int*)($3->val));
 								char *s = calloc(1, sizeof(char));
-								prependString(s, $1->code);
-								prependString(s, "||");
-								prependString(s, $3->code);
+								s = prependString(s,  $1->code);
+								s = prependString(s,  "||");
+								s = prependString(s,  $3->code);
 								temp->code = s;
 																											//temp->code = prependString($1->code, prependString("||", $3->code));
 																											$$ = temp;
@@ -405,9 +405,9 @@ logical_and_expression : logical_not_expression  {
 							      																		temp->val = (int*) malloc(sizeof(int));
 																												*((int*)(temp->val)) = *((int*)($1->val)) && *((int*)($3->val));
 									char *s = calloc(1, sizeof(char));
-									prependString(s, $1->code);
-									prependString(s, "&&");
-									prependString(s, $3->code);
+									s = prependString(s,  $1->code);
+									s = prependString(s,  "&&");
+									s = prependString(s,  $3->code);
 									temp->code = s;
 																												//temp->code = prependString($1->code, prependString("&&", $3->code));
 																												$$ = temp;
@@ -422,8 +422,8 @@ logical_not_expression : exclusive_or_expression {
 					temp->val = (int*) malloc(sizeof(int));
 					*((int*)(temp->val)) = ! *((int*)($2->val));
 					char *s = calloc(1, sizeof(char));
-					prependString(s, "!");
-					prependString(s, $2->code);
+					s = prependString(s,  "!");
+					s = prependString(s,  $2->code);
 					temp->code = s;
 					//temp->code = prependString("!", $2->code);
 					$$ = temp;
@@ -446,9 +446,9 @@ equality_expression : relational_expression { $$ = $1; }
 								//temp->val = (int*)malloc(sizeof(int));
 								//*((int*)(temp->val)) = check_equal($1, $3);
 								char *s = calloc(1, sizeof(char));
-								prependString(s, $1->code);
-								prependString(s, "==");
-								prependString(s, $3->code);
+								s = prependString(s,  $1->code);
+								s = prependString(s,  "==");
+								s = prependString(s,  $3->code);
 								temp->code = s;
 								//temp->code = prependString($1->code, prependString("==", $3->code));
 								$$ = temp;
@@ -462,9 +462,9 @@ equality_expression : relational_expression { $$ = $1; }
 								//*((int*)(temp->val)) = check_equal($1, $3);
 								//aggiungo il codice al valore di ritorno
 								char *s = calloc(1, sizeof(char));
-								prependString(s, $1->code);
-								prependString(s, "!=");
-								prependString(s, $3->code);
+								s = prependString(s,  $1->code);
+								s = prependString(s,  "!=");
+								s = prependString(s,  $3->code);
 								temp->code =  s;
 								//temp->code = prependString($1->code, prependString("!=", $3->code));
 							 	$$ = temp;
@@ -493,9 +493,9 @@ additive_expression : multiplicative_expression { $$ = $1; }
 																													//add_base_type(0, $1, $3, temp);
 																													//aggiungo il codice al valore di ritorno
 										char *s = calloc(1, sizeof(char));
-										prependString(s, $1->code);
-										prependString(s, "+");
-										prependString(s, $3->code);
+										s = prependString(s,  $1->code);
+										s = prependString(s,  "+");
+										s = prependString(s,  $3->code);
 										temp->code = s;
 																													//temp->code = prependString($1->code, prependString("+", $3->code));
 																													$$ = temp;
@@ -510,9 +510,9 @@ additive_expression : multiplicative_expression { $$ = $1; }
 																															temp->type = strdup($3->type);
 																														//add_base_type(0, $1, $3, temp);
 											 char *s = calloc(1, sizeof(char));
-											 prependString(s, $1->code);
-											 prependString(s, "-");
-											 prependString(s, $3->code);
+											 s = prependString(s,  $1->code);
+											 s = prependString(s,  "-");
+											 s = prependString(s,  $3->code);
 											 temp->code = s;
 																														//temp->code = prependString($1->code, prependString("-", $3->code));
 																														$$ = temp;
@@ -531,9 +531,9 @@ multiplicative_expression : exp_expression { $$ = $1; }
 																											//mul_base_type(0, $1, $3, temp);
 																											// associo il codice
 								 char *s = calloc(1, sizeof(char));
-								 prependString(s, $1->code);
-								 prependString(s, "*");
-								 prependString(s, $3->code);
+								 s = prependString(s,  $1->code);
+								 s = prependString(s,  "*");
+								 s = prependString(s,  $3->code);
 								 temp->code = s;
 																											//temp->code = prependString($1->code, prependString("*", $3->code));
 																											$$ = temp;
@@ -550,9 +550,9 @@ multiplicative_expression : exp_expression { $$ = $1; }
 																											//mul_base_type(1, $1, $3, temp);
 																											//associo il codice
 								 char *s = calloc(1, sizeof(char));
-								 prependString(s, $1->code);
-								 prependString(s, "/");
-								 prependString(s, $3->code);
+								 s = prependString(s,  $1->code);
+								 s = prependString(s,  "/");
+								 s = prependString(s,  $3->code);
 								 temp->code = s;
 																											//temp->code = prependString($1->code, prependString("/", $3->code));
 																											$$ = temp;
@@ -565,9 +565,9 @@ exp_expression : cast_expression { $$ = $1; }
 																					value* temp = (value*) malloc(sizeof(value));
 																					temp->type = strdup($3->type);
 		  char *s = calloc(1, sizeof(char));
-		  prependString(s, $1->code);
-		  prependString(s, "#");
-		  prependString(s, $3->code);
+		  s = prependString(s,  $1->code);
+		  s = prependString(s,  "#");
+		  s = prependString(s,  $3->code);
 		  temp->code = s;
 																					//temp->code = prependString($1->code, prependString("#", $3->code));
 																					$$ = temp;
@@ -583,10 +583,10 @@ cast_expression : unary_expression { $$ = $1; }
 																		*((double*)(temp->val)) = (double)(*((int*)($3->val)));
 																		//associo il codice relativo alla espressione di cast
 			char *s = calloc(1, sizeof(char));
-			prependString(s, "floating");
-			prependString(s, "(");
-			prependString(s, $3->code);
-			prependString(s, ")");
+			s = prependString(s,  "floating");
+			s = prependString(s,  "(");
+			s = prependString(s,  $3->code);
+			s = prependString(s,  ")");
 			temp->code = s;
 																		//temp->code = prependString("floating", prependString("(", prependString($3->code, ")")));
 																		$$ = temp; }
@@ -607,8 +607,8 @@ unary_expression : postfix_expression {
 																		change_sign($2);
 																		//associo al valore di ritorno il codice relativo
 				char *s = calloc(1, sizeof(char));
-				prependString(s, "-");
-				prependString(s, $2->code);
+				s = prependString(s,  "-");
+				s = prependString(s,  $2->code);
 				$2->code = s;
 					//													$2->code = prependString("-", $2->code);
 																		$$ = $2;
@@ -640,10 +640,10 @@ postfix_expression : primary_expression {
 							$1->type = strdup(type->param_type);
 							//associo alla chiamata di funzione il codice relativo
 							char s = calloc(1, sizeof(char));
-							prependString(s, $1->code);
-							prependString(s, "(");
-							prependString(s, $3->code);
-							prependString(s, ")");
+							s = prependString(s,  $1->code);
+							s = prependString(s,  "(");
+							s = prependString(s,  $3->code);
+							s = prependString(s,  ")");
 							$1->code = s;
 							//$1->code = prependString($1->code, prependString("(",prependString($3->code, ")")));
 						}
@@ -671,12 +671,12 @@ postfix_expression : primary_expression {
 									//associo il codice relativo alla dereferenziazione della matrice
 									printf("prima delle prependString\n");
 									char *s = calloc(1, sizeof(char));
-									prependString(s, $1->code);
-									prependString(s, "[");
-									prependString(s, $3->code);
-									prependString(s, ", ");
-									prependString(s, $5->code);
-									prependString(s, "]");
+									s = prependString(s,  $1->code);
+									s = prependString(s,  "[");
+									s = prependString(s,  $3->code);
+									s = prependString(s, ", ");
+									s = prependString(s,  $5->code);
+									s = prependString(s,  "]");
 									temp->code = s;
 									printf("dopo le prependString\n");
 									//temp->code = prependString($1->code, prependString("[", prependString($3->code, prependString(",", prependString($5->code,"]")))));
@@ -706,11 +706,11 @@ postfix_expression : primary_expression {
 							check_function_arguments($1, $3);
 							//associo al valore di ritorno il codice relativo
 							char *s = calloc(1, sizeof(char));
-							prependString(s, $1->code);
-							prependString(s, "(");
+							s = prependString(s,  $1->code);
+							s = prependString(s,  "(");
 							if($3 != 0)
-								prependString(s, $3->code);
-							prependString(s, ")");
+								s = prependString(s,  $3->code);
+							s = prependString(s,  ")");
 							$1->code = s;
 							//$1->code = prependString($1->code, prependString("(", prependString($3->code, ")")));
 							//ritorno il value corrispondente alla funzione, che cosi ho il tipo
@@ -731,14 +731,14 @@ postfix_expression : primary_expression {
 							//associo il codice relativo all'uso della funzione
 							char *s = calloc(1, sizeof(char));
 							printf("prima del primo prependString\n");
-							prependString(s, $1->code);
+							s = prependString(s,  $1->code);
 							printf("dopo il primo prependString\n");
-							prependString(s, "(");
+							s = prependString(s,  "(");
 							printf("dopo il secondo prependString\n");
 							if($3 != 0)
-								prependString(s, $3->code);
+								s = prependString(s,  $3->code);
 							printf("dopo il terzo prependString\n");
-							prependString(s, ")");
+							s = prependString(s,  ")");
 							$1->code = s;
 							printf("fine della postfix\n");
 							//$1->code = prependString($1->code, prependString("(", prependString($3->code, ")")));
@@ -754,9 +754,9 @@ postfix_expression : primary_expression {
 						value* temp = get_record_field($1, $3);
 						//exit;
 						char *s = calloc(1, sizeof(char));
-						prependString(s, $1->code);
-						prependString(s, "->");
-						prependString(s, $3);
+						s = prependString(s,  $1->code);
+						s = prependString(s,  "->");
+						s = prependString(s,  $3);
 						temp->code = s;
 						//temp->code = prependString($1->code, prependString("->", $3));
 						$$ = temp;
@@ -867,9 +867,9 @@ primary_expression : IDENTIFIER {
 	| OP expression CP {
 	 										//associo il codice associato alle parentesi
 											char *s = calloc(1, sizeof(char));
-											prependString(s, "(");
-											prependString(s, $2->code);
-											prependString(s, ")");
+											s = prependString(s,  "(");
+											s = prependString(s,  $2->code);
+											s = prependString(s,  ")");
 											$2->code = s;
 											//$2->code = prependString("(", prependString($2->code, ")"));
 											$$ = $2;
@@ -945,14 +945,14 @@ vardecl : NEWVARS type varlist var  SEMI_COLON  {
 						//aggiungo il codice da generare
 						symbol = (sym_rec*) malloc(sizeof(sym_rec));
 						char *s = calloc(1, sizeof(char));
-						prependString(s, $2);
-						prependString(s, " ");
+						s = prependString(s,  $2);
+						s = prependString(s,  " ");
 						if($3 != 0)
-							prependString(s, $3->code);
-						prependString(s, $4->code);
+							s = prependString(s,  $3->code);
+						s = prependString(s,  $4->code);
 						printf("//bison.y : dopo agigunta delle variabili al codice della dichiarazione \n");
 						printf("//bison.y : valori delle variabili da dichiarare %s \n" , $4->code);
-						prependString(s, ";\n");
+						s = prependString(s,  ";\n");
 						symbol->code = s;
 						printf("// bison.y : dopo l'assegnamento\n");
 						//symbol->code = prependString("newvars ", prependString($2, prependString($3, prependString($4, ";\n"))));
@@ -985,15 +985,15 @@ varlist :
 				//aggiungo il codice generato
 				if($1 == 0) {
 					char *s = calloc(1, sizeof(char));
-					prependString(s, $2->code);
-					prependString(s, ", ");
+					s = prependString(s,  $2->code);
+					s = prependString(s, ", ");
 					$2->code = s;
 				}
 				else {
 					char *s = calloc(1, sizeof(char));
-					prependString(s, $1);
-					prependString(s, $2);
-					prependString(s, ", ");
+					s = prependString(s,  $1);
+					s = prependString(s,  $2);
+					s = prependString(s, ", ");
 					$2->code = s;
 				}
 				$$ = $2;
@@ -1050,22 +1050,22 @@ deffunc : FUNC IDENTIFIER OP params CP COLON type block { //inserisco nella symb
 							printf("//bison.y : prima della costruzione del codice della funzione\n");
 							char* s = calloc(1, sizeof(char));
 							if(strcmp($7, "integer") == 0 )
-								prependString(s, "int ");
+								s = prependString(s,  "int ");
 							else if(strcmp($7, "floating ") == 0)
-								prependString(s, "double ");
+								s = prependString(s,  "double ");
 							else if(strcmp($7, "boolean ") == 0)
-								prependString(s, "int ");
+								s = prependString(s,  "int ");
 							else
-								prependString(s, $7);
+								s = prependString(s,  $7);
 							printf("//bison.y : dopo inserimento del tipo di ritorno della funzione\n");
-							prependString(s, $2);
+							s = prependString(s,  $2);
 							printf("//bison.y : dopo inserimento del nome della funzione\n");
-							prependString(s, " ( ");
+							s = prependString(s,  " ( ");
 							if($4 != 0)
-								prependString(s, $4->code);
+								s = prependString(s,  $4->code);
 							printf("//bison.y : dopo inserimento del codice per i parametri della funzione\n");
-							prependString(s, " ) ");
-							prependString(s, $8->code);
+							s = prependString(s,  " ) ");
+							s = prependString(s,  $8->code);
 							printf("//bison.y : dopo inserimento del codice per il body della funzione\n");
 							//stampo il codice relativo alla definizione della nuova funzione
 							printf("//bison.y : codice della definizione della nuova funzione\n");
@@ -1102,24 +1102,24 @@ main : FUNC_EXEC OP params CP COLON type block  { //inserisco nella symbol table
 							//creo il codice per la funzione main
 							char* s = calloc(1, sizeof(char));
 							if(strcmp($6, "integer") == 0 || strcmp($6, "boolean") == 0) {
-								prependString(s, "int ");
+								s = prependString(s,  "int ");
 							}
 							else if(strcmp($6, "floating") == 0) {
-								prependString(s, "double ");
+								s = prependString(s,  "double ");
 							}
 							else if(strcmp($6, "void") == 0) {
-								prependString(s, "void ");
+								s = prependString(s,  "void ");
 							}
 							else {
-								prependString(s, $6);
+								s = prependString(s,  $6);
 							}
 							printf("//bison.y : dopo il tipo della main\n");
-							prependString(s, "main(");
+							s = prependString(s,  "main(");
 							if($3 != 0)
-								prependString(s, $3->code);
+								s = prependString(s,  $3->code);
 							printf("//bison.y : dopo il codice dei parametri\n");
-							prependString(s, ")\n");
-							prependString(s, $7->code);
+							s = prependString(s,  ")\n");
+							s = prependString(s,  $7->code);
 							printf("//bison.y : codice del main \n");
 							printf("%s", s);
 							}
@@ -1162,9 +1162,9 @@ param : type IDENTIFIER {//prova di aggiunta di simbolo
 			temp->type = strdup($1);
 			//inserisco il codice per il parametro
 			char* s = calloc(1, sizeof(char));
-			prependString(s, $1);
-			prependString(s, " ");
-			prependString(s, $2);
+			s = prependString(s,  $1);
+			s = prependString(s,  " ");
+			s = prependString(s,  $2);
 			temp->code = s;
 			//ritorno il parametro
 			$$ = temp;
@@ -1183,10 +1183,10 @@ param : type IDENTIFIER {//prova di aggiunta di simbolo
 block : BEG body END {
 			printf("//bison.y : inizio della sezione del blocco \n");
 			char* s = calloc(1, sizeof(char));
-			prependString(s, "{\n");
+			s = prependString(s,  "{\n");
 			if($2 != 0)
-				prependString(s, $2->code);
-			prependString(s, "\n}\n");
+				s = prependString(s,  $2->code);
+			s = prependString(s,  "\n}\n");
 			$2->code = s;
 			$$ = $2;
 			}
@@ -1198,16 +1198,16 @@ body : declist_check varlistdecl stmts {
 						char* s = calloc(1, sizeof(char));
 						printf("//bison.y : prima del primo prepend\n");
 						if($1 != 0)
-							prependString(s, $1->code);
+							s = prependString(s,  $1->code);
 						printf("//bison.y : dopo il primo prepend \n");
-						prependString(s, "\n ");
+						s = prependString(s,  "\n ");
 						printf("//bison.y : dopo il secondo prepend \n");
 						if($2 != 0)
-							prependString(s, $2->code);
-						prependString(s, "\n");
+							s = prependString(s,  $2->code);
+						s = prependString(s,  "\n");
 						if($3 != 0)
-							prependString(s, $3->code);
-						prependString(s, "\n");
+							s = prependString(s,  $3->code);
+						s = prependString(s,  "\n");
 						temp->code = s;
 						$$ = temp;
 						printf("//bison.y : fine della sezione relativa al body\n");
@@ -1240,11 +1240,11 @@ stmt :	assignment_statement { $$ = $1; }
 scanf_statement: SCANF OP STRING printf_temp CP SEMI_COLON {
 								value* val = calloc(1, sizeof(value));
 								char* s = calloc(1, sizeof(char));
-								prependString(s, "scanf(");
-								prependString(s, $3);
+								s = prependString(s,  "scanf(");
+								s = prependString(s,  $3);
 								if($4 != 0)
-									prependString(s, $4->code);
-								prependString(s, ");\n");
+									s = prependString(s,  $4->code);
+								s = prependString(s,  ");\n");
 								val->code = s;
 								$$ = val;
 							   }
@@ -1252,11 +1252,11 @@ scanf_statement: SCANF OP STRING printf_temp CP SEMI_COLON {
 printf_statement: PRINTF OP STRING  printf_temp CP SEMI_COLON	{
 									value* val = calloc(1,sizeof(value));
 									char* s = calloc(1, sizeof(char));
-									prependString(s, "printf(");
-									prependString(s, $3);
+									s = prependString(s,  "printf(");
+									s = prependString(s,  $3);
 									if($4 != 0)
-										prependString(s, $4->code);
-									prependString(s, ");\n");
+										s = prependString(s,  $4->code);
+									s = prependString(s,  ");\n");
 									val->code = s;
 									$$ = val;
 								}
@@ -1266,8 +1266,8 @@ printf_temp:
 	| /* empty */  { $$ = 0; }
 	| COMMA  exprlist {
 				char* s = calloc(1, sizeof(char));
-				prependString(s, ", ");
-				prependString(s, $2->code);
+				s = prependString(s, ", ");
+				s = prependString(s, $2->code);
 				$2->code = s;
 				$$ = $2;
 			}
@@ -1275,10 +1275,10 @@ printf_temp:
 
 jump_statement : RETURN jump_temp SEMI_COLON {
 						char* s = calloc(1, sizeof(char));
-						prependString(s, "return ");
+						s = prependString(s,  "return ");
 						if($2 != 0)
-							prependString(s, $2->code);
-						prependString(s, " ; ");
+							s = prependString(s,  $2->code);
+						s = prependString(s,  " ; ");
 						$2->code = s;
 						$$ = $2;
 						}
@@ -1292,23 +1292,23 @@ jump_temp :
 
 selection_statement : IF OP expression CP BEG stmts END {
 								char* s = calloc(1, sizeof(char));
-								prependString(s, "if (");
-								prependString(s, $3->code);
-								prependString(s, ") \n {");
-								prependString(s, $6);
-								prependString(s, "\n}\n");
+								s = prependString(s,  "if (");
+								s = prependString(s,  $3->code);
+								s = prependString(s,  ") \n {");
+								s = prependString(s,  $6);
+								s = prependString(s,  "\n}\n");
 								$3->code = s;
 								$$ = $3;
 							}
 	| IF OP expression CP BEG stmts END ELSE BEG stmts END {
 								char* s = calloc(1, sizeof(char));
-								prependString(s, "if (");
-								prependString(s, $3->code);
-								prependString(s, ") \n {");
-								prependString(s, $6);
-								prependString(s, "\n} else {\n");
-								prependString(s, $10->code);
-								prependString(s, "\n}\n");
+								s = prependString(s,  "if (");
+								s = prependString(s,  $3->code);
+								s = prependString(s,  ") \n {");
+								s = prependString(s,  $6);
+								s = prependString(s,  "\n} else {\n");
+								s = prependString(s,  $10->code);
+								s = prependString(s,  "\n}\n");
 								$3->code = s;
 								$$ = $3;
 								}
@@ -1316,11 +1316,11 @@ selection_statement : IF OP expression CP BEG stmts END {
 
 iteration_statement : LOOP OP expression CP BEG stmts END {
 								char* s = calloc(1, sizeof(char));
-								prependString(s, "while(");
-								prependString(s, $3->code);
-								prependString(s, ") {\n");
-								prependString(s, $6->code);
-								prependString(s, "\n}\n");
+								s = prependString(s,  "while(");
+								s = prependString(s,  $3->code);
+								s = prependString(s,  ") {\n");
+								s = prependString(s,  $6->code);
+								s = prependString(s,  "\n}\n");
 								$3->code = s;
 								$$ = $3;
 							}
@@ -1332,18 +1332,18 @@ assignment_statement : unary_expression assignment_operator expression SEMI_COLO
 											copy_val($1,$3);
 											printf("//bison.y : Fine dell'assignment statement\n");
 											char* s = calloc(1, sizeof(char));
-											prependString(s, $1->code);
-											prependString(s, " ");
-											prependString(s ,$2);
-											prependString(s, " ");
-											prependString(s, $3->code);
+											s = prependString(s,  $1->code);
+											s = prependString(s,  " ");
+											s  = prependString(s , $2);
+											s = prependString(s,  " ");
+											s = prependString(s,  $3->code);
 											$1->code = s;
 											$$ = $1;
 										}
 	| expression SEMI_COLON {
 					char* s = calloc(1, sizeof(char));
-					prependString(s, $1->code);
-					prependString(s, " ; ");
+					s = prependString(s,  $1->code);
+					s = prependString(s,  " ; ");
 					$1->code = s;
 					$$ = $1;
 				}
@@ -1358,9 +1358,9 @@ object_statement : FREE OP IDENTIFIER CP SEMI_COLON {
 							dealloc_mem(val);
 							//codice della deallocazione
 							char* s = calloc(1, sizeof(char));
-							prependString(s, "free(");
-							prependString(s, $3);
-							prependString(s, ") ;");
+							s = prependString(s,  "free(");
+							s = prependString(s,  $3);
+							s = prependString(s,  ") ;");
 							val->code = s;
 							$$ = val;
 						    }
