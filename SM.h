@@ -24,7 +24,16 @@ void change_environment() {
 
 //funzione per la chiusura dell'environment
 void pop_environment() {
+	sym_table* prev = top;
+	sym_rec* entry = top->entries;
+	struct sym_rec* temp;
 	top = top->next;
+	for(; entry != 0;) {
+		temp = entry;
+		entry = entry->next;
+		free(temp);
+	}
+	free(prev);
 }
 
 //aggiungo nuovo simbolo. Passo alla funzione puntatore a simbolo con campi gia' compilati
@@ -565,6 +574,7 @@ char* insert_after_struct(char* dst, char* toInsert) {
 
 char* recursive_array_allocation(char* qualifiedId, param* par_list, char* type) {
 	//caso base
+	printf("//SM.h : dentro la recursive_array_allocation\n");
 	if(par_list->next == 0) {
 		char* temp = calloc(1, sizeof(char));
 		return temp;
@@ -573,13 +583,20 @@ char* recursive_array_allocation(char* qualifiedId, param* par_list, char* type)
 	int count = *((int*)(par_list->val));
 	//size della dimensione successiva
 	int toAlloc = *((int*)(par_list->next->val));
+	printf("//SM.h : prima  dell'allocazione dello spazio per s_temp\n");
 	char* s_temp = calloc(10, sizeof(char));
-	char* s = calloc(1, sizeof(char));
-	char* s_next;
+	printf("//SM.h : dopo allocazione di s_temp\n");
+	char *s;
+	s = (char*)malloc(1);
+	printf("//SM.h : dopo allocazione di s\n");
+	char *s_next;
+	printf("//SM.h : dopo allocazione di s_next\n");
 	int i = 0;
 	for(i = 0; i < count; i++) {
 		//creo il pezzo di output
+		printf("//SM.h : prima della creazione del qualified identifier\n");
 		sprintf(s_temp, "%s[%d]", qualifiedId, i);
+		printf("//SM.h : dopo la creazione del qualified identifier\n");
 		prependString(s, s_temp);
 		prependString(s, " = calloc(");
 		sprintf(s_temp, "%d", toAlloc);

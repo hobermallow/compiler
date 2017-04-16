@@ -4,6 +4,8 @@
 	#include <string.h>
 	#include "SM.h"
 
+	#define YYDEBUG 1
+
 	extern int functionDefinitions;
 	extern func* func_list;
 	extern func* func_list_total;
@@ -1144,7 +1146,7 @@ parlist :
 	| parlist param COMMA {//provo cosi. salvo il valore di ritorno di parlist come next element di param
 				printf("//bison.y : inzio della sezione della lista delle parametri\n");
 				$2->next = $1;
-				if($1 != 0 ) 
+				if($1 != 0 )
 					$2->code = prependString($2->code, $1->code);
 				//ritorno la lista completa
 				$$ = $2;
@@ -1174,7 +1176,7 @@ param : type IDENTIFIER {//prova di aggiunta di simbolo
 			initialize_value(rec);
 			insert_sym_rec(rec);
 			printf("//bison.y : Inserito simbolo %s di tipo %s\n", rec->text, rec->type);
-			
+
 			}
 	;
 
@@ -1182,7 +1184,7 @@ block : BEG body END {
 			printf("//bison.y : inizio della sezione del blocco \n");
 			char* s = calloc(1, sizeof(char));
 			prependString(s, "{\n");
-			if($2 != 0) 
+			if($2 != 0)
 				prependString(s, $2->code);
 			prependString(s, "\n}\n");
 			$2->code = s;
@@ -1195,7 +1197,7 @@ body : declist_check varlistdecl stmts {
 						value* temp = calloc(1, sizeof(value));
 						char* s = calloc(1, sizeof(char));
 						printf("//bison.y : prima del primo prepend\n");
-						if($1 != 0) 
+						if($1 != 0)
 							prependString(s, $1->code);
 						printf("//bison.y : dopo il primo prepend \n");
 						prependString(s, "\n ");
@@ -1203,7 +1205,7 @@ body : declist_check varlistdecl stmts {
 						if($2 != 0)
 							prependString(s, $2->code);
 						prependString(s, "\n");
-						if($3 != 0) 
+						if($3 != 0)
 							prependString(s, $3->code);
 						prependString(s, "\n");
 						temp->code = s;

@@ -2,7 +2,7 @@
 parser: bison.y lexer.l SM.h
 	bison -d bison.y
 	flex lexer.l
-	gcc -o $@ bison.tab.c lex.yy.c -lfl
+	gcc  -g -Wall -o $@ bison.tab.c lex.yy.c -lfl
 
 
 
