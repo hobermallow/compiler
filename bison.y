@@ -77,7 +77,7 @@
 %type <str> type
 %type <str> basetype assignment_operator
 %type <par> param parlist params var varlist field fieldlist
-%type <val> constant primary_expression expression conditional_expression logical_or_expression logical_and_expression logical_not_expression exclusive_or_expression and_expression equality_expression relational_expression shift_expression additive_expression multiplicative_expression exp_expression cast_expression unary_expression postfix_expression exprlist exprlist_temp arrayexpr block body stmt stmts varlistdecl vardecl declist_check assignment_statement selection_statement iteration_statement object_statement jump_statement printf_statement scanf_statement  printf_temp jump_temp declist decl
+%type <val> constant primary_expression expression conditional_expression logical_or_expression logical_and_expression logical_not_expression exclusive_or_expression and_expression equality_expression relational_expression shift_expression additive_expression multiplicative_expression exp_expression cast_expression unary_expression postfix_expression exprlist exprlist_temp arrayexpr block body stmt stmts varlistdecl vardecl declist_check assignment_statement selection_statement iteration_statement object_statement jump_statement printf_statement scanf_statement  printf_temp jump_temp declist decl deffunclist_check overloads main  deffunc deffunclist
 %type <symrec> typebuilder
 %type <str> overloadable_operands
 
@@ -86,7 +86,20 @@
 %%
 
 /* grammar starting symbol */
-S : declist_check deffunclist_check overloads varlistdecl main EOF_TOKEN  	{ printf("//bison.y : parsato !\n"); return 0; }
+S : declist_check deffunclist_check overloads varlistdecl main EOF_TOKEN  	{
+											//printing every source component translated
+											if($1 != 0) 
+												printf($1->code);
+											if($2 != 0)
+												printf($2->code);
+											if($4 != 0)
+												printf($4->code);
+											if($5 != 0)
+												printf($5->code);
+
+											 printf("//bison.y : parsato !\n");
+											 return 0;
+										 }
 	;
 
 declist_check : declist {
@@ -108,6 +121,7 @@ declist :
 				else {
 					//altrimenti , assegno $2 come successivo di $1
 					$1->next = $2;
+					$1->code = prependString($1->code, $2->code);
 					$$ = $1;
 				}
 			}
@@ -143,7 +157,7 @@ decl : NEWTYPE IDENTIFIER typebuilder SEMI_COLON {
 						//value per fare il bubbling del codice
 						value* val = calloc(1, sizeof(value));
 						val->code = s;
-						printf(s);
+						//printf(s);
 						$$ = val;
 						}
 
@@ -914,8 +928,14 @@ constant : INTEGER_CONSTANT {
 
 
 varlistdecl :
-	/* empty */
-	| varlistdecl vardecl
+	/* empty */ { $$ = 0; }
+	| varlistdecl vardecl {
+				$2->next = $1;
+				if($1 != 0 ) {
+					$2->code = prependString($1->code, $2->code);
+				}
+				$$ = $2;
+			      }
 	;
 
 vardecl : NEWVARS type varlist var  SEMI_COLON  {
@@ -972,8 +992,13 @@ vardecl : NEWVARS type varlist var  SEMI_COLON  {
 						initialize_value(symbol);
 						insert_sym_rec(symbol);
 						//printf("//bison.y : codice della dichiarazione delle variabili \n");
-						printf("%s\n", s);
+						//printf("%s\n", s);
 						//printf("//bison.y : Fine dichiarazione nuove variabili\n");
+						value* val = (value*)calloc(1, sizeof(value));
+						val->name = strdup($4->name);
+						val->type = strdup($2);
+						val->code = s;
+						$$ = val;
 						}
 	;
 
@@ -1027,15 +1052,23 @@ deffunclist_check : deffunclist {
 						while((int)(temp) != 0);
 
 					}
+					$$ = $1;
 				}
 	;
 
 deffunclist :
-	/* empty */ { 
+	/* empty */ {  $$ = 0;
 			//printf("//bison.y : nessuna dichiarazione di funzione\n");
 		    }
 	| deffunclist deffunc { 
 				//printf("//bison.y : dichiarazioni di funzione presenti\n"); 
+				if($1 == 0) {
+					$$ = $2;
+				}
+				else {
+					$1->code = prependString($1->code, $2->code);
+					$$ = $1;
+				}
 			      }
 	;
 
@@ -1082,8 +1115,12 @@ deffunc : FUNC IDENTIFIER OP params CP COLON type block { //inserisco nella symb
 							//printf("//bison.y : dopo inserimento del codice per il body della funzione\n");
 							//stampo il codice relativo alla definizione della nuova funzione
 							//printf("//bison.y : codice della definizione della nuova funzione\n");
-							printf("%s\n", s);
-
+							//printf("%s\n", s);
+							value* val = (value*)calloc(1, sizeof(value));
+							val->name = strdup($2);
+							val->type = strdup($7);
+							val->code = s;
+							$$ = val;
 							}
 
 
@@ -1134,7 +1171,12 @@ main : FUNC_EXEC OP params CP COLON type block  { //inserisco nella symbol table
 							s = prependString(s,  ")\n");
 							s = prependString(s,  $7->code);
 							//printf("//bison.y : codice del main \n");
-							printf("%s", s);
+							//printf("%s", s);
+							value* val = (value*)calloc(1, sizeof(value));
+							val->name = "main";
+							val->type = strdup($7);
+							val->code = s;
+							$$ = val;
 							}
 
 	;
@@ -1224,6 +1266,7 @@ body : declist_check varlistdecl stmts {
 						//printf("//bison.y : dopo il secondo prepend \n");
 						if($2 != 0)
 							s = prependString(s,  $2->code);
+						//printf("//bison.y : dopo il prepend boh \n");
 						s = prependString(s,  "\n");
 						if($3 != 0)
 							s = prependString(s,  $3->code);
@@ -1411,10 +1454,9 @@ object_statement : FREE OP IDENTIFIER CP SEMI_COLON {
 	;
 
 overloads :
-	/*empty */ { 
-			//printf("//bison.y : sezione per gli overloads vuota \n"); 
-		   }
-	| overloads overload
+	/*empty */  
+	| overloads overload 
+			     
 	;
 
 overload : OVERLOAD OP overloadable_operands COMMA IDENTIFIER CP BEG stmts END  {
