@@ -641,10 +641,11 @@ char* output_allocation_code_matrix(char* variable, char* type) {
 	sprintf(s_temp, "%d", rows);
 	s = prependString(s,  s_temp);
 	s = prependString(s, ", sizeof(");
-	if(flag == 0)
-		prependString(s, "int));\n");
-	else
-		s = prependString(s,  "double));\n");
+	s = prependString(s, "void*));\n");
+	//if(flag == 0)
+	//	prependString(s, "int));\n");
+	//else
+	//	s = prependString(s,  "double));\n");
 	//alloco lo spazio per le colonne, recuperando il numero delle colonne
 	temp_param = temp_param->next;
 	int cols = *((int*)(temp_param->val));

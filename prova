@@ -8,10 +8,12 @@ end
 
 newvars mioarray arra;
 newvars miorecord rec, rec2;
+newvars miamatrice mat;
 
 func exec (integer x) :  integer
 begin
 	rec = new(miorecord);
 	rec2 = new(miorecord);
 	arra = new(mioarray);
+	mat = new(miamatrice);
 end
