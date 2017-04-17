@@ -143,6 +143,7 @@ decl : NEWTYPE IDENTIFIER typebuilder SEMI_COLON {
 						//value per fare il bubbling del codice
 						value* val = calloc(1, sizeof(value));
 						val->code = s;
+						printf(s);
 						$$ = val;
 						}
 
@@ -349,7 +350,15 @@ field : type IDENTIFIER {
 				temp->type = strdup($1);
 				temp->name = strdup($2);
 				char *s = malloc(sizeof(char));
-				s = prependString(s,  $1);
+				//traduzione del tipo
+				if(strcmp($1,"integer") == 0)
+					s = prependString(s, "int ");
+				else if(strcmp($1, "floating") == 0)
+					s = prependString(s, "double ");
+				else if(strcmp($1, "boolean"))
+					s = prependString(s, "int ");
+				else
+					s = prependString(s, $1);
 				s = prependString(s,  " ");
 				s = prependString(s,  $2);
 				s = prependString(s,  " ;\n");
@@ -1166,7 +1175,14 @@ param : type IDENTIFIER {//prova di aggiunta di simbolo
 			temp->type = strdup($1);
 			//inserisco il codice per il parametro
 			char* s = calloc(1, sizeof(char));
-			s = prependString(s,  $1);
+			if(strcmp($1,"integer") == 0)
+				s = prependString(s, "int ");
+			else if(strcmp($1, "floating") == 0)
+				s = prependString(s, "double ");
+			else if(strcmp($1, "boolean"))
+				s = prependString(s, "int ");
+			else
+				s = prependString(s, $1);
 			s = prependString(s,  " ");
 			s = prependString(s,  $2);
 			temp->code = s;
@@ -1254,24 +1270,32 @@ scanf_statement: SCANF OP STRING printf_temp CP SEMI_COLON {
 							   }
 
 printf_statement: PRINTF OP STRING  printf_temp CP SEMI_COLON	{
+									printf("//bison.y : inizio della printf statement\n");
 									value* val = calloc(1,sizeof(value));
 									char* s = calloc(1, sizeof(char));
 									s = prependString(s,  "printf(");
+									printf("//bison.y : prima della prepend della string literal\n");
 									s = prependString(s,  $3);
+									printf("//bison.y : dopo prepend della string literal\n");
+									printf("//bison.y : printf_temp %d \n", $4);
 									if($4 != 0)
 										s = prependString(s,  $4->code);
+									printf("//bison.y : dopo prepend del codice della printf\n");
 									s = prependString(s,  ");\n");
 									val->code = s;
+									printf("//bison.y : fine della printf statement\n");
 									$$ = val;
 								}
 
 
 printf_temp:
-	| /* empty */  { $$ = 0; }
+	/* empty */  { $$ = 0; printf("//bison.y : ciao\n"); }
 	| COMMA  exprlist {
+				printf("//bison.y : dentro printf_temp\n");
 				char* s = calloc(1, sizeof(char));
 				s = prependString(s, ", ");
 				s = prependString(s, $2->code);
+				printf("//bison.y : stampa del codice di exprlist %s \n", $2->code);
 				$2->code = s;
 				$$ = $2;
 			}
@@ -1371,6 +1395,7 @@ object_statement : FREE OP IDENTIFIER CP SEMI_COLON {
 	| unary_expression ASSIGN  NEW OP IDENTIFIER CP SEMI_COLON {
 									//debbo controllare che l'unary_expression sia dello stesso tipo
 									//identificato dall'identifier
+									printf("//bison.y : inizio dell'allocazione\n");
 									value* temp;
 									temp = (value*) malloc(sizeof(value));
 									temp->type = strdup($5);
@@ -1380,6 +1405,7 @@ object_statement : FREE OP IDENTIFIER CP SEMI_COLON {
 									//codice corrispondente all'allocazione di memoria
 									char* s = generate_allocation_code($1, $5);
 									$1->code = s;
+									printf("//bison.y : dine dell'allocazione\n");
 									$$ = $1;
 								   }
 	;
@@ -1449,8 +1475,8 @@ main(int argc, char* argv[]) {
 	for(table = top; table != 0; table = table->next) {
 		for(rec = table->entries; rec != 0; rec = rec->next) {
 			if(rec->text != 0) {
-				printf("Lessema corrispondente al token: %s\n", rec->text);
-				printf("Tipo del lessema %s\n", rec->type);
+				//printf("Lessema corrispondente al token: %s\n", rec->text);
+				//printf("Tipo del lessema %s\n", rec->type);
 			}
 		}
 	}

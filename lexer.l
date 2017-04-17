@@ -4,46 +4,57 @@
 //dichiaro le variabili globali per la gesstione delle definizioni di funzione
 extern int functionDefinitions;
 extern func* func_list;
+//#define DEBUG_MODE 1
+
+void myDebug(const char *s) {
+
+	#ifdef DEBUG_MODE
+	printf(s);
+	#endif
+
+}
+
 
 %}
 
+
 %%
 
-"scanf" {printf("SCANF\n"); return SCANF; }
-"printf" {printf("PRINTF\n"); return PRINTF; }
-"matrix" {printf("MATRIX\n");return MATRIX;}
-";" {printf("SEMI_COLON\n");return SEMI_COLON; }
-"newtype" {printf("NEWTYPE\n"); return NEWTYPE; }
-"(" {printf("OP\n"); return OP;}
-")" {printf("CP\n"); return CP;}
-"record" {printf("RECORD\n"); return RECORD; }
-"array" {printf("ARRAY\n"); return ARRAY; }
-"integer" {printf("INTEGER\n"); yylval.str = strdup(yytext); return INTEGER; }
-"boolean" {printf("BOOLEAN\n"); yylval.str = strdup(yytext); return BOOLEAN; }
-"[" {printf("OSP\n"); return OSP; }
-"]" {printf("CSP\n"); return CSP; }
-"floating" {printf("FLOATING\n"); yylval.str = strdup(yytext);  return FLOATING; }
-"char" {printf("CHAR\n"); yylval.str = strdup(yytext); return CHAR; }
-"string" {printf("STRING\n"); yylval.str = strdup(yytext); return STRING_TYPE; }
-"," {printf("COMMA\n"); return COMMA; }
-"=" {printf("ASSIGN\n"); return ASSIGN; }
-"-" {printf("MINUS\n"); return MINUS; }
-"->" {printf("ARROW\n"); return ARROW; }
-"||" {printf("OR\n"); return OR; }
-"&&" {printf("AND\n");  return AND; }
-"!" {printf("NOT\n");  return NOT; }
-"==" {printf("EQUAL\n");  return EQUAL; }
-"!=" {printf("NOTEQUAL\n"); return NOTEQUAL; }
-"+" {printf("PLUS\n"); return PLUS; }
-"*" {printf("MUL\n");  return MUL; }
-"#" {printf("EXP\n"); return EXP; }
-"/" {printf("DIV\n");  return DIV; }
-"func" {printf("FUNC\n");  functionDefinitions = 1; change_environment();printf("Nuovo environment\n"); return FUNC; }
-func[ ]+exec {int a = check_recursive_definitions(); if(a==0) { printf("Errore nelle definizioni ricorsive dei tipi\n"); exit(1); } printf("FUNC_EXEC\n"); change_environment(); printf("Nuovo environment\n"); return FUNC_EXEC; }
-":" {printf("COLON\n");  return COLON; }
-"begin" {printf("BEG\n"); return BEG; }
+"scanf" {myDebug("SCANF\n"); return SCANF; }
+"printf" {myDebug("PRINTF\n"); return PRINTF; }
+"matrix" {myDebug("MATRIX\n");return MATRIX;}
+";" {myDebug("SEMI_COLON\n");return SEMI_COLON; }
+"newtype" {myDebug("NEWTYPE\n"); return NEWTYPE; }
+"(" {myDebug("OP\n"); return OP;}
+")" {myDebug("CP\n"); return CP;}
+"record" {myDebug("RECORD\n"); return RECORD; }
+"array" {myDebug("ARRAY\n"); return ARRAY; }
+"integer" {myDebug("INTEGER\n"); yylval.str = strdup(yytext); return INTEGER; }
+"boolean" {myDebug("BOOLEAN\n"); yylval.str = strdup(yytext); return BOOLEAN; }
+"[" {myDebug("OSP\n"); return OSP; }
+"]" {myDebug("CSP\n"); return CSP; }
+"floating" {myDebug("FLOATING\n"); yylval.str = strdup(yytext);  return FLOATING; }
+"char" {myDebug("CHAR\n"); yylval.str = strdup(yytext); return CHAR; }
+"string" {myDebug("STRING\n"); yylval.str = strdup(yytext); return STRING_TYPE; }
+"," {myDebug("COMMA\n"); return COMMA; }
+"=" {myDebug("ASSIGN\n"); return ASSIGN; }
+"-" {myDebug("MINUS\n"); return MINUS; }
+"->" {myDebug("ARROW\n"); return ARROW; }
+"||" {myDebug("OR\n"); return OR; }
+"&&" {myDebug("AND\n");  return AND; }
+"!" {myDebug("NOT\n");  return NOT; }
+"==" {myDebug("EQUAL\n");  return EQUAL; }
+"!=" {myDebug("NOTEQUAL\n"); return NOTEQUAL; }
+"+" {myDebug("PLUS\n"); return PLUS; }
+"*" {myDebug("MUL\n");  return MUL; }
+"#" {myDebug("EXP\n"); return EXP; }
+"/" {myDebug("DIV\n");  return DIV; }
+"func" {myDebug("FUNC\n");  functionDefinitions = 1; change_environment();myDebug("Nuovo environment\n"); return FUNC; }
+func[ ]+exec {int a = check_recursive_definitions(); if(a==0) { myDebug("Errore nelle definizioni ricorsive dei tipi\n"); exit(1); } myDebug("FUNC_EXEC\n"); change_environment(); myDebug("Nuovo environment\n"); return FUNC_EXEC; }
+":" {myDebug("COLON\n");  return COLON; }
+"begin" {myDebug("BEG\n"); return BEG; }
 "end" {	
-	printf("END\n"); 
+	myDebug("END\n"); 
 	//controllo le definizioni ricorsive di tipo
 	int a =	check_recursive_definitions();
 	if(a == 0) {
@@ -58,31 +69,31 @@ func[ ]+exec {int a = check_recursive_definitions(); if(a==0) { printf("Errore n
 		//modifico il valore del flag in bison
 	}
 	pop_environment();
-	printf("Pop environment\n");
+	myDebug("Pop environment\n");
 	return END; 
 	}
-"return" {printf("RETURN\n"); return RETURN; }
-"{" {printf("OGP\n"); return OGP; }
-"}" {printf("CGP\n"); return CGP; }
-"new" {printf("NEW\n"); return NEW; }
-"if" {printf("IF\n"); return IF; }
-"else" {printf("ELSE\n"); return ELSE; }
-"loop" {printf("LOOP\n"); return LOOP; }
-"free" {printf("FREE\n"); return FREE; }
-">" {printf("GRT\n"); return GRT; }
-"<" {printf("LST\n"); return LST; }
-">=" {printf("GTE\n"); return GTE; }
-"<=" {printf("LTE\n"); return LTE; }
-"newvars" {printf("NEWVARS\n"); return NEWVARS; }
-"then" {printf("THEN\n"); return THEN; }
-"true" {printf("BOOLEAN_CONSTANT\n"); yylval.str = (char*) strdup(yytext); return BOOLEAN_CONSTANT; }
-"false" {printf("BOOLEAN_CONSTANT\n"); yylval.str = (char*) strdup(yytext); return BOOLEAN_CONSTANT;}
-[1-9][0-9]* {printf("INTEGER_CONSTANT\n"); printf("%d\n", atoi(yytext)); yylval.intval = atoi(yytext); return INTEGER_CONSTANT; }
-"'"[:alnum:]*"'"  {printf("CHARACTER_CONSTANT\n"); yylval.str = (char*) strdup(yytext); return CHARACTER_CONSTANT; }
-"\""[:alnum:]*"\""  {printf("STRING\n"); yylval.str = (char*) strdup(yytext); return STRING; }
-[0-9]*"."[0-9]* {printf("FLOATING_CONSTANT\n"); yylval.dval = atof(yytext); return FLOATING_CONSTANT; }
-"overload" {printf("OVERLOAD\n"); change_environment(); printf("Nuovo environment\n");return OVERLOAD; }
-[_a-zA-Z][_a-zA-Z0-9]{0,30} {printf("IDENTIFIER\n");  printf("%s\n", yytext); yylval.id = (char*) strdup(yytext); return IDENTIFIER;}
+"return" {myDebug("RETURN\n"); return RETURN; }
+"{" {myDebug("OGP\n"); return OGP; }
+"}" {myDebug("CGP\n"); return CGP; }
+"new" {myDebug("NEW\n"); return NEW; }
+"if" {myDebug("IF\n"); return IF; }
+"else" {myDebug("ELSE\n"); return ELSE; }
+"loop" {myDebug("LOOP\n"); return LOOP; }
+"free" {myDebug("FREE\n"); return FREE; }
+">" {myDebug("GRT\n"); return GRT; }
+"<" {myDebug("LST\n"); return LST; }
+">=" {myDebug("GTE\n"); return GTE; }
+"<=" {myDebug("LTE\n"); return LTE; }
+"newvars" {myDebug("NEWVARS\n"); return NEWVARS; }
+"then" {myDebug("THEN\n"); return THEN; }
+"true" {myDebug("BOOLEAN_CONSTANT\n"); yylval.str = (char*) strdup(yytext); return BOOLEAN_CONSTANT; }
+"false" {myDebug("BOOLEAN_CONSTANT\n"); yylval.str = (char*) strdup(yytext); return BOOLEAN_CONSTANT;}
+[1-9][0-9]* {myDebug("INTEGER_CONSTANT\n"); yylval.intval = atoi(yytext); return INTEGER_CONSTANT; }
+"'"[:alnum:]*"'"  {myDebug("CHARACTER_CONSTANT\n"); yylval.str = (char*) strdup(yytext); return CHARACTER_CONSTANT; }
+\"(\\.|[^\\"])*\"  {myDebug("STRING\n"); yylval.str = (char*) strdup(yytext); return STRING; }
+[0-9]*"."[0-9]* {myDebug("FLOATING_CONSTANT\n"); yylval.dval = atof(yytext); return FLOATING_CONSTANT; }
+"overload" {myDebug("OVERLOAD\n"); change_environment(); myDebug("Nuovo environment\n");return OVERLOAD; }
+[_a-zA-Z][_a-zA-Z0-9]{0,30} {myDebug("IDENTIFIER\n"); myDebug(yytext); yylval.id = (char*) strdup(yytext); return IDENTIFIER;}
 "\t"
 " "
 "\n" 

@@ -4,16 +4,20 @@ newtype mioarray array(miamatrice, 3, 5, 4, 6);
 
 func ciao() : integer 
 begin
+	return 1;
 end
 
 newvars mioarray arra;
 newvars miorecord rec, rec2;
 newvars miamatrice mat;
 
-func exec (integer x) :  integer
+func exec () :  integer
 begin
+	printf("ciao");
 	rec = new(miorecord);
 	rec2 = new(miorecord);
 	arra = new(mioarray);
 	mat = new(miamatrice);
+	printf("fine");
+	return 1;
 end
