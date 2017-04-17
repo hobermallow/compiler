@@ -95,7 +95,7 @@ declist_check : declist {
 					printf("bison.y: errore nella definizione delle funzioni ricorsive\n");
 					exit(1);
 				}
-				printf("//bison.y : fine della sezione di dichiarazione dei tipi\n");
+				//printf("//bison.y : fine della sezione di dichiarazione dei tipi\n");
 				$$ = $1;
 			}
 	;
@@ -137,9 +137,9 @@ decl : NEWTYPE IDENTIFIER typebuilder SEMI_COLON {
 						}
 						s = prependString(s,  $2);
 						s = prependString(s,  " ;\n");
-						printf("//bison.y: codice del nuovo tipo ");
+						//printf("//bison.y: codice del nuovo tipo ");
 						//printf("%s \n",s );
-						printf("//bison.y: alla fine della dichiarazione del nuovo tipo \n");
+						//printf("//bison.y: alla fine della dichiarazione del nuovo tipo \n");
 						//value per fare il bubbling del codice
 						value* val = calloc(1, sizeof(value));
 						val->code = s;
@@ -185,16 +185,16 @@ typebuilder : RECORD OP fieldlist field CP {
 							temp->code[strlen(s)-1] = '\0';
 
 						}
-						printf("//bison.y: dopo l'if \n");
+						//printf("//bison.y: dopo l'if \n");
 						//ritorno il sym_rec
 						$$ = temp;
-						printf("//bison.y: codice del typebuilder del record %s\n", $$->code);
+						//printf("//bison.y: codice del typebuilder del record %s\n", $$->code);
 						//qui e' corretto , ma nella riduzione del nuovo tipo il codice viene tagliato
 
 					}
 	| MATRIX OP basetype COMMA expression COMMA expression CP {
 						//controllo che il tipo delle espressioni sia intero
-						printf("//bison.y : all'inizio della riduzione del typebuilder della matrice\n");
+						//printf("//bison.y : all'inizio della riduzione del typebuilder della matrice\n");
 						check_is_integer($5);
 						check_is_integer($7);
 						//controllo che il tipo degli elementi della matrice sia intero o floating
@@ -210,10 +210,10 @@ typebuilder : RECORD OP fieldlist field CP {
 						temp_1 = (param*) malloc(sizeof(param));
 						temp_2 = (param*) malloc(sizeof(param));
 						//copio i valori nei due parametri
-						printf("//bison.y : prima del salvataggio dei valori dei parametri della matrice \n");
+						//printf("//bison.y : prima del salvataggio dei valori dei parametri della matrice \n");
 						copy_val_in_param(temp_1, $5);
 						copy_val_in_param(temp_2, $7);
-						printf("//bison.y : dopo il salvataggio dei valori dei parametri della matrice\n");
+						//printf("//bison.y : dopo il salvataggio dei valori dei parametri della matrice\n");
 						//unisco i parametri
 						temp_1->next = temp_2;
 						//salvo i parametri
@@ -224,7 +224,7 @@ typebuilder : RECORD OP fieldlist field CP {
 						temp->current_param = temp->par_list;
 						//aggiugo il codice al valore di ritorno
 						char* s = calloc(1, sizeof(char));
-						printf("//bison.y : prima dell'aggiunta del tipo della matrice \n");
+						//printf("//bison.y : prima dell'aggiunta del tipo della matrice \n");
 						if(strcmp($3, "integer")== 0)
 							s = prependString(s,  "int** ");
 						else
@@ -232,11 +232,11 @@ typebuilder : RECORD OP fieldlist field CP {
 						temp->code = s;
 						//ritorno il sym_rec
 						$$ = temp;
-						printf("//bison.y : alla fine del typebuilder della matrice \n");
+						//printf("//bison.y : alla fine del typebuilder della matrice \n");
 					}
 
 	| ARRAY OP type COMMA arrayexpr expression CP {
-							printf("dentro la definizione dell'array\n");
+							//printf("dentro la definizione dell'array\n");
 							//creo il nuovo elemento per la symbol table
 							sym_rec* rec = malloc (sizeof(sym_rec));
 							rec->type = "array";
@@ -295,10 +295,10 @@ typebuilder : RECORD OP fieldlist field CP {
 arrayexpr :
 	 /* empty */ { $$ = 0; }
 	| arrayexpr expression COMMA {
-					printf("inizio arrayexpr \n");
+					//printf("inizio arrayexpr \n");
 					//aggiungo il valore alla lista
 					$2->next = $1;
-					printf("dopo next\n");
+					//printf("dopo next\n");
 					//associo il codice al valore di ritorno
 					if($1 == 0) {
 						char *s = calloc(1, sizeof(char));
@@ -316,7 +316,7 @@ arrayexpr :
 						//$2->code = prependString($1->code, prependString($2->code, ", "));
 					}
 					$$ = $2;
-					printf("fine arrayexpr\n");
+					//printf("fine arrayexpr\n");
 				}
 	;
 
@@ -439,7 +439,7 @@ and_expression : equality_expression { $$ = $1; }
 equality_expression : relational_expression { $$ = $1; }
 	| equality_expression EQUAL relational_expression {
 								value *temp = (value*) malloc(sizeof(value));
-								printf("tipo di $1 %s tipo di $3 %s \n", $1->type, $3->type);
+								//printf("tipo di $1 %s tipo di $3 %s \n", $1->type, $3->type);
 								if(strcmp($1->type, "unidentified") != 0 && strcmp($3->type, "unidentified") != 0)
 									check_type($1, $3);
 								temp->type = "boolean";
@@ -651,14 +651,14 @@ postfix_expression : primary_expression {
 						$$ = $1;
 						}
 	| postfix_expression OSP expression COMMA expression CSP {
-									printf("inizio della postfix della matrice\n");
+									//printf("inizio della postfix della matrice\n");
 									//controllo che le espressioni siano di tipo intero
 									check_is_integer($3);
 									check_is_integer($5);
-									printf("dopo i controlli sul tipo delle espressioni\n");
+									//printf("dopo i controlli sul tipo delle espressioni\n");
 									//controllo che il valore delle espressioni sia compreso nei parametri della matrice
 									check_matrix_arguments($1, $3, $5);
-									printf("dopo il controllo sugli argomenti della matrice\n");
+									//printf("dopo il controllo sugli argomenti della matrice\n");
 									//controllo sia stata allocata memoria per la matrice
 									check_mem_alloc($1);
 									//ritorno un oggetto di tipo value con tipo settato al
@@ -669,7 +669,7 @@ postfix_expression : primary_expression {
 									sym_rec* temp_rec = (sym_rec*) get_sym_rec($1->type);
 									temp->type = strdup(temp_rec->param_type);
 									//associo il codice relativo alla dereferenziazione della matrice
-									printf("prima delle prependString\n");
+									//printf("prima delle prependString\n");
 									char *s = calloc(1, sizeof(char));
 									s = prependString(s,  $1->code);
 									s = prependString(s,  "[");
@@ -678,17 +678,17 @@ postfix_expression : primary_expression {
 									s = prependString(s,  $5->code);
 									s = prependString(s,  "]");
 									temp->code = s;
-									printf("dopo le prependString\n");
+									//printf("dopo le prependString\n");
 									//temp->code = prependString($1->code, prependString("[", prependString($3->code, prependString(",", prependString($5->code,"]")))));
 									$$ = temp;
-									printf("fine della postfix della matrice\n");
+									//printf("fine della postfix della matrice\n");
 								}
 	| postfix_expression OP exprlist CP {
 						//se sono in una sezione normale
 						if(functionDefinitions == 0) {
 							//controllo se sia stato dichiarato l'identificatore
 							sym_rec* rec = get_sym_rec($1);
-							printf("Record %s trovato\n", $1);
+							//printf("Record %s trovato\n", $1);
 							//creo il value
 							value* temp = (value*) malloc(sizeof(value));
 							//recupero il tipo dalla dichiarazione
@@ -718,7 +718,7 @@ postfix_expression : primary_expression {
 						}
 						//altrimenti, salvo la funzione all'interno dell'apposita lista globale
 						else {
-							printf("inizio della postfix da non controllare\n");
+							//printf("inizio della postfix da non controllare\n");
 							//creo elemento da aggiungere alla lista
 							func* temp = (func*) malloc(sizeof(func));
 							//recupero il nome della funzione utilizzata
@@ -730,24 +730,24 @@ postfix_expression : primary_expression {
 							func_list = temp;
 							//associo il codice relativo all'uso della funzione
 							char *s = calloc(1, sizeof(char));
-							printf("prima del primo prependString\n");
+							//printf("prima del primo prependString\n");
 							s = prependString(s,  $1->code);
-							printf("dopo il primo prependString\n");
+							//printf("dopo il primo prependString\n");
 							s = prependString(s,  "(");
-							printf("dopo il secondo prependString\n");
+							//printf("dopo il secondo prependString\n");
 							if($3 != 0)
 								s = prependString(s,  $3->code);
-							printf("dopo il terzo prependString\n");
+							//printf("dopo il terzo prependString\n");
 							s = prependString(s,  ")");
 							$1->code = s;
-							printf("fine della postfix\n");
+							//printf("fine della postfix\n");
 							//$1->code = prependString($1->code, prependString("(", prependString($3->code, ")")));
 						}
 					}
 	| postfix_expression ARROW IDENTIFIER {
 						//debbo controllare che l'identificatore esista per quel tipo di record
 						check_record_arguments($1, $3);
-						printf("record field\n");
+						//printf("record field\n");
 						//controllo l'allocazione di memoria per il record
 						check_mem_alloc($1);
 						//debbo passare come value quello corrispondente al campo del record
@@ -784,14 +784,14 @@ primary_expression : IDENTIFIER {
 					//se non sono all'interno della definizione di una funzione
 					if(functionDefinitions == 0) {
 						//controllo se sia stato dichiarato l'identificatore
-						printf("controllo l'identificatore \n");
+						//printf("controllo l'identificatore \n");
 						sym_rec* rec = get_sym_rec($1);
 						if(rec == 0 ) {
 							printf("Identificarore %s non trovato\n", $1);
 							exit(1);
 						}
 						else {
-							printf("Record %s trovato\n", $1);
+							//printf("Record %s trovato\n", $1);
 							//creo il value
 							value* temp = (value*) malloc(sizeof(value));
 							//recupero il tipo dalla dichiarazione
@@ -832,7 +832,7 @@ primary_expression : IDENTIFIER {
 
 						}
 						else {
-							printf("Record %s trovato\n", $1);
+							//printf("Record %s trovato\n", $1);
 							//creo il value
 							value* temp = (value*) malloc(sizeof(value));
 							//recupero il tipo dalla dichiarazione
@@ -910,7 +910,7 @@ varlistdecl :
 	;
 
 vardecl : NEWVARS type varlist var  SEMI_COLON  {
-						printf("//bison.y : Dentro la dichiarazione di nuove variabili\n");
+						//printf("//bison.y : Dentro la dichiarazione di nuove variabili\n");
 						//variabile utility per l'allocazione
 						int alloc = 0;
 						if(is_base_type($2) == 1) {
@@ -937,7 +937,7 @@ vardecl : NEWVARS type varlist var  SEMI_COLON  {
 								symbol->memoryAllocated = alloc;
 								//inserisco il simbolo nella symbol table
 								insert_sym_rec(symbol);
-								printf("//bison.y : Inserisco simbolo %s di tipo %s\n", symbol->text, symbol->type);
+								//printf("//bison.y : Inserisco simbolo %s di tipo %s\n", symbol->text, symbol->type);
 							}
 
 						}
@@ -950,11 +950,11 @@ vardecl : NEWVARS type varlist var  SEMI_COLON  {
 						if($3 != 0)
 							s = prependString(s,  $3->code);
 						s = prependString(s,  $4->code);
-						printf("//bison.y : dopo agigunta delle variabili al codice della dichiarazione \n");
-						printf("//bison.y : valori delle variabili da dichiarare %s \n" , $4->code);
+						//printf("//bison.y : dopo agigunta delle variabili al codice della dichiarazione \n");
+						//printf("//bison.y : valori delle variabili da dichiarare %s \n" , $4->code);
 						s = prependString(s,  ";\n");
 						symbol->code = s;
-						printf("// bison.y : dopo l'assegnamento\n");
+						//printf("// bison.y : dopo l'assegnamento\n");
 						//symbol->code = prependString("newvars ", prependString($2, prependString($3, prependString($4, ";\n"))));
 						printf("%s ", symbol->code );
 						symbol->text = strdup($4->name);
@@ -962,9 +962,9 @@ vardecl : NEWVARS type varlist var  SEMI_COLON  {
 						symbol->memoryAllocated = alloc;
 						initialize_value(symbol);
 						insert_sym_rec(symbol);
-						printf("//bison.y : codice della dichiarazione delle variabili \n");
+						//printf("//bison.y : codice della dichiarazione delle variabili \n");
 						printf("%s\n", s);
-						printf("//bison.y : Fine dichiarazione nuove variabili\n");
+						//printf("//bison.y : Fine dichiarazione nuove variabili\n");
 						}
 	;
 
@@ -997,11 +997,11 @@ varlist :
 					$2->code = s;
 				}
 				$$ = $2;
-				printf("//bison.y : fine della reduce della varlist \n");
+				//printf("//bison.y : fine della reduce della varlist \n");
 			    }
 	;
 deffunclist_check : deffunclist {
-					printf("controllo alla fine delle definizioni di funzione\n");
+					//printf("controllo alla fine delle definizioni di funzione\n");
 					//controllo alla fine delle dichiarazioni di tutte le funzioni , controllo che siano state tutte dichiarate
 					func* temp;
 					temp = func_list_total;
@@ -1022,12 +1022,16 @@ deffunclist_check : deffunclist {
 	;
 
 deffunclist :
-	/* empty */ { printf("//bison.y : nessuna dichiarazione di funzione\n"); }
-	| deffunclist deffunc { printf("//bison.y : dichiarazioni di funzione presenti\n"); }
+	/* empty */ { 
+			//printf("//bison.y : nessuna dichiarazione di funzione\n");
+		    }
+	| deffunclist deffunc { 
+				//printf("//bison.y : dichiarazioni di funzione presenti\n"); 
+			      }
 	;
 
 deffunc : FUNC IDENTIFIER OP params CP COLON type block { //inserisco nella symbol table il simbolo corrispondente alla funzione
-							printf("//bison.y : controllo prima dell'inserimento della nuova funzione nella symbol table\n");
+							//printf("//bison.y : controllo prima dell'inserimento della nuova funzione nella symbol table\n");
 							sym_rec *func = (sym_rec*) malloc(sizeof(sym_rec));
 							//inserisco nome della funzione
 							func->text = strdup($2);
@@ -1042,12 +1046,12 @@ deffunc : FUNC IDENTIFIER OP params CP COLON type block { //inserisco nella symb
 							func->par_list = $4;
 							//inserisco il simbolo appena creato nella symbol table
 							insert_sym_rec(func);
-							printf("//bison.y : Inserito simbolo per la funzione %s\n", func->text);
+							//printf("//bison.y : Inserito simbolo per la funzione %s\n", func->text);
 							//reimposto il flag per la sezione di normale parsing
 							//all'ultima definizione di funzione rimarra' 0
 							functionDefinitions = 0;
 							//inserisco il codice C corrispondente alla funzione
-							printf("//bison.y : prima della costruzione del codice della funzione\n");
+							//printf("//bison.y : prima della costruzione del codice della funzione\n");
 							char* s = calloc(1, sizeof(char));
 							if(strcmp($7, "integer") == 0 )
 								s = prependString(s,  "int ");
@@ -1057,18 +1061,18 @@ deffunc : FUNC IDENTIFIER OP params CP COLON type block { //inserisco nella symb
 								s = prependString(s,  "int ");
 							else
 								s = prependString(s,  $7);
-							printf("//bison.y : dopo inserimento del tipo di ritorno della funzione\n");
+							//printf("//bison.y : dopo inserimento del tipo di ritorno della funzione\n");
 							s = prependString(s,  $2);
-							printf("//bison.y : dopo inserimento del nome della funzione\n");
+							//printf("//bison.y : dopo inserimento del nome della funzione\n");
 							s = prependString(s,  " ( ");
 							if($4 != 0)
 								s = prependString(s,  $4->code);
-							printf("//bison.y : dopo inserimento del codice per i parametri della funzione\n");
+							//printf("//bison.y : dopo inserimento del codice per i parametri della funzione\n");
 							s = prependString(s,  " ) ");
 							s = prependString(s,  $8->code);
-							printf("//bison.y : dopo inserimento del codice per il body della funzione\n");
+							//printf("//bison.y : dopo inserimento del codice per il body della funzione\n");
 							//stampo il codice relativo alla definizione della nuova funzione
-							printf("//bison.y : codice della definizione della nuova funzione\n");
+							//printf("//bison.y : codice della definizione della nuova funzione\n");
 							printf("%s\n", s);
 
 							}
@@ -1098,7 +1102,7 @@ main : FUNC_EXEC OP params CP COLON type block  { //inserisco nella symbol table
 							}
 							//inserisco il simbolo appena creato nella symbol table
 							insert_sym_rec(func);
-							printf("Inserito simbolo per la funzione %s\n", func->text);
+							//printf("Inserito simbolo per la funzione %s\n", func->text);
 							//creo il codice per la funzione main
 							char* s = calloc(1, sizeof(char));
 							if(strcmp($6, "integer") == 0 || strcmp($6, "boolean") == 0) {
@@ -1113,14 +1117,14 @@ main : FUNC_EXEC OP params CP COLON type block  { //inserisco nella symbol table
 							else {
 								s = prependString(s,  $6);
 							}
-							printf("//bison.y : dopo il tipo della main\n");
+							//printf("//bison.y : dopo il tipo della main\n");
 							s = prependString(s,  "main(");
 							if($3 != 0)
 								s = prependString(s,  $3->code);
-							printf("//bison.y : dopo il codice dei parametri\n");
+							//printf("//bison.y : dopo il codice dei parametri\n");
 							s = prependString(s,  ")\n");
 							s = prependString(s,  $7->code);
-							printf("//bison.y : codice del main \n");
+							//printf("//bison.y : codice del main \n");
 							printf("%s", s);
 							}
 
@@ -1129,22 +1133,22 @@ main : FUNC_EXEC OP params CP COLON type block  { //inserisco nella symbol table
 params :
 	/* empty */ { $$ = 0; }
 	| parlist param {
-			printf("//bison.y : inizio della sezione di params\n");
+			//printf("//bison.y : inizio della sezione di params\n");
 			$2->next = $1;
-			printf("//bison.y : dopo assegnazione dell'elemento della lista\n");
+			//printf("//bison.y : dopo assegnazione dell'elemento della lista\n");
 			if($1 != 0)
 				$2->code = prependString($2->code, $1->code);
-			printf("//bison.y : dopo il prepend\n");
+			//printf("//bison.y : dopo il prepend\n");
 			$$ = $2;
 			//stampo tutti i parametri
-			printf("//bison.y : fine della sezione di params\n");
+			//printf("//bison.y : fine della sezione di params\n");
 			}
 	;
 
 parlist :
 	/* empty */ { $$ = 0; }
 	| parlist param COMMA {//provo cosi. salvo il valore di ritorno di parlist come next element di param
-				printf("//bison.y : inzio della sezione della lista delle parametri\n");
+				//printf("//bison.y : inzio della sezione della lista delle parametri\n");
 				$2->next = $1;
 				if($1 != 0 )
 					$2->code = prependString($2->code, $1->code);
@@ -1155,7 +1159,7 @@ parlist :
 
 param : type IDENTIFIER {//prova di aggiunta di simbolo
 			//alloco spazio per il parametro
-			printf("//bison.y : inizio della sezione relativa ad un parametro \n");
+			//printf("//bison.y : inizio della sezione relativa ad un parametro \n");
 			param* temp = (param*) malloc(sizeof(param));
 			//associo i valori
 			temp->name = strdup($2);
@@ -1175,13 +1179,13 @@ param : type IDENTIFIER {//prova di aggiunta di simbolo
 			rec->memoryAllocated = 0;
 			initialize_value(rec);
 			insert_sym_rec(rec);
-			printf("//bison.y : Inserito simbolo %s di tipo %s\n", rec->text, rec->type);
+			//printf("//bison.y : Inserito simbolo %s di tipo %s\n", rec->text, rec->type);
 
 			}
 	;
 
 block : BEG body END {
-			printf("//bison.y : inizio della sezione del blocco \n");
+			//printf("//bison.y : inizio della sezione del blocco \n");
 			char* s = calloc(1, sizeof(char));
 			s = prependString(s,  "{\n");
 			if($2 != 0)
@@ -1193,15 +1197,15 @@ block : BEG body END {
 	;
 
 body : declist_check varlistdecl stmts {
-						printf("//bison.y : inizio della sezione relativa al body\n");
+						//printf("//bison.y : inizio della sezione relativa al body\n");
 						value* temp = calloc(1, sizeof(value));
 						char* s = calloc(1, sizeof(char));
-						printf("//bison.y : prima del primo prepend\n");
+						//printf("//bison.y : prima del primo prepend\n");
 						if($1 != 0)
 							s = prependString(s,  $1->code);
-						printf("//bison.y : dopo il primo prepend \n");
+						//printf("//bison.y : dopo il primo prepend \n");
 						s = prependString(s,  "\n ");
-						printf("//bison.y : dopo il secondo prepend \n");
+						//printf("//bison.y : dopo il secondo prepend \n");
 						if($2 != 0)
 							s = prependString(s,  $2->code);
 						s = prependString(s,  "\n");
@@ -1210,7 +1214,7 @@ body : declist_check varlistdecl stmts {
 						s = prependString(s,  "\n");
 						temp->code = s;
 						$$ = temp;
-						printf("//bison.y : fine della sezione relativa al body\n");
+						//printf("//bison.y : fine della sezione relativa al body\n");
 					}
 	;
 
@@ -1326,11 +1330,11 @@ iteration_statement : LOOP OP expression CP BEG stmts END {
 							}
 	;
 
-assignment_statement : unary_expression assignment_operator expression SEMI_COLON { printf("//bison.y : Dentro l'assignment statement\n");
+assignment_statement : unary_expression assignment_operator expression SEMI_COLON { //printf("//bison.y : Dentro l'assignment statement\n");
 											if(strcmp($1->type, "unidentified") != 0 && strcmp($3->type, "unidentified") != 0)
 												check_type($1,$3);
 											copy_val($1,$3);
-											printf("//bison.y : Fine dell'assignment statement\n");
+											//printf("//bison.y : Fine dell'assignment statement\n");
 											char* s = calloc(1, sizeof(char));
 											s = prependString(s,  $1->code);
 											s = prependString(s,  " ");
@@ -1381,7 +1385,9 @@ object_statement : FREE OP IDENTIFIER CP SEMI_COLON {
 	;
 
 overloads :
-	/*empty */ { printf("//bison.y : sezione per gli overloads vuota \n"); }
+	/*empty */ { 
+			//printf("//bison.y : sezione per gli overloads vuota \n"); 
+		   }
 	| overloads overload
 	;
 

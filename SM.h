@@ -49,8 +49,8 @@ sym_rec* get_sym_rec(char* name) {
 	sym_rec* record;
 	for(table = top; table != 0; table = table->next) {
 		for(record = table->entries; record != 0; record = record->next) {
-			printf("Sto analizzando record %s\n", record->text);
-			printf("Cerco l'identificatore %s\n", name);
+			//printf("Sto analizzando record %s\n", record->text);
+			//printf("Cerco l'identificatore %s\n", name);
 			if(strcmp(record->text, name)== 0) {
 				return record;
 			}
@@ -216,13 +216,13 @@ void check_function_arguments(value* func, value* args) {
 	//recupero il record corrispondente alla funzione
 	sym_rec* func_rec = get_sym_rec(func->name);
 	//debug
-	printf("Analizzo argomenti per la funzione %s\n", func_rec->text);
+	//printf("Analizzo argomenti per la funzione %s\n", func_rec->text);
 	//variabili temporanee per iterare su parametri e valori
 	param* temp_par;
 	value* temp_val;
 	for(temp_par = func_rec->par_list, temp_val = args; temp_par != 0; temp_par = temp_par->next, temp_val = temp_val->next) {
-		printf("Analizzo l'argomento di nome (se c'e') %s\n", temp_val->name);
-		printf("Analizzo il parametro di nome (se c'e') %s\n", temp_par->name);
+		//printf("Analizzo l'argomento di nome (se c'e') %s\n", temp_val->name);
+		//printf("Analizzo il parametro di nome (se c'e') %s\n", temp_par->name);
 		//se l'argomento e' nullo, errore (manca argomento)
 		if(temp_val == 0) {
 			printf("Numero argomenti inseriti minore di quello richiesto dalla funzione\n");
@@ -256,8 +256,8 @@ void check_array_arguments(value* id, value* val) {
 	sym_rec* rec = get_sym_rec(id->type);
 	//controllo con current_param, di cui dereferenzio il valore con int
 	//DEBUG
-	printf("valore del parametro dell'array %d\n", *((int*)(rec->current_param->val)));
-	printf("valore inserito %d\n", *((int*)(val->val)));
+	//printf("valore del parametro dell'array %d\n", *((int*)(rec->current_param->val)));
+	//printf("valore inserito %d\n", *((int*)(val->val)));
 	if( *((int*)(val->val)) >= *((int*)(rec->current_param->val)) ) {
 		printf("Indice oltre l'array\n");
 		exit(1);
@@ -267,7 +267,7 @@ void check_array_arguments(value* id, value* val) {
 }
 
 void check_matrix_arguments(value* id, value* val_1, value* val_2) {
-	printf("prima del recupero del symrec della matrice\n");
+	//printf("prima del recupero del symrec della matrice\n");
 	//recupero il sym_rec corrispondente al tipo della matrice
 	sym_rec* rec = get_sym_rec(id->type);
 	//controllo i due valori
@@ -295,10 +295,10 @@ void print_array_params(sym_rec* array) {
 	//debbo stampare la lista par_list
 	param* temp;
 	for(temp = array->par_list; temp->next != 0; temp = temp->next) {
-		printf("sto stampando un parametro\n");
-		printf("valore del puntatore %p\n", temp);
-		printf("parametro di tipo %s\n", temp->name);
-		printf("Parametro di valore %d\n", *((int*)(temp->val)));
+		//printf("sto stampando un parametro\n");
+		//printf("valore del puntatore %p\n", temp);
+		//printf("parametro di tipo %s\n", temp->name);
+		//printf("Parametro di valore %d\n", *((int*)(temp->val)));
 	}
 }
 
@@ -321,7 +321,7 @@ void check_record_arguments(value* record, char* field) {
 void check_mem_alloc(value* val) {
 	//recupero il record corrispondente alla variabile
 	sym_rec* rec = get_sym_rec(val->name);
-	printf("record %s memoria %d\n", rec->text, rec->memoryAllocated);
+	//printf("record %s memoria %d\n", rec->text, rec->memoryAllocated);
 	//controllo l'allocazione
 	if(rec->memoryAllocated == 0) {
 		printf("Memoria per la variabile non allocata\n");
@@ -369,10 +369,10 @@ void check_type_definitions() {
 			//dovrei essere sicuro , al momento dell'invocazione della funzione, che i record presenti corrispondono solamente a
 			//dichiarazioni di tipo
 			//DEBUG
-			printf("record di nome %s tipo %s\n", temp_rec->text, temp_rec->type);
+			//printf("record di nome %s tipo %s\n", temp_rec->text, temp_rec->type);
 			for(temp_param = temp_rec->par_list; temp_param != 0; temp_param = temp_param->next) {
 				//cerco nella symbol table il record corrispondente al tipo del parametro
-				printf("cerco il tipo %s (nome %s) \n", temp_param->type, temp_param->name);
+				//printf("cerco il tipo %s (nome %s) \n", temp_param->type, temp_param->name);
 				if(is_base_type(temp_param->type)) continue;
 				if(get_sym_rec(temp_param->type) == 0) {
 					printf("Tipo non trovato: %s\n", temp_param->type);
@@ -410,17 +410,17 @@ int check_recursive_definitions() {
 	//a partire dalla symbol table, per ogni record di tipo
 	//array, matrice o record , controlla la lista dei parametri, cercando
 	//per ciascun tipo custom il corrispondente record nella symbol table
-	printf("//SM.h: all'inizio della check_recursive_definitions\n");
+	//printf("//SM.h: all'inizio della check_recursive_definitions\n");
 	sym_rec* temp_rec;
 	param* temp_param;
 	for(temp_rec = top->entries; (int)temp_rec != 0; temp_rec = temp_rec->next) {
 		//se e' record corrispondente a typebuilder
-		printf("//SM.h: record in analisi nome: %s tipo: %s\n", temp_rec->text, temp_rec->type);
+		//printf("//SM.h: record in analisi nome: %s tipo: %s\n", temp_rec->text, temp_rec->type);
 		if(is_recursive_type_builder(temp_rec->type)) {
-			printf("//SM.h: nome del record %s\n", temp_rec->text);
+			//printf("//SM.h: nome del record %s\n", temp_rec->text);
 			//itero sui parametri e controllo che il tipo di ciascun parametro sia esistente
 			for(temp_param = temp_rec->par_list; (int) temp_param != 0; temp_param = temp_param->next) {
-				printf("//SM.h: puntatore prossimo elemento %d\n", temp_param->next);
+				//printf("//SM.h: puntatore prossimo elemento %d\n", temp_param->next);
 				//controllo che esista un record corrispondente al tipo del parametro se non e' base type
 				if(is_base_type(temp_param->type) == 0) {
 					//cerco il record corrispondente al tipo del parametro
@@ -434,7 +434,7 @@ int check_recursive_definitions() {
 
 
 	}
-	printf("ritorno dalla funzione check_recursive_definitions\n");
+	//printf("ritorno dalla funzione check_recursive_definitions\n");
 	return 1;
 }
 
@@ -475,12 +475,12 @@ void check_function_definition_identifiers() {
 	temp = identifier_list;
 	//se la lista non e' vuota
 	if((int)(temp) != 0) {
-		printf("prima del do while\n");
+		//printf("prima del do while\n");
 		do  {
-			printf("nome dell'identifier %s\n", temp->name);
+			//printf("nome dell'identifier %s\n", temp->name);
 			//recuper il nome e controllo che non sia un nome di funzione
 			if(find_function_definition(temp->name) == 0) {
-				printf("dopo la find\n");
+				//printf("dopo la find\n");
 				//non e' una funzione, dunque cerco il record corrispondente nella symbol table
 				//se non viene trovato, la funzione get_sym_rec interrompe l'esecuzione
 				sym_rec* rec = get_sym_rec(temp->name);
@@ -494,9 +494,9 @@ void check_function_definition_identifiers() {
 		while((int)(temp) != 0);
 	}
 	//merge delle liste degli utilizzi di funzione
-	printf("prima del merge\n");
+	//printf("prima del merge\n");
 	merge_function_list();
-	printf("dopo merge\n");
+	//printf("dopo merge\n");
 	//debbo reinizializzare la lista degli identificatori e quella temporanea delle funzioni
 	identifier_list = 0;
 	func_list = 0;
@@ -508,7 +508,7 @@ int find_function_definition(char* name) {
 	temp = func_list;
 	if((int)(temp) != 0) {
 		do {
-			printf("nome dell'identifier che confronto %s\n", temp->name);
+			//printf("nome dell'identifier che confronto %s\n", temp->name);
 			//verifico che il nome della funzione sia lo stesso di quello passato come argomento
 			if(strcmp(name, temp->name) == 0) {
 				return 1;
@@ -532,15 +532,15 @@ void merge_function_list() {
 			temp = temp->next;
 		}
 	}
-	printf("arrivato all'ultimo elemento della func_list_total\n");
+	//printf("arrivato all'ultimo elemento della func_list_total\n");
 	//aggiungo func_list come elemento successivo di temp
 	if((int)(func_list) != 0) {
 		if((int)(temp) != 0) {
-			printf("merge con lista esistente \n");
+			//printf("merge con lista esistente \n");
 			temp->next = func_list;
 		}
 		else {
-			printf("merge con lista nuova\n");
+			//printf("merge con lista nuova\n");
 			func_list_total = func_list;
 		}
 	}
@@ -574,7 +574,7 @@ char* insert_after_struct(char* dst, char* toInsert) {
 //funzione per la ricorsione necessaria all'allocazione di un array
 char* recursive_array_allocation(char* qualifiedId, param* par_list, char* type) {
 	//caso base
-	printf("//SM.h : dentro la recursive_array_allocation\n");
+	//printf("//SM.h : dentro la recursive_array_allocation\n");
 	if(par_list->next == 0) {
 		char* temp = calloc(1, sizeof(char));
 		return temp;
@@ -583,20 +583,20 @@ char* recursive_array_allocation(char* qualifiedId, param* par_list, char* type)
 	int count = *((int*)(par_list->val));
 	//size della dimensione successiva
 	int toAlloc = *((int*)(par_list->next->val));
-	printf("//SM.h : prima  dell'allocazione dello spazio per s_temp\n");
+	//printf("//SM.h : prima  dell'allocazione dello spazio per s_temp\n");
 	char* s_temp = calloc(10, sizeof(char));
-	printf("//SM.h : dopo allocazione di s_temp\n");
+	//printf("//SM.h : dopo allocazione di s_temp\n");
 	char *s;
 	s = (char*)calloc(1, sizeof(char));
-	printf("//SM.h : dopo allocazione di s\n");
+	//printf("//SM.h : dopo allocazione di s\n");
 	char *s_next;
-	printf("//SM.h : dopo allocazione di s_next\n");
+	//printf("//SM.h : dopo allocazione di s_next\n");
 	int i = 0;
 	for(i = 0; i < count; i++) {
 		//creo il pezzo di output
-		printf("//SM.h : prima della creazione del qualified identifier\n");
+		//printf("//SM.h : prima della creazione del qualified identifier\n");
 		sprintf(s_temp, "%s[%d]", qualifiedId, i);
-		printf("//SM.h : dopo la creazione del qualified identifier\n");
+		//printf("//SM.h : dopo la creazione del qualified identifier\n");
 		s = prependString(s,  s_temp);
 		s = prependString(s,  " = calloc(");
 		sprintf(s_temp, "%d", toAlloc);
@@ -712,13 +712,13 @@ char* output_allocation_code_array(char* variable, char* type) {
 
 char* generate_allocation_code(value* val, char* type) {
 	//recupero il record corrispondente alla variabile
-	printf("//SM.h : dentro la generate_allocation_code\n");
+	//printf("//SM.h : dentro la generate_allocation_code\n");
 	sym_rec* temp = get_sym_rec(type);
 	char* s = calloc(1, sizeof(char));
-	printf("//SM.h : tipo della variabile che si sta allocando %s \n", temp->type);
+	//printf("//SM.h : tipo della variabile che si sta allocando %s \n", temp->type);
 	//controllo il tipo
 	if(strcmp(temp->type, "record") == 0) {
-		printf("//SM.h : dentro la sezione della generate_allocation_code relativa ai record\n");
+		//printf("//SM.h : dentro la sezione della generate_allocation_code relativa ai record\n");
 		s = prependString(s,  val->name);
 		s = prependString(s,  " = ");
 		s = prependString(s, "calloc(1, sizeof(");
