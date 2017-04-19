@@ -585,6 +585,7 @@ multiplicative_expression : exp_expression { $$ = $1; }
 
 exp_expression : cast_expression { $$ = $1; }
 	| exp_expression EXP cast_expression {
+		printf("//bison.y : inizio della exp_expression\n");
 																					value* temp = (value*) malloc(sizeof(value));
 																					temp->type = strdup($3->type);
 		  char *s = calloc(1, sizeof(char));
@@ -594,6 +595,7 @@ exp_expression : cast_expression { $$ = $1; }
 		  temp->code = s;
 																					//temp->code = prependString($1->code, prependString("#", $3->code));
 																					$$ = temp;
+		printf("//bison.y : fine dell exp_expression\n");
 																					}
 	;
 
@@ -623,8 +625,10 @@ unary_operator : MINUS
 	;
 
 unary_expression : postfix_expression {
+					printf("//bison.y : inizio della unary expression\n");
 					 $$ = $1;
 					reset_current_param($1);
+					printf("//bison.y : fine della unary expression\n");
 					}
 	| unary_operator cast_expression {
 																		change_sign($2);
@@ -674,7 +678,7 @@ postfix_expression : primary_expression {
 						$$ = $1;
 						}
 	| postfix_expression OSP expression COMMA expression CSP {
-									//printf("inizio della postfix della matrice\n");
+									printf("//bison.y : inizio della postfix della matrice\n");
 									//controllo che le espressioni siano di tipo intero
 									check_is_integer($3);
 									check_is_integer($5);
@@ -697,14 +701,14 @@ postfix_expression : primary_expression {
 									s = prependString(s,  $1->code);
 									s = prependString(s,  "[");
 									s = prependString(s,  $3->code);
-									s = prependString(s, ", ");
+									s = prependString(s, "][");
 									s = prependString(s,  $5->code);
 									s = prependString(s,  "]");
 									temp->code = s;
 									//printf("dopo le prependString\n");
 									//temp->code = prependString($1->code, prependString("[", prependString($3->code, prependString(",", prependString($5->code,"]")))));
 									$$ = temp;
-									//printf("fine della postfix della matrice\n");
+									printf("//bison.y : fine della postfix della matrice\n");
 								}
 	| postfix_expression OP exprlist CP {
 						//se sono in una sezione normale
@@ -1412,19 +1416,24 @@ iteration_statement : LOOP OP expression CP BEG stmts END {
 							}
 	;
 
-assignment_statement : unary_expression assignment_operator expression SEMI_COLON { //printf("//bison.y : Dentro l'assignment statement\n");
+assignment_statement : unary_expression assignment_operator expression SEMI_COLON { printf("//bison.y : Dentro l'assignment statement\n");
 											if(strcmp($1->type, "unidentified") != 0 && strcmp($3->type, "unidentified") != 0)
 												check_type($1,$3);
 											copy_val($1,$3);
-											//printf("//bison.y : Fine dell'assignment statement\n");
+											printf("//bison.y : dopo copia del valore\n");
 											char* s = calloc(1, sizeof(char));
 											s = prependString(s,  $1->code);
+											printf("//bison.y : dopo prima prepend\n");
 											s = prependString(s,  " ");
-											s  = prependString(s , $2);
+											printf("//bison.y : dopo seconda prepend\n");
+											s  = prependString(s , "=");
+											printf("//bison.y : dopo terza prepend\n");
 											s = prependString(s,  " ");
 											s = prependString(s,  $3->code);
+											s = prependString(s, ";\n");
 											$1->code = s;
 											$$ = $1;
+											printf("//bison.y : fine dell'assignemnt statement\n");
 										}
 	| expression SEMI_COLON {
 					char* s = calloc(1, sizeof(char));

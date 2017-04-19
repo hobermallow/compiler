@@ -20,5 +20,5 @@ begin
 	rec2 = new(miorecord);
 	arra = new(mioarray);
 	mat = new(miamatrice);
-	return 1;
+	mat[1,1] = 3;
 end
