@@ -696,6 +696,7 @@ postfix_expression : primary_expression {
 									//tipo dei parametri della matrice
 									value* temp = (value*)malloc(sizeof(value));
 									temp->val = (int*)malloc(sizeof(int));
+									temp->name = strdup($1->name);
 									//recupero il sym_rec del tipo della matrice
 									sym_rec* temp_rec = (sym_rec*) get_sym_rec($1->type);
 									temp->type = strdup(temp_rec->param_type);
