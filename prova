@@ -2,7 +2,7 @@ newtype miorecord record(integer x);
 newtype miamatrice matrix(integer, 3, 4 );
 newtype mioarray array(miamatrice, 3, 5, 4, 6);
 
-func ciao() : integer 
+func ciao() : integer
 begin
 	return 1;
 end
@@ -13,7 +13,9 @@ newvars miamatrice mat;
 
 func exec () :  integer
 begin
+	newvars integer x;
 	printf("ciao");
+	scanf("%d", x);
 	rec = new(miorecord);
 	rec2 = new(miorecord);
 	arra = new(mioarray);
