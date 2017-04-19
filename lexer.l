@@ -4,7 +4,7 @@
 //dichiaro le variabili globali per la gesstione delle definizioni di funzione
 extern int functionDefinitions;
 extern func* func_list;
-#define DEBUG_MODE 1
+//#define DEBUG_MODE 1
 
 void myDebug(const char *s) {
 
@@ -20,6 +20,7 @@ void myDebug(const char *s) {
 
 %%
 
+"&" {}
 "scanf" {myDebug("SCANF\n"); return SCANF; }
 "printf" {myDebug("PRINTF\n"); return PRINTF; }
 "matrix" {myDebug("MATRIX\n");return MATRIX;}

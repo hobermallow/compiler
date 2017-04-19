@@ -267,21 +267,28 @@ void check_array_arguments(value* id, value* val) {
 }
 
 void check_matrix_arguments(value* id, value* val_1, value* val_2) {
-	//printf("prima del recupero del symrec della matrice\n");
+	printf("//SM.h : prima del recupero del symrec della matrice\n");
 	//recupero il sym_rec corrispondente al tipo della matrice
 	sym_rec* rec = get_sym_rec(id->type);
+	printf("//SM.h : dopo il recupero del sym_rec\n");
+	printf("//SM.h : %d\n", *((int*)(rec->current_param->val)));
 	//controllo i due valori
-	if(*((int*)(val_1->val)) >=  *((int*)(rec->current_param->val))) {
+	if(*((int*)(val_2->val)) >=  *((int*)(rec->current_param->val))) {
 		printf("Indice oltre la matrice\n");
 		exit(1);
 	}
 	//sposto il current_param
+	printf("//SM.h : prima dello spostamento dl current_param\n");
 	rec->current_param = rec->current_param->next;
+	printf("//SM.h : dopo spostamento del current param\n");
+	printf("//SM.h : %d\n", rec->current_param);
 	//controllo il secondo parametro
 	if(*((int*)(val_2->val)) >=  *((int*)(rec->current_param->val))) {
                 printf("Indice oltre la matrice\n");
                 exit(1);
         }
+	printf("//SM.h : dopo boh\n");
+	printf("//SM.h : a fine check_matrix_arguments\n");
 }
 
 void reset_current_param(value* val) {

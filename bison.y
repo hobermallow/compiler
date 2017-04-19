@@ -77,7 +77,7 @@
 %type <str> type
 %type <str> basetype assignment_operator
 %type <par> param parlist params var varlist field fieldlist
-%type <val> constant primary_expression expression conditional_expression logical_or_expression logical_and_expression logical_not_expression exclusive_or_expression and_expression equality_expression relational_expression shift_expression additive_expression multiplicative_expression exp_expression cast_expression unary_expression postfix_expression exprlist exprlist_temp arrayexpr block body stmt stmts varlistdecl vardecl declist_check assignment_statement selection_statement iteration_statement object_statement jump_statement printf_statement scanf_statement  printf_temp jump_temp declist decl deffunclist_check overloads main  deffunc deffunclist
+%type <val> constant primary_expression expression conditional_expression logical_or_expression logical_and_expression logical_not_expression exclusive_or_expression and_expression equality_expression relational_expression shift_expression additive_expression multiplicative_expression exp_expression cast_expression unary_expression postfix_expression exprlist exprlist_temp arrayexpr block body stmt stmts varlistdecl vardecl declist_check assignment_statement selection_statement iteration_statement object_statement jump_statement printf_statement scanf_statement  printf_temp scanf_temp jump_temp declist decl deffunclist_check overloads main  deffunc deffunclist
 %type <symrec> typebuilder
 %type <str> overloadable_operands
 
@@ -87,6 +87,10 @@
 
 /* grammar starting symbol */
 S : declist_check deffunclist_check overloads varlistdecl main EOF_TOKEN  	{
+											//including some libs
+											printf("#include<stdio.h>\n");
+											printf("#include<stdlib.h>\n");
+											printf("#include<string.h>\n");
 											//printing every source component translated
 											if($1 != 0)
 												printf("%s",$1->code);
@@ -682,10 +686,10 @@ postfix_expression : primary_expression {
 									//controllo che le espressioni siano di tipo intero
 									check_is_integer($3);
 									check_is_integer($5);
-									//printf("dopo i controlli sul tipo delle espressioni\n");
+									printf("//bison.y : dopo i controlli sul tipo delle espressioni\n");
 									//controllo che il valore delle espressioni sia compreso nei parametri della matrice
 									check_matrix_arguments($1, $3, $5);
-									//printf("dopo il controllo sugli argomenti della matrice\n");
+									printf("dopo il controllo sugli argomenti della matrice\n");
 									//controllo sia stata allocata memoria per la matrice
 									check_mem_alloc($1);
 									//ritorno un oggetto di tipo value con tipo settato al
@@ -696,7 +700,7 @@ postfix_expression : primary_expression {
 									sym_rec* temp_rec = (sym_rec*) get_sym_rec($1->type);
 									temp->type = strdup(temp_rec->param_type);
 									//associo il codice relativo alla dereferenziazione della matrice
-									//printf("prima delle prependString\n");
+									printf("prima delle prependString\n");
 									char *s = calloc(1, sizeof(char));
 									s = prependString(s,  $1->code);
 									s = prependString(s,  "[");
@@ -996,7 +1000,7 @@ vardecl : NEWVARS type varlist var  SEMI_COLON  {
 						symbol->code = s;
 						//printf("// bison.y : dopo l'assegnamento\n");
 						//symbol->code = prependString("newvars ", prependString($2, prependString($3, prependString($4, ";\n"))));
-						printf("%s ", symbol->code );
+						//printf("%s ", symbol->code );
 						symbol->text = strdup($4->name);
 						symbol->type = strdup($2);
 						symbol->memoryAllocated = alloc;
@@ -1312,7 +1316,7 @@ stmt :	assignment_statement { $$ = $1; }
 	| printf_statement   { $$ = $1; }
 	| scanf_statement  { $$ = $1; }
 	;
-scanf_statement: SCANF OP STRING printf_temp CP SEMI_COLON {
+scanf_statement: SCANF OP STRING scanf_temp CP SEMI_COLON {
 								value* val = calloc(1, sizeof(value));
 								char* s = calloc(1, sizeof(char));
 								s = prependString(s,  "scanf(");
@@ -1362,6 +1366,23 @@ printf_temp:
 				$$ = $2;
 			}
 	;
+
+scanf_temp:
+	/* empty */  { $$ = 0; printf("//bison.y : ciao\n"); }
+	| COMMA  exprlist {
+				printf("//bison.y : dentro printf_temp\n");
+				char* s = calloc(1, sizeof(char));
+				s = prependString(s, ", ");
+				s = prependString(s, "&");
+				s = prependString(s, $2->code);
+				printf("//bison.y : stampa del codice di exprlist %s \n", $2->code);
+				$2->code = s;
+				$$ = $2;
+			}
+	;
+
+
+
 
 jump_statement : RETURN jump_temp SEMI_COLON {
 						char* s = calloc(1, sizeof(char));
