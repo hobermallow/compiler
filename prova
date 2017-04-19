@@ -14,8 +14,8 @@ newvars miamatrice mat;
 func exec () :  integer
 begin
 	newvars integer x;
-	printf("ciao");
-	scanf("%d", x);
+	printf("ciao", x);
+	scanf("cioa", x);
 	rec = new(miorecord);
 	rec2 = new(miorecord);
 	arra = new(mioarray);

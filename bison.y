@@ -88,7 +88,7 @@
 /* grammar starting symbol */
 S : declist_check deffunclist_check overloads varlistdecl main EOF_TOKEN  	{
 											//printing every source component translated
-											if($1 != 0) 
+											if($1 != 0)
 												printf($1->code);
 											if($2 != 0)
 												printf($2->code);
@@ -974,7 +974,14 @@ vardecl : NEWVARS type varlist var  SEMI_COLON  {
 						//aggiungo il codice da generare
 						symbol = (sym_rec*) malloc(sizeof(sym_rec));
 						char *s = calloc(1, sizeof(char));
-						s = prependString(s,  $2);
+						if(strcmp($2, "integer") == 0)
+							s = prependString(s, "int ");
+						else if(strcmp($2, "floating") == 0)
+							s = prependString(s, "double ");
+						else if(strcmp($2, "boolean") == 0)
+							s = prependString(s, "int ");
+						else
+							s = prependString(s,  $2);
 						s = prependString(s,  " ");
 						if($3 != 0)
 							s = prependString(s,  $3->code);
@@ -1060,8 +1067,8 @@ deffunclist :
 	/* empty */ {  $$ = 0;
 			//printf("//bison.y : nessuna dichiarazione di funzione\n");
 		    }
-	| deffunclist deffunc { 
-				//printf("//bison.y : dichiarazioni di funzione presenti\n"); 
+	| deffunclist deffunc {
+				//printf("//bison.y : dichiarazioni di funzione presenti\n");
 				if($1 == 0) {
 					$$ = $2;
 				}
@@ -1454,9 +1461,9 @@ object_statement : FREE OP IDENTIFIER CP SEMI_COLON {
 	;
 
 overloads :
-	/*empty */  
-	| overloads overload 
-			     
+	/*empty */
+	| overloads overload
+
 	;
 
 overload : OVERLOAD OP overloadable_operands COMMA IDENTIFIER CP BEG stmts END  {
