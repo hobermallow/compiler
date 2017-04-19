@@ -89,11 +89,11 @@
 S : declist_check deffunclist_check overloads varlistdecl main EOF_TOKEN  	{
 											//printing every source component translated
 											if($1 != 0)
-												printf($1->code);
+												printf("%s",$1->code);
 											if($2 != 0)
-												printf($2->code);
+												printf("%s",$2->code);
 											if($4 != 0)
-												printf($4->code);
+												printf("%s", $4->code);
 											if($5 != 0)
 												printf($5->code);
 
@@ -1293,6 +1293,7 @@ stmts :
 				else {
 					$1->next = $2;
 					$1->code = prependString($1->code, $2->code);
+					//printf("//bison.y : codice delle stmts %s\n", $1->code);
 					$$ = $1;
 				}
 			}
@@ -1311,7 +1312,10 @@ scanf_statement: SCANF OP STRING printf_temp CP SEMI_COLON {
 								value* val = calloc(1, sizeof(value));
 								char* s = calloc(1, sizeof(char));
 								s = prependString(s,  "scanf(");
-								s = prependString(s,  $3);
+								char* hello = escape_percent($3);
+								s = prependString(s, "\"");
+								s = prependString(s,  hello);
+								s = prependString(s, "\"");
 								if($4 != 0)
 									s = prependString(s,  $4->code);
 								s = prependString(s,  ");\n");
@@ -1325,14 +1329,18 @@ printf_statement: PRINTF OP STRING  printf_temp CP SEMI_COLON	{
 									char* s = calloc(1, sizeof(char));
 									s = prependString(s,  "printf(");
 									printf("//bison.y : prima della prepend della string literal\n");
-									s = prependString(s,  $3);
-									printf("//bison.y : dopo prepend della string literal\n");
+									char* hello = escape_percent($3);
+									s = prependString(s, "\"");
+									s = prependString(s,  hello);
+									s = prependString(s, "\"");
+									printf("\n//bison.y : dopo prepend della string literal\n");
 									printf("//bison.y : printf_temp %d \n", $4);
 									if($4 != 0)
 										s = prependString(s,  $4->code);
 									printf("//bison.y : dopo prepend del codice della printf\n");
 									s = prependString(s,  ");\n");
 									val->code = s;
+									//printf("//bison.y : codice della printf %s\n", s);
 									printf("//bison.y : fine della printf statement\n");
 									$$ = val;
 								}

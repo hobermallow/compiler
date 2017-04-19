@@ -736,3 +736,45 @@ char* generate_allocation_code(value* val, char* type) {
 	return s;
 
 }
+
+//function to escape percent in string
+char* escape_percent(char* string) {
+	printf("//SM.h : inizio della escape_percent\n");
+	//loop the string escaping percent
+	char c = string[0];
+	int i_old = 0;
+	int i_new = 0;
+	int countRealloc = 0;
+	//new string to be returned
+	char* s = calloc(strlen(string)+1, sizeof(char));
+	while(c != '\0') {
+		c = string[i_old];
+		printf("//SM.h : carattere che sto leggento %c\n", c);
+		if(c == '\"') {
+			i_old++;
+			continue;
+		}
+		//if character is %
+		if(c == '%') {
+			printf("//SM.h : sto leggendo percent \n");
+			countRealloc++;
+			s = realloc(s, strlen(string)+1+countRealloc);
+			s[i_new] = '%';
+			printf("//SM.h : carattere che sto scrivendo %c\n", s[i_new]);
+			s[i_new+1] = c;
+			printf("//SM.h : carattere che sto scrivendo %c\n",s[i_new+1]);
+			i_new++;
+		}
+		else {
+			s[i_new] = c;
+			printf("//SM.h : carattere che sto scrivendo %c\n", s[i_new]);
+		}
+		i_old++;
+		i_new++;
+	}
+	s[i_new] = '\0';
+	printf("//SM.h : stringa dopo la escape_percent %s\n", s );
+	printf("//SM.h : fine della escape_percent\n");
+
+	return s;
+}
