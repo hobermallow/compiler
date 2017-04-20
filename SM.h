@@ -293,9 +293,14 @@ void check_matrix_arguments(value* id, value* val_1, value* val_2) {
 
 void reset_current_param(value* val) {
 	//trovo il sym_rec
-	sym_rec* rec = get_sym_rec(val->type);
-	if(rec != 0)
-		rec->current_param = rec->par_list;
+	if(val->name != 0) {
+		printf("//SM.H : nome del value da resettare %s\n", val->name);
+		sym_rec* rec = get_sym_rec(val->name);
+		if(rec != 0) {
+			printf("//SM.h : sto resettando il parametro\n");
+			rec->current_param = rec->par_list;
+		}
+	}
 }
 
 void print_array_params(sym_rec* array) {

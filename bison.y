@@ -161,6 +161,8 @@ decl : NEWTYPE IDENTIFIER typebuilder SEMI_COLON {
 						//value per fare il bubbling del codice
 						value* val = calloc(1, sizeof(value));
 						val->code = s;
+						val->name = 0;
+						val->type = 0;
 						//printf(s);
 						$$ = val;
 						}
@@ -413,6 +415,8 @@ logical_or_expression : logical_and_expression {
 	| logical_or_expression OR logical_and_expression {
 																											value* temp = (value*) malloc(sizeof(value));
 							    																		temp->val = (int*) malloc(sizeof(int));
+						  temp->name = 0;
+						  temp->type = 0;
 							    																		*((int*)(temp->val)) = *((int*)($1->val)) || *((int*)($3->val));
 								char *s = calloc(1, sizeof(char));
 								s = prependString(s,  $1->code);
@@ -430,6 +434,8 @@ logical_and_expression : logical_not_expression  {
 	| logical_and_expression AND logical_not_expression {
 																												value* temp = (value*) malloc(sizeof(value));
 							      																		temp->val = (int*) malloc(sizeof(int));
+									temp->name = 0;
+									temp->type = 0;
 																												*((int*)(temp->val)) = *((int*)($1->val)) && *((int*)($3->val));
 									char *s = calloc(1, sizeof(char));
 									s = prependString(s,  $1->code);
@@ -452,6 +458,8 @@ logical_not_expression : exclusive_or_expression {
 					s = prependString(s,  "!");
 					s = prependString(s,  $2->code);
 					temp->code = s;
+					temp->name = 0;
+					temp->type = 0;
 					//temp->code = prependString("!", $2->code);
 					$$ = temp;
 				}
@@ -470,6 +478,7 @@ equality_expression : relational_expression { $$ = $1; }
 								if(strcmp($1->type, "unidentified") != 0 && strcmp($3->type, "unidentified") != 0)
 									check_type($1, $3);
 								temp->type = "boolean";
+								temp->name = 0;
 								//temp->val = (int*)malloc(sizeof(int));
 								//*((int*)(temp->val)) = check_equal($1, $3);
 								char *s = calloc(1, sizeof(char));
@@ -485,6 +494,7 @@ equality_expression : relational_expression { $$ = $1; }
 								if(strcmp($1->type, "unidentified") != 0 && strcmp($3->type, "unidentified") != 0)
 									check_type($1, $3);
 								temp->type = "boolean";
+								temp->name = 0;
 								//temp->val = (int*)malloc(sizeof(int));
 								//*((int*)(temp->val)) = check_equal($1, $3);
 								//aggiungo il codice al valore di ritorno
@@ -893,6 +903,7 @@ primary_expression : IDENTIFIER {
 						temp->val = strdup($1);
 						//associo il codice
 						temp->code = strdup($1);
+						temp->name = 0;
 						temp->type = "string";
 						$$ = temp;
 		}
@@ -912,6 +923,7 @@ constant : INTEGER_CONSTANT {
 				value* temp = (value*) malloc(sizeof(value));
 				temp->val = malloc(sizeof(int)); *((int*)(temp->val)) = $1;
 				temp->type = "integer";
+				temp->name = 0;
 				//associo il codice alla costante intera
 				temp->code = malloc(sizeof(char)*10);
 				sprintf(temp->code, "%d", $1);
@@ -921,12 +933,14 @@ constant : INTEGER_CONSTANT {
 													value* temp = (value*) malloc(sizeof(value));
 													temp->val = strdup($1);
 													temp->code = strdup($1);
+													temp->name = 0;
 													temp->type = "character";
 													$$ = temp;
 													}
 	| FLOATING_CONSTANT {
 												value* temp = (value*) malloc(sizeof(value));
 												temp->val = malloc(sizeof(double));
+												temp->name = 0;
 												*((double*)(temp->val)) = $1;
 												temp->type = "floating";
 												//associo il codice al valore di ritorno
