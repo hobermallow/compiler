@@ -10,6 +10,8 @@ end
 newvars mioarray arra;
 newvars miorecord rec, rec2;
 newvars miamatrice mat;
+newvars string ciao;
+newvars char c;
 
 func exec () :  integer
 begin
@@ -18,7 +20,12 @@ begin
 	rec = new(miorecord);
 	rec2 = new(miorecord);
 	arra = new(mioarray);
+	arra[1] = new(miamatrice);
 	mat = new(miamatrice);
 	scanf("%d", &mat[1,1]);
 	printf("ciao %d\n", mat[1,1]);
+	if(mat[1,1] == 1)
+	begin 
+		printf("uguale a 1\n");
+	end
 end

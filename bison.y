@@ -403,7 +403,11 @@ basetype : INTEGER  { $$ = $1; }
 	| STRING_TYPE { $$ = $1; }
 	;
 
-expression : conditional_expression { $$ = $1; }
+expression : conditional_expression {
+					printf("//bison.y : inizio della expression \n");
+					 $$ = $1;
+					printf("//bison.y : fine della expression\n");
+					 }
 	;
 
 conditional_expression : logical_or_expression  { $$ = $1; }
@@ -613,7 +617,11 @@ exp_expression : cast_expression { $$ = $1; }
 																					}
 	;
 
-cast_expression : unary_expression { $$ = $1; }
+cast_expression : unary_expression { 
+					printf("//bison.y : inizio della cast_expression\n");
+					$$ = $1; 
+					printf("//bison.y : fine della cast_expression\n");
+				}
 	| FLOATING OP cast_expression CP {
 																		check_is_integer($3);
 																		value* temp = (value*) malloc(sizeof(value));
@@ -661,35 +669,43 @@ postfix_expression : primary_expression {
 					 $$ = $1;
 					 }
 	| postfix_expression OSP expression CSP {
+						printf("//bison.y : dentro la postfix per array\n");
 						//debbo controllare che l'espressione inserita sia compatibile con le espressioni inserite
 						//in primis, essendo indice di array, controllo che expression sia integer
 						check_is_integer($3);
+						printf("//bison.y : dopo controllo intero\n");
 						//in secundis, controllo che il valore dell'espressione sia compreso nel limite dell'array
 						//print_array_params(get_sym_rec($1->name));
 						//siccome non voglio cambiare la funzione check , creo un nuovo val...
 						//lebensraum
 						value* val = (value*)malloc(sizeof(value));
 						val->name = strdup($1->name);
+						printf("//bison.y : dopo assegnazione del nome\n");
 						val->type = strdup($1->custom_type);
+						printf("//bison.y : dopo assegnazione del tipo\n");
 						check_array_arguments(val, $3);
+						printf("//bison.y : dopo check degli argomenti dell'array\n");
 						//controllo che sia stata allocata memoria per l'array
 						check_mem_alloc($1);
+						printf("//bison.y : dopo check dell'allocazione della memoria \n");
 						//sto dereferenziando array , quindi modifico il tipo
 						if(is_base_type($1->type) == 0) {
+							printf("//bison.y : se e' tipo base\n");
 							//recupero il record corrispondente al tipo dell'array
 							sym_rec* type = (sym_rec*)get_sym_rec($1->type);
 							$1->type = strdup(type->param_type);
 							//associo alla chiamata di funzione il codice relativo
-							char s = calloc(1, sizeof(char));
+							char* s = calloc(1, sizeof(char));
 							s = prependString(s,  $1->code);
-							s = prependString(s,  "(");
+							s = prependString(s,  "[");
 							s = prependString(s,  $3->code);
-							s = prependString(s,  ")");
+							s = prependString(s,  "]");
 							$1->code = s;
 							//$1->code = prependString($1->code, prependString("(",prependString($3->code, ")")));
 						}
 						//ritorno $1
 						$$ = $1;
+						printf("//bison.y : fine della postfix per array\n");
 						}
 	| postfix_expression OSP expression COMMA expression CSP {
 									printf("//bison.y : inizio della postfix della matrice\n");
@@ -1003,6 +1019,8 @@ vardecl : NEWVARS type varlist var  SEMI_COLON  {
 							s = prependString(s, "double ");
 						else if(strcmp($2, "boolean") == 0)
 							s = prependString(s, "int ");
+						else if(strcmp($2, "string") == 0)
+							s = prependString(s, "char* ");
 						else
 							s = prependString(s,  $2);
 						s = prependString(s,  " ");
@@ -1157,6 +1175,7 @@ deffunc : FUNC IDENTIFIER OP params CP COLON type block { //inserisco nella symb
 	;
 
 main : FUNC_EXEC OP params CP COLON type block  { //inserisco nella symbol table il simbolo corrispondente alla funzione
+							printf("//bison.y : inizio della sezione della main\n");
 							sym_rec *func = (sym_rec*) malloc(sizeof(sym_rec));
 							//inserisco nome della funzione
 							func->text = "exec";
@@ -1171,12 +1190,15 @@ main : FUNC_EXEC OP params CP COLON type block  { //inserisco nella symbol table
 							func->par_list = $3;
 							//controllo che i parametri della funzione exec siano tutti di tipo base
 							check_param_list_base_type(func->par_list);
+							printf("//bison.y : dopo controllo dei paramentri della exec\n");
 							//controllo che il tipo di ritorno della funzione sia integer o null
 							if(strcmp($6, "integer") != 0 && strcmp($6, "null")) {
 								printf("Tipo di ritorno non valido per la funzione exec\n");
 								exit(1);
 							}
 							//inserisco il simbolo appena creato nella symbol table
+							printf("//bison.y : prima dell'inserimento del sym_rec per la main\n");
+							printf("//bison.y : puntatore al sym_rec della funzione %d\n", func);
 							insert_sym_rec(func);
 							//printf("Inserito simbolo per la funzione %s\n", func->text);
 							//creo il codice per la funzione main
@@ -1193,15 +1215,14 @@ main : FUNC_EXEC OP params CP COLON type block  { //inserisco nella symbol table
 							else {
 								s = prependString(s,  $6);
 							}
-							//printf("//bison.y : dopo il tipo della main\n");
+							printf("//bison.y : dopo il tipo della main\n");
 							s = prependString(s,  "main(");
 							if($3 != 0)
 								s = prependString(s,  $3->code);
-							//printf("//bison.y : dopo il codice dei parametri\n");
+							printf("//bison.y : dopo il codice dei parametri\n");
 							s = prependString(s,  ")\n");
 							s = prependString(s,  $7->code);
 							//printf("//bison.y : codice del main \n");
-							//printf("%s", s);
 							value* val = (value*)calloc(1, sizeof(value));
 							val->name = "main";
 							val->type = strdup($7);
@@ -1273,7 +1294,7 @@ param : type IDENTIFIER {//prova di aggiunta di simbolo
 	;
 
 block : BEG body END {
-			//printf("//bison.y : inizio della sezione del blocco \n");
+			printf("//bison.y : inizio della sezione del blocco \n");
 			char* s = calloc(1, sizeof(char));
 			s = prependString(s,  "{\n");
 			if($2 != 0)
@@ -1281,11 +1302,12 @@ block : BEG body END {
 			s = prependString(s,  "\n}\n");
 			$2->code = s;
 			$$ = $2;
+			printf("//bison.y : fine della sezione del blocco \n");
 			}
 	;
 
 body : declist_check varlistdecl stmts {
-						//printf("//bison.y : inizio della sezione relativa al body\n");
+						printf("//bison.y : inizio della sezione relativa al body\n");
 						value* temp = calloc(1, sizeof(value));
 						char* s = calloc(1, sizeof(char));
 						//printf("//bison.y : prima del primo prepend\n");
@@ -1303,7 +1325,7 @@ body : declist_check varlistdecl stmts {
 						s = prependString(s,  "\n");
 						temp->code = s;
 						$$ = temp;
-						//printf("//bison.y : fine della sezione relativa al body\n");
+						printf("//bison.y : fine della sezione relativa al body\n");
 					}
 	;
 
@@ -1316,7 +1338,7 @@ stmts :
 				else {
 					$1->next = $2;
 					$1->code = prependString($1->code, $2->code);
-					//printf("//bison.y : codice delle stmts %s\n", $1->code);
+					printf("//bison.y : dentro stmts\n");
 					$$ = $1;
 				}
 			}
@@ -1417,14 +1439,16 @@ jump_temp :
 
 
 selection_statement : IF OP expression CP BEG stmts END {
+								printf("//bison.y : inizion della if statement\n");
 								char* s = calloc(1, sizeof(char));
 								s = prependString(s,  "if (");
 								s = prependString(s,  $3->code);
 								s = prependString(s,  ") \n {");
-								s = prependString(s,  $6);
+								s = prependString(s,  $6->code);
 								s = prependString(s,  "\n}\n");
 								$3->code = s;
 								$$ = $3;
+								printf("//bison.y : fine della if statement\n");
 							}
 	| IF OP expression CP BEG stmts END ELSE BEG stmts END {
 								char* s = calloc(1, sizeof(char));
@@ -1441,6 +1465,7 @@ selection_statement : IF OP expression CP BEG stmts END {
 	;
 
 iteration_statement : LOOP OP expression CP BEG stmts END {
+								printf("//bison.y : inizio della loop statement\n");
 								char* s = calloc(1, sizeof(char));
 								s = prependString(s,  "while(");
 								s = prependString(s,  $3->code);
@@ -1449,6 +1474,7 @@ iteration_statement : LOOP OP expression CP BEG stmts END {
 								s = prependString(s,  "\n}\n");
 								$3->code = s;
 								$$ = $3;
+								printf("//bison.y : fine della loop statement\n");
 							}
 	;
 
@@ -1472,11 +1498,13 @@ assignment_statement : unary_expression assignment_operator expression SEMI_COLO
 											printf("//bison.y : fine dell'assignemnt statement\n");
 										}
 	| expression SEMI_COLON {
+					printf("//bison.y : dentro la stmt formata da singola expression \n");
 					char* s = calloc(1, sizeof(char));
 					s = prependString(s,  $1->code);
 					s = prependString(s,  " ; ");
 					$1->code = s;
 					$$ = $1;
+					printf("//bison.y : fine della stmt formata da singola expression\n");
 				}
 	/* eliminata statements fatta da solo SEMI_COLON */
 	;
@@ -1506,6 +1534,7 @@ object_statement : FREE OP IDENTIFIER CP SEMI_COLON {
 									//alloco memoria per il valore dell'unary_expression
 									alloc_mem($1);
 									//codice corrispondente all'allocazione di memoria
+									printf("//bison.y : codice della unary %s\n", $1->code);
 									char* s = generate_allocation_code($1, $5);
 									$1->code = s;
 									printf("//bison.y : dine dell'allocazione\n");

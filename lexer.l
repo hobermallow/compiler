@@ -70,7 +70,7 @@ func[ ]+exec {int a = check_recursive_definitions(); if(a==0) { myDebug("Errore 
 		//modifico il valore del flag in bison
 	}
 	pop_environment();
-	myDebug("Pop environment\n");
+	myDebug("//lexer.l : Pop environment\n");
 	return END; 
 	}
 "return" {myDebug("RETURN\n"); return RETURN; }

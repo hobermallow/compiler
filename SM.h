@@ -34,12 +34,24 @@ void pop_environment() {
 		free(temp);
 	}
 	free(prev);
+	//ONLY FOR DEBUG 
+	if(top == 0) {
+		top = calloc(1, sizeof(sym_table));
+		top->entries = 0;
+	}
 }
 
 //aggiungo nuovo simbolo. Passo alla funzione puntatore a simbolo con campi gia' compilati
 void insert_sym_rec(sym_rec* symbol) {
-	sym_rec* old = top->entries;
-	symbol->next = old;
+	printf("//SM.h : dentro la insert_sym_rec\n");
+	printf("//SM.h : eloi eloi lema sabactani\n");
+	printf("//SM.h : top->entries %p\n", top);
+	if(top->entries != 0) {
+		printf("//SM.h : top->entries != 0 \n");
+		sym_rec* old = top->entries;
+		printf("//SM.h : dopo salvataggio del vecchio valore\n");
+		symbol->next = old;
+	}
 	top->entries = symbol;
 }
 
@@ -738,11 +750,11 @@ char* generate_allocation_code(value* val, char* type) {
 	}
 	else if(strcmp(temp->type, "matrix") == 0) {
 		//richiamo funzione specifica per allocazione della matrice
-		s = output_allocation_code_matrix(val->name, type);
+		s = output_allocation_code_matrix(val->code, type);
 	}
 	else {
 		//richiamo funzione specifica per allocazione dell'array
-		s = output_allocation_code_array(val->name, type);
+		s = output_allocation_code_array(val->code, type);
 	}
 	return s;
 
