@@ -287,19 +287,18 @@ void check_matrix_arguments(value* id, value* val_1, value* val_2) {
                 printf("Indice oltre la matrice\n");
                 exit(1);
         }
-	printf("//SM.h : dopo boh\n");
+	printf("//SM.h : resetto i parametri della matrice\n");
+	reset_current_param(id);
 	printf("//SM.h : a fine check_matrix_arguments\n");
 }
 
 void reset_current_param(value* val) {
 	//trovo il sym_rec
-	if(val->name != 0) {
-		printf("//SM.H : nome del value da resettare %s\n", val->name);
-		sym_rec* rec = get_sym_rec(val->name);
-		if(rec != 0) {
-			printf("//SM.h : sto resettando il parametro\n");
-			rec->current_param = rec->par_list;
-		}
+	printf("//SM.H : nome del value da resettare %s\n", val->name);
+	sym_rec* rec = get_sym_rec(val->type);
+	if(rec != 0) {
+		printf("//SM.h : sto resettando il parametro\n");
+		rec->current_param = rec->par_list;
 	}
 }
 
