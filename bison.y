@@ -699,7 +699,7 @@ postfix_expression : primary_expression {
 									printf("//bison.y : dopo i controlli sul tipo delle espressioni\n");
 									//controllo che il valore delle espressioni sia compreso nei parametri della matrice
 									check_matrix_arguments($1, $3, $5);
-									printf("dopo il controllo sugli argomenti della matrice\n");
+									printf("//bison.y : dopo il controllo sugli argomenti della matrice\n");
 									//controllo sia stata allocata memoria per la matrice
 									check_mem_alloc($1);
 									//ritorno un oggetto di tipo value con tipo settato al
@@ -711,7 +711,7 @@ postfix_expression : primary_expression {
 									sym_rec* temp_rec = (sym_rec*) get_sym_rec($1->type);
 									temp->type = strdup(temp_rec->param_type);
 									//associo il codice relativo alla dereferenziazione della matrice
-									printf("prima delle prependString\n");
+									printf("//bison.y : prima delle prependString\n");
 									char *s = calloc(1, sizeof(char));
 									s = prependString(s,  $1->code);
 									s = prependString(s,  "[");

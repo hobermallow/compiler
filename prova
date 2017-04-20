@@ -1,6 +1,6 @@
 newtype miorecord record(integer x);
 newtype miamatrice matrix(integer, 3, 4 );
-newtype mioarray array(miamatrice, 3, 5, 4, 6);
+newtype mioarray array(miamatrice, 3);
 
 func ciao() : integer
 begin
@@ -15,11 +15,10 @@ func exec () :  integer
 begin
 	newvars integer x;
 	printf("%d", x);
-	scanf("%d", &x);
 	rec = new(miorecord);
 	rec2 = new(miorecord);
 	arra = new(mioarray);
 	mat = new(miamatrice);
-	mat[1,1] = 3;
+	scanf("%d", &mat[1,1]);
 	printf("ciao %d\n", mat[1,1]);
 end
