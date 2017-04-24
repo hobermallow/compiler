@@ -28,8 +28,9 @@ begin
 	begin 
 		printf("uguale a 1\n");
 	end
-	loop(x<1)
+	loop(1 )
 	begin
-		printf("ciao\n");
+		x = 1;
+		printf("cioa\n");
 	end
 end

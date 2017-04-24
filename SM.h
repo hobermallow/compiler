@@ -14,6 +14,8 @@ func* func_list_total;
 func* identifier_list;
 //variabile per escludere dal normale controllo sugli identificatori di funzione la sezione deditcata alla definizioni di funzioni
 int functionDefinitions = 0;
+//flag per la gestione del pop dell'environment
+int shouldPop  = 0;
 
 //funzione per lo swicht dell'environment ( scoping a blocchi del C)
 void change_environment() {
@@ -35,10 +37,10 @@ void pop_environment() {
 	}
 	free(prev);
 	//ONLY FOR DEBUG 
-	if(top == 0) {
-		top = calloc(1, sizeof(sym_table));
-		top->entries = 0;
-	}
+	//if(top == 0) {
+	//	top = calloc(1, sizeof(sym_table));
+	//	top->entries = 0;
+	//}
 }
 
 //aggiungo nuovo simbolo. Passo alla funzione puntatore a simbolo con campi gia' compilati

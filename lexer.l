@@ -3,8 +3,9 @@
 #include "type_definitions.h"
 //dichiaro le variabili globali per la gesstione delle definizioni di funzione
 extern int functionDefinitions;
+extern int shouldPop;
 extern func* func_list;
-//#define DEBUG_MODE 1
+#define DEBUG_MODE 1
 
 void myDebug(const char *s) {
 
@@ -50,8 +51,8 @@ void myDebug(const char *s) {
 "*" {myDebug("MUL\n");  return MUL; }
 "#" {myDebug("EXP\n"); return EXP; }
 "/" {myDebug("DIV\n");  return DIV; }
-"func" {myDebug("FUNC\n");  functionDefinitions = 1; change_environment();myDebug("Nuovo environment\n"); return FUNC; }
-func[ ]+exec {int a = check_recursive_definitions(); if(a==0) { myDebug("Errore nelle definizioni ricorsive dei tipi\n"); exit(1); } myDebug("FUNC_EXEC\n"); change_environment(); myDebug("Nuovo environment\n"); return FUNC_EXEC; }
+"func" {shouldPop = 1; myDebug("FUNC\n");  functionDefinitions = 1; change_environment();myDebug("Nuovo environment\n"); return FUNC; }
+func[ ]+exec {shouldPop = 1; int a = check_recursive_definitions(); if(a==0) { myDebug("Errore nelle definizioni ricorsive dei tipi\n"); exit(1); } myDebug("FUNC_EXEC\n"); change_environment(); myDebug("Nuovo environment\n"); return FUNC_EXEC; }
 ":" {myDebug("COLON\n");  return COLON; }
 "begin" {myDebug("BEG\n"); return BEG; }
 "end" {	
@@ -69,7 +70,9 @@ func[ ]+exec {int a = check_recursive_definitions(); if(a==0) { myDebug("Errore 
 		check_function_definition_identifiers();
 		//modifico il valore del flag in bison
 	}
-	pop_environment();
+	if(shouldPop == 1) 
+		pop_environment();
+	shouldPop = 1;
 	myDebug("//lexer.l : Pop environment\n");
 	return END; 
 	}
@@ -77,9 +80,9 @@ func[ ]+exec {int a = check_recursive_definitions(); if(a==0) { myDebug("Errore 
 "{" {myDebug("OGP\n"); return OGP; }
 "}" {myDebug("CGP\n"); return CGP; }
 "new" {myDebug("NEW\n"); return NEW; }
-"if" {myDebug("IF\n"); return IF; }
+"if" {shouldPop = 0; myDebug("IF\n"); return IF; }
 "else" {myDebug("ELSE\n"); return ELSE; }
-"loop" {myDebug("LOOP\n"); return LOOP; }
+"loop" {shouldPop = 0; myDebug("LOOP\n"); return LOOP; }
 "free" {myDebug("FREE\n"); return FREE; }
 ">" {myDebug("GRT\n"); return GRT; }
 "<" {myDebug("LST\n"); return LST; }
