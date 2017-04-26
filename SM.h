@@ -64,9 +64,13 @@ sym_rec* get_sym_rec(char* name) {
 	sym_table* table ;
 	sym_rec* record;
 	for(table = top; table != 0; table = table->next) {
+		printf("//SM.h : dentro primo for della get_sym_rec \n");
 		for(record = table->entries; record != 0; record = record->next) {
-			//printf("Sto analizzando record %s\n", record->text);
-			//printf("Cerco l'identificatore %s\n", name);
+			printf("//SM.h : dentro secondo for della get_sym_rec \n");
+			printf("//SM.h : prima \n");
+			printf("//SM.h : Sto analizzando record %s\n", record->text);
+			printf("//SM.h : dopo \n");
+			printf("//SM.h : Cerco l'identificatore %s\n", name);
 			if(strcmp(record->text, name)== 0) {
 				return record;
 			}

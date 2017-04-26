@@ -846,9 +846,11 @@ primary_expression : IDENTIFIER {
 					printf("//bison.y : primay expression \n");
 					//se non sono all'interno della definizione di una funzione
 					if(functionDefinitions == 0) {
+						printf("//bison.y : functionDefinitions = 0 \n");
 						//controllo se sia stato dichiarato l'identificatore
-						//printf("controllo l'identificatore \n");
+						printf("//bison.y : controllo l'identificatore %s \n", $1);
 						sym_rec* rec = get_sym_rec($1);
+						printf("//bison.y : dopo aver preso il rec \n");
 						if(rec == 0 ) {
 							printf("Identificarore %s non trovato\n", $1);
 							exit(1);
