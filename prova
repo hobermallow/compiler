@@ -1,15 +1,15 @@
 newtype miorecord record(integer x);
 newtype miamatrice matrix(integer, 3, 4 );
-newtype mioarray array(miamatrice, 3);
+newtype miamatricee matrix(integer, 3, 4 );
+newtype mioarray array(miamatrice, 4);
+newtype mioarrayy array(miamatrice, 5);
 
-func ciao() : integer
-begin
-	return 1;
-end
 
 newvars mioarray arra;
-newvars miorecord rec, rec2;
-newvars miamatrice mat;
+newvars mioarrayy arraa;
+newvars miorecord rec;
+newvars miorecord rec2;
+newvars miamatricee mat;
 newvars string ciao;
 newvars char c;
 
@@ -20,10 +20,15 @@ begin
 	rec = new(miorecord);
 	rec2 = new(miorecord);
 	arra = new(mioarray);
-	arra[1] = new(miamatrice);
-	mat = new(miamatrice);
+	arraa = new(mioarrayy);
+	mat = new(miamatricee);
 	scanf("%d", &mat[1,1]);
 	printf("ciao %d\n", mat[1,1]);
+	arra[0] = mat;
+	if(mat[1,1] == 1)
+	begin 
+		printf("uguale a 1\n");
+	end
 	if(mat[1,1] == 1)
 	begin 
 		printf("uguale a 1\n");
@@ -33,4 +38,6 @@ begin
 		x = 1;
 		printf("cioa\n");
 	end
+	rec->x = 1;
+	arra = arraa;
 end

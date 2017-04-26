@@ -68,6 +68,8 @@ sym_rec* get_sym_rec(char* name) {
 		for(record = table->entries; record != 0; record = record->next) {
 			printf("//SM.h : dentro secondo for della get_sym_rec \n");
 			printf("//SM.h : prima \n");
+			printf("//SM.H : %d \n", (int)record->type);
+			printf("//SM.h : Sto analizzando record di tipo %s\n", record->type);
 			printf("//SM.h : Sto analizzando record %s\n", record->text);
 			printf("//SM.h : dopo \n");
 			printf("//SM.h : Cerco l'identificatore %s\n", name);
@@ -76,6 +78,7 @@ sym_rec* get_sym_rec(char* name) {
 			}
 		}
 	}
+	printf("//SM.h : fine della get_sym_rec \n");
 
 	return 0;
 }
@@ -95,8 +98,18 @@ void check_type(value* val_1, value* val_2) {
 			printf("//SM.h : confronto di tipi custom \n");
 			//recupero i record corrispondente ai due tipi custom
 			sym_rec* type_1, *type_2;
+			printf("//SM.h : prima della prima get_sym_rec \n");
 			type_1 = get_sym_rec(val_1->type);
+			printf("//SM.h : prima della seconda get_sym_rec \n");
 			type_2 = get_sym_rec(val_2->type);
+			if(type_1 == 0) {
+				printf("tipo 1 non trovato \n");
+				exit(1);
+			}
+			if(type_2 == 0) {
+				printf("tipo 2 non trovato \n");
+				exit(1);
+			}
 			printf("//SM.h : tipi da confrontare %s %s \n", type_1->type, type_2->type);
 			//se sono  array
 			if(strcmp(type_1->type, "array") == 0 && strcmp(type_2->type, "array") == 0) {
@@ -107,8 +120,10 @@ void check_type(value* val_1, value* val_2) {
 				char* param_type_1 = type_1->param_type;
 				char* param_type_2 = type_2->param_type;
 				if(strcmp(param_type_1, param_type_2) == 0 && count_1 == count_2) {
+					printf("//SM.H : uscito correttamente dalla check_type \n");
 					return;
 				}
+				printf("//SM.h	: tipi sbagliati \n");
 			}	
 			printf("//SM.h : prima dell'if delle matrici \n");
 			if(strcmp(type_1->type, "matrix") == 0 && strcmp(type_2->type, "matrix") == 0) {

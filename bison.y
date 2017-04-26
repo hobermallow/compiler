@@ -1013,7 +1013,7 @@ vardecl : NEWVARS type varlist var  SEMI_COLON  {
 								symbol->memoryAllocated = alloc;
 								//inserisco il simbolo nella symbol table
 								insert_sym_rec(symbol);
-								//printf("//bison.y : Inserisco simbolo %s di tipo %s\n", symbol->text, symbol->type);
+								printf("//bison.y : Inserisco simbolo %s di tipo %s\n", symbol->text, symbol->type);
 							}
 
 						}
@@ -1046,6 +1046,7 @@ vardecl : NEWVARS type varlist var  SEMI_COLON  {
 						symbol->type = strdup($2);
 						symbol->memoryAllocated = alloc;
 						initialize_value(symbol);
+						printf("//bison.y : Inserisco simbolo %s di tipo %s \n", symbol->text, symbol->type);
 						insert_sym_rec(symbol);
 						//printf("//bison.y : codice della dichiarazione delle variabili \n");
 						//printf("%s\n", s);
@@ -1538,7 +1539,14 @@ object_statement : FREE OP IDENTIFIER CP SEMI_COLON {
 									value* temp;
 									temp = (value*) malloc(sizeof(value));
 									temp->type = strdup($5);
+									printf("//bison.y : prima della check_type \n");
+									printf("//bison.y : tipo da confrontare %s \n", temp->type);
+									if(temp->type == 0) {
+										printf("errore nell'assign \n");
+										exit(1);
+									}
 									check_type($1, temp);
+									printf("//bison.y : dopo la check_type \n");
 									//alloco memoria per il valore dell'unary_expression
 									alloc_mem($1);
 									//codice corrispondente all'allocazione di memoria
