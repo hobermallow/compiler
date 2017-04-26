@@ -20,7 +20,7 @@ begin
 	rec = new(miorecord);
 	rec2 = new(miorecord);
 	arra = new(mioarray);
-	arraa = new(mioarrayy);
+	arraa = new(mioarray);
 	mat = new(miamatricee);
 	scanf("%d", &mat[1,1]);
 	printf("ciao %d\n", mat[1,1]);

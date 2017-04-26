@@ -1545,6 +1545,10 @@ object_statement : FREE OP IDENTIFIER CP SEMI_COLON {
 										printf("errore nell'assign \n");
 										exit(1);
 									}
+									if(strcmp($1->type, temp->type) != 0) {
+										printf("errore nel tipo dell'allocazione \n");
+										exit(1);
+									}
 									check_type($1, temp);
 									printf("//bison.y : dopo la check_type \n");
 									//alloco memoria per il valore dell'unary_expression
