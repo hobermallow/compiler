@@ -19,9 +19,11 @@ int shouldPop  = 0;
 
 //funzione per lo swicht dell'environment ( scoping a blocchi del C)
 void change_environment() {
+	printf("//SM.h : inizio nuovo environment \n");
 	sym_table* table  = (sym_table*) malloc(sizeof(sym_table));
 	table->next = top;
 	top = table;
+	printf("//SM.h : fine nuovo environment \n");
 }
 
 //funzione per la chiusura dell'environment
@@ -75,10 +77,47 @@ sym_rec* get_sym_rec(char* name) {
 }
 
 //funzione per controllare l'uguaglianza di due tipi
+//implementa anche i controlli particolari per matrici e array
 void check_type(value* val_1, value* val_2) {
+	printf("//SM.h : dentro la check_type\n");
+	//se sono esattamente lo stesso tipo
 	if(strcmp(val_1->type, val_2->type) == 0) {
 	}
+	//altrimenti
 	else {
+		printf("//SM.h : confronto di tipi custom \n");
+		//se sono dei tipi custom 
+		if(is_base_type(val_1->type) !=1 && is_base_type(val_2->type) != 1) {
+			printf("//SM.h : confronto di tipi custom \n");
+			//recupero i record corrispondente ai due tipi custom
+			sym_rec* type_1, *type_2;
+			type_1 = get_sym_rec(val_1->type);
+			type_2 = get_sym_rec(val_2->type);
+			printf("//SM.h : tipi da confrontare %s %s \n", type_1->type, type_2->type);
+			//se sono  array
+			if(strcmp(type_1->type, "array") == 0 && strcmp(type_2->type, "array") == 0) {
+				//recupero il conto dei dei parametri per i due tipi
+				int count_1 = get_record_params_number(type_1);	
+				int count_2 = get_record_params_number(type_2);
+				//recupero il tipo dei parametri
+				char* param_type_1 = type_1->param_type;
+				char* param_type_2 = type_2->param_type;
+				if(strcmp(param_type_1, param_type_2) == 0 && count_1 == count_2) {
+					return;
+				}
+			}	
+			printf("//SM.h : prima dell'if delle matrici \n");
+			if(strcmp(type_1->type, "matrix") == 0 && strcmp(type_2->type, "matrix") == 0) {
+				printf("//SM.h sto confrontando due matrici \n");
+				//recupero il tipo dei parametri
+				char* param_type_1 = type_1->param_type;
+				char* param_type_2 = type_2->param_type;
+				if(strcmp(param_type_1, param_type_2) == 0 ) {
+					return;
+				}
+				
+			}
+		}
 		printf("%s tipo diverso da %s\n", val_1->type, val_2->type);
 		exit(1);
 	}
@@ -309,6 +348,8 @@ void check_matrix_arguments(value* id, value* val_1, value* val_2) {
 void reset_current_param(value* val) {
 	//trovo il sym_rec
 	printf("//SM.H : nome del value da resettare %s\n", val->name);
+	printf("//SM.h : tipo %s \n", val->type);
+	if(is_base_type(val->type) == 1) return;
 	sym_rec* rec = get_sym_rec(val->type);
 	if(rec != 0) {
 		printf("//SM.h : sto resettando il parametro\n");
@@ -802,4 +843,16 @@ char* escape_percent(char* string) {
 	printf("//SM.h : fine della escape_percent\n");
 
 	return s;
+}
+
+//function to get number of parameters from a symbol record
+int get_record_params_number(sym_rec* rec) {
+	//initialize counter and seeker
+	int count = 1;
+	param* temp = rec->par_list;
+	while(temp->next != 0) {
+		count++;
+		temp = temp->next;
+	}
+	return count;
 }

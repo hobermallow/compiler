@@ -665,8 +665,10 @@ unary_expression : postfix_expression {
 	;
 
 postfix_expression : primary_expression {
+					printf("//bison.y : postfix della primary \n");
  					//controllo se sia stato dichiarato l'identificatore
 					 $$ = $1;
+					printf("//bison.y : fine della postfix della primary \n");
 					 }
 	| postfix_expression OSP expression CSP {
 						printf("//bison.y : dentro la postfix per array\n");
@@ -726,6 +728,7 @@ postfix_expression : primary_expression {
 									//recupero il sym_rec del tipo della matrice
 									sym_rec* temp_rec = (sym_rec*) get_sym_rec($1->type);
 									temp->type = strdup(temp_rec->param_type);
+									temp->custom_type = strdup(temp_rec->text);
 									//associo il codice relativo alla dereferenziazione della matrice
 									printf("//bison.y : prima delle prependString\n");
 									char *s = calloc(1, sizeof(char));
@@ -810,6 +813,7 @@ postfix_expression : primary_expression {
 						check_mem_alloc($1);
 						//debbo passare come value quello corrispondente al campo del record
 						value* temp = get_record_field($1, $3);
+						temp->custom_type = strdup($1->type);
 						//exit;
 						char *s = calloc(1, sizeof(char));
 						s = prependString(s,  $1->code);
@@ -839,6 +843,7 @@ exprlist_temp :
 	;
 
 primary_expression : IDENTIFIER {
+					printf("//bison.y : primay expression \n");
 					//se non sono all'interno della definizione di una funzione
 					if(functionDefinitions == 0) {
 						//controllo se sia stato dichiarato l'identificatore
@@ -907,7 +912,8 @@ primary_expression : IDENTIFIER {
 							$$ = temp;
 						}
 
-											}
+					}
+					printf("//bison.y : fine della primary expression \n");
 
 				}
 	| constant {

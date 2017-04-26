@@ -92,7 +92,7 @@ func[ ]+exec {shouldPop = 1; int a = check_recursive_definitions(); if(a==0) { m
 "then" {myDebug("THEN\n"); return THEN; }
 "true" {myDebug("BOOLEAN_CONSTANT\n"); yylval.str = (char*) strdup(yytext); return BOOLEAN_CONSTANT; }
 "false" {myDebug("BOOLEAN_CONSTANT\n"); yylval.str = (char*) strdup(yytext); return BOOLEAN_CONSTANT;}
-[1-9][0-9]* {myDebug("INTEGER_CONSTANT\n"); yylval.intval = atoi(yytext); return INTEGER_CONSTANT; }
+([1-9][0-9]*|0) {myDebug("INTEGER_CONSTANT\n"); yylval.intval = atoi(yytext); return INTEGER_CONSTANT; }
 "'"[:alnum:]*"'"  {myDebug("CHARACTER_CONSTANT\n"); yylval.str = (char*) strdup(yytext); return CHARACTER_CONSTANT; }
 \"(\\.|[^\\"])*\"  {myDebug("STRING\n"); yylval.str = (char*) strdup(yytext); return STRING; }
 [0-9]*"."[0-9]* {myDebug("FLOATING_CONSTANT\n"); yylval.dval = atof(yytext); return FLOATING_CONSTANT; }
