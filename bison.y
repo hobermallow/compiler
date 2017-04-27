@@ -91,6 +91,8 @@ S : declist_check deffunclist_check overloads varlistdecl main EOF_TOKEN  	{
 											printf("#include<stdio.h>\n");
 											printf("#include<stdlib.h>\n");
 											printf("#include<string.h>\n");
+											//generating macro to add 2 matrixes
+											generate_macro_add_matrix();
 											//printing every source component translated
 											if($1 != 0)
 												printf("%s",$1->code);

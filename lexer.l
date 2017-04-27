@@ -5,7 +5,7 @@
 extern int functionDefinitions;
 extern int shouldPop;
 extern func* func_list;
-#define DEBUG_MODE 1
+//#define DEBUG_MODE 1
 
 void myDebug(const char *s) {
 

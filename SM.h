@@ -875,3 +875,25 @@ int get_record_params_number(sym_rec* rec) {
 	}
 	return count;
 }
+
+void generate_macro_add_matrix() {
+	char* macro = "#define add_matrix(type, param_type, mat_1, mat_2, rows, columns) \\ \n \
+	({ \\ \n \ 
+		int ros = rows; \\ \n  \
+		int cols = columns; \\ \n  \
+		int i = 0, j = 0; \\ \n \
+		type mat = calloc(ros, sizeof(void*)); \\ \n \
+		for(i = 0; i < ros; i++) { \\ \n \
+			mat[i] = calloc(cols, sizeof(param_type)); \\ \n \
+		} \\ \n \
+		char *mat1 = strdup(#mat_1); \\ \n \
+		char *mat2 = strdup(#mat_2); \\ \n \
+	 	for(i = 0; i < ros; i++) { \\ \n \
+			for(j = 0; j < cols; j++) { \\ \n \
+				mat[i][j] = mat_1[i][j] + mat_2[i][j]; \\ \n \
+			} \\ \n \
+		} \\ \n \
+		mat; \\ \n \
+	}) \n";
+	printf("%s", macro);
+}
