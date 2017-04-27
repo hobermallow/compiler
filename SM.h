@@ -876,30 +876,69 @@ int get_record_params_number(sym_rec* rec) {
 	return count;
 }
 
-char* generate_add_matrix_code(char* mat_1, char* mat_2, char* type, char* param_type, int rows, int cols) {
-	char *s = calloc(1, strlen(mat_1) + strlen(mat_2) + strlen(type) + strlen(param_type)+ 30);
-	sprintf(s, "add_matrix(%s, %s, %s, %s, %d, %d)", type, param_type, mat_1, mat_2, rows, cols);
+char* generate_add_matrix_code(char* mat_1, char* mat_2,  char* param_type, int rows, int cols) {
+	char *s = calloc(1, strlen(mat_1) + strlen(mat_2)  + strlen(param_type)+ 30);
+	sprintf(s, "add_matrix(\"%s\", %s, %s, %d, %d)", param_type, mat_1, mat_2, rows, cols);
 	return s; 
 }
 
 void generate_macro_add_matrix() {
-	char* macro = "#define add_matrix(type, param_type, mat_1, mat_2, rows, columns) \\ \n \
-	({ \\ \n \ 
-		int ros = rows; \\ \n  \
-		int cols = columns; \\ \n  \
-		int i = 0, j = 0; \\ \n \
-		type mat = calloc(ros, sizeof(void*)); \\ \n \
-		for(i = 0; i < ros; i++) { \\ \n \
-			mat[i] = calloc(cols, sizeof(param_type)); \\ \n \
-		} \\ \n \
-		char *mat1 = strdup(#mat_1); \\ \n \
-		char *mat2 = strdup(#mat_2); \\ \n \
-	 	for(i = 0; i < ros; i++) { \\ \n \
-			for(j = 0; j < cols; j++) { \\ \n \
-				mat[i][j] = mat_1[i][j] + mat_2[i][j]; \\ \n \
-			} \\ \n \
-		} \\ \n \
-		mat; \\ \n \
-	}) \n";
+	char* macro = "void** add_matrix(char const* param_type, void** mat_1, void**  mat_2, int rows, int columns) { \n \
+	int i, j; \n \
+	if(strcmp(\"int\", param_type) == 0) { \n \
+		int** mat; \n \
+		int** mat1 = (int**) mat_1; \n \
+		int** mat2 = (int**) mat_2; \n  \
+		mat = calloc(rows, sizeof(void*)); \n \
+		for(i=0; i<rows; i++) {  \n \
+			mat[i] = calloc(columns, sizeof(int)); \n \
+			for(j=0; j<columns; j++) { \n \
+				mat[i][j] = mat1[i][j] + mat2[i][j]; \n \
+			} \n \
+		} \n \
+		return mat; \n \
+	} \n \
+	else { \n \
+		double** mat; \n \
+		double** mat1 = (double**)mat_1; \n \
+		double** mat2 = (double**)mat_2; \n \
+		mat = calloc(rows, sizeof(void*)); \n \
+		for(i=0; i<rows; i++) { \n \
+			mat[i] = calloc(columns, sizeof(double)); \n \
+			for(j=0; j<columns; j++) { \n \
+				mat[i][j] = mat1[i][j] + mat2[i][j]; \n \
+			} \n \
+		} \n \
+		return mat; \n \
+	} \n \
+	void** mat = 0; \n \
+	return mat; \n \
+}\n";
 	printf("%s", macro);
+}
+void* add_matrix(char const* param_type, int** mat_1, int**  mat_2, int rows, int columns) {
+	int i, j;
+	if(strcmp("int", param_type) == 0) {
+		int** mat;
+		mat = calloc(rows, sizeof(void*));
+		for(i=0; i<rows; i++) {
+			mat[i] = calloc(columns, sizeof(int));
+			for(j=0; j<columns; j++) {
+				mat[i][j] = mat_1[i][j] + mat_2[i][j];
+			}
+		}
+		return mat;
+	}
+	else {
+		double** mat;
+		mat = calloc(rows, sizeof(void*));
+		for(i=0; i<rows; i++) {
+			mat[i] = calloc(columns, sizeof(double));
+			for(j=0; j<columns; j++) {
+				mat[i][j] = mat_1[i][j] + mat_2[i][j];
+			}
+		}
+		return mat;
+	}
+	
 }

@@ -542,7 +542,14 @@ additive_expression : multiplicative_expression { $$ = $1; }
 								if(type_1 != 0 && type_2 != 0) {
 									if(strcmp(type_1->type, "matrix") == 0) {
 										//genero il codice corrispondente all'uso della macro
-										char *s = generate_add_matrix_code($1->name, $3->name, $1->type, type_1->param_type,*((int*)(type_1->par_list->val)), *((int*)(type_1->par_list->next->val)));	
+										char* type_temp;
+										if(strcmp(type_1->param_type, "integer") == 0 ) {
+											type_temp = "int";
+										}
+										else {
+											 type_temp = "double";	
+										}
+										char *s = generate_add_matrix_code($1->name, $3->name, type_temp ,*((int*)(type_1->par_list->val)), *((int*)(type_1->par_list->next->val)));	
 										temp->code = s;
 										flag = 0;
 									}
