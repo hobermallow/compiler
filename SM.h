@@ -57,6 +57,7 @@ void insert_sym_rec(sym_rec* symbol) {
 		symbol->next = old;
 	}
 	top->entries = symbol;
+	printf("//SM.h : fine della insert_sym_rec \n");
 }
 
 //funzione per controllare l'esistenza di un simbolo nella symbol table ed eventualmente recuperarlo
@@ -881,6 +882,11 @@ char* generate_add_matrix_code(char* mat_1, char* mat_2,  char* param_type, int 
 	sprintf(s, "add_matrix(\"%s\", %s, %s, %d, %d)", param_type, mat_1, mat_2, rows, cols);
 	return s; 
 }
+char* generate_minus_matrix_code(char* mat_1, char* mat_2,  char* param_type, int rows, int cols) {
+	char *s = calloc(1, strlen(mat_1) + strlen(mat_2)  + strlen(param_type)+ 30);
+	sprintf(s, "minus_matrix(\"%s\", %s, %s, %d, %d)", param_type, mat_1, mat_2, rows, cols);
+	return s; 
+}
 
 void generate_macro_add_matrix() {
 	char* macro = "void** add_matrix(char const* param_type, void** mat_1, void**  mat_2, int rows, int columns) { \n \
@@ -916,6 +922,43 @@ void generate_macro_add_matrix() {
 }\n";
 	printf("%s", macro);
 }
+
+void generate_macro_minus_matrix() {
+	char* macro = "void** minus_matrix(char const* param_type, void** mat_1, void**  mat_2, int rows, int columns) { \n \
+	int i, j; \n \
+	if(strcmp(\"int\", param_type) == 0) { \n \
+		int** mat; \n \
+		int** mat1 = (int**) mat_1; \n \
+		int** mat2 = (int**) mat_2; \n  \
+		mat = calloc(rows, sizeof(void*)); \n \
+		for(i=0; i<rows; i++) {  \n \
+			mat[i] = calloc(columns, sizeof(int)); \n \
+			for(j=0; j<columns; j++) { \n \
+				mat[i][j] = mat1[i][j] - mat2[i][j]; \n \
+			} \n \
+		} \n \
+		return mat; \n \
+	} \n \
+	else { \n \
+		double** mat; \n \
+		double** mat1 = (double**)mat_1; \n \
+		double** mat2 = (double**)mat_2; \n \
+		mat = calloc(rows, sizeof(void*)); \n \
+		for(i=0; i<rows; i++) { \n \
+			mat[i] = calloc(columns, sizeof(double)); \n \
+			for(j=0; j<columns; j++) { \n \
+				mat[i][j] = mat1[i][j] - mat2[i][j]; \n \
+			} \n \
+		} \n \
+		return mat; \n \
+	} \n \
+	void** mat = 0; \n \
+	return mat; \n \
+}\n";
+	printf("%s", macro);
+}
+
+
 void* add_matrix(char const* param_type, int** mat_1, int**  mat_2, int rows, int columns) {
 	int i, j;
 	if(strcmp("int", param_type) == 0) {

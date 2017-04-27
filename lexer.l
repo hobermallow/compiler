@@ -5,7 +5,7 @@
 extern int functionDefinitions;
 extern int shouldPop;
 extern func* func_list;
-//#define DEBUG_MODE 1
+#define DEBUG_MODE 1
 
 void myDebug(const char *s) {
 
@@ -97,7 +97,7 @@ func[ ]+exec {shouldPop = 1; int a = check_recursive_definitions(); if(a==0) { m
 \"(\\.|[^\\"])*\"  {myDebug("STRING\n"); yylval.str = (char*) strdup(yytext); return STRING; }
 [0-9]*"."[0-9]* {myDebug("FLOATING_CONSTANT\n"); yylval.dval = atof(yytext); return FLOATING_CONSTANT; }
 "overload" {myDebug("OVERLOAD\n"); change_environment(); myDebug("Nuovo environment\n");return OVERLOAD; }
-[_a-zA-Z][_a-zA-Z0-9]{0,30} {myDebug("IDENTIFIER\n"); myDebug(yytext); yylval.id = (char*) strdup(yytext); return IDENTIFIER;}
+[_a-zA-Z][_a-zA-Z0-9]{0,30} {myDebug("IDENTIFIER\n"); myDebug("aaaaaaa\n"); myDebug(yytext); myDebug("bbbb\n"); yylval.id = (char*) strdup(yytext); myDebug("ccccc\n"); return IDENTIFIER;}
 "\t"
 " "
 "\n" 

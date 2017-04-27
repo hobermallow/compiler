@@ -93,6 +93,7 @@ S : declist_check deffunclist_check overloads varlistdecl main EOF_TOKEN  	{
 											printf("#include<string.h>\n");
 											//generating macro to add 2 matrixes
 											generate_macro_add_matrix();
+											generate_macro_minus_matrix();
 											//printing every source component translated
 											if($1 != 0)
 												printf("%s",$1->code);
@@ -573,15 +574,41 @@ additive_expression : multiplicative_expression { $$ = $1; }
 									temp->type = strdup($1->type);
 								else
 									temp->type = strdup($3->type);
+
+								//flag per switch tra le diverse generazioni del codice
+								int flag = 1;
 								//add_base_type(0, $1, $3, temp);
-								char *s = calloc(1, sizeof(char));
-								s = prependString(s,  $1->code);
-								s = prependString(s,  "-");
-								s = prependString(s,  $3->code);
-								temp->code = s;
-								//temp->code = prependString($1->code, prependString("-", $3->code));
-								$$ = temp;
+								//recupero l'eventuale record corrispondente al tipo delle espressioni
+								sym_rec* type_1 = get_sym_rec($1->type);
+								sym_rec* type_2 = get_sym_rec($3->type);
+								if(type_1 != 0 && type_2 != 0) {
+									if(strcmp(type_1->type, "matrix") == 0) {
+										//genero il codice corrispondente all'uso della macro
+										char* type_temp;
+										if(strcmp(type_1->param_type, "integer") == 0 ) {
+											type_temp = "int";
+										}
+										else {
+											 type_temp = "double";	
+										}
+										char *s = generate_minus_matrix_code($1->name, $3->name, type_temp ,*((int*)(type_1->par_list->val)), *((int*)(type_1->par_list->next->val)));	
+										temp->code = s;
+										flag = 0;
+									}
 								}
+								//aggiungo il codice al valore di ritorno
+								//add_base_type(0, $1, $3, temp);
+								if(flag) {
+									char *s = calloc(1, sizeof(char));
+									s = prependString(s,  $1->code);
+									s = prependString(s,  "-");
+									s = prependString(s,  $3->code);
+									temp->code = s;
+									//temp->code = prependString($1->code, prependString("-", $3->code));
+								
+								}
+								$$ = temp;
+							}
 
 	;
 multiplicative_expression : exp_expression { $$ = $1; }
