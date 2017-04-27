@@ -524,42 +524,57 @@ shift_expression : additive_expression { $$ = $1; }
 additive_expression : multiplicative_expression { $$ = $1; }
 	| additive_expression PLUS multiplicative_expression {
 								value* temp = (value*) malloc(sizeof(value));
-																										if(strcmp($1->type, "unidentified") != 0 && strcmp($3->type, "unidentified") != 0) {
+								if(strcmp($1->type, "unidentified") != 0 && strcmp($3->type, "unidentified") != 0) {
 									check_type($1, $3);
 								}
-																													if(strcmp($3->type, "unidentified") == 0) {
-																														temp->type = strdup($1->type);
-										}
-																													else {
-																														temp->type = strdup($3->type);
-										}
-																													//add_base_type(0, $1, $3, temp);
-																													//aggiungo il codice al valore di ritorno
-										char *s = calloc(1, sizeof(char));
-										s = prependString(s,  $1->code);
-										s = prependString(s,  "+");
-										s = prependString(s,  $3->code);
+								if(strcmp($3->type, "unidentified") == 0) {
+									temp->type = strdup($1->type);
+								}
+								else {
+									temp->type = strdup($3->type);
+								}
+								//flag per switch tra le diverse generazioni del codice
+								int flag = 1;
+								//add_base_type(0, $1, $3, temp);
+								//recupero l'eventuale record corrispondente al tipo delle espressioni
+								sym_rec* type_1 = get_sym_rec($1->type);
+								sym_rec* type_2 = get_sym_rec($3->type);
+								if(type_1 != 0 && type_2 != 0) {
+									if(strcmp(type_1->type, "matrix") == 0) {
+										//genero il codice corrispondente all'uso della macro
+										char *s = generate_add_matrix_code($1->name, $3->name, $1->type, type_1->param_type,*((int*)(type_1->par_list->val)), *((int*)(type_1->par_list->next->val)));	
 										temp->code = s;
-																													//temp->code = prependString($1->code, prependString("+", $3->code));
-																													$$ = temp;
-																													}
+										flag = 0;
+									}
+								}
+								//aggiungo il codice al valore di ritorno
+								if(flag) {
+									char *s = calloc(1, sizeof(char));
+									s = prependString(s,  $1->code);
+									s = prependString(s,  "+");
+									s = prependString(s,  $3->code);
+									temp->code = s;
+								}
+								//temp->code = prependString($1->code, prependString("+", $3->code));
+								$$ = temp;
+								}
 	| additive_expression MINUS multiplicative_expression   {
-																														value* temp = (value*) malloc(sizeof(value));
-																														if(strcmp($1->type, "unidentified") != 0 && strcmp($3->type, "unidentified") != 0)
-																															check_type($1, $3);
-																														if(strcmp($3->type, "unidentified") == 0)
-																															temp->type = strdup($1->type);
-																														else
-																															temp->type = strdup($3->type);
-																														//add_base_type(0, $1, $3, temp);
-											 char *s = calloc(1, sizeof(char));
-											 s = prependString(s,  $1->code);
-											 s = prependString(s,  "-");
-											 s = prependString(s,  $3->code);
-											 temp->code = s;
-																														//temp->code = prependString($1->code, prependString("-", $3->code));
-																														$$ = temp;
-																														}
+								value* temp = (value*) malloc(sizeof(value));
+								if(strcmp($1->type, "unidentified") != 0 && strcmp($3->type, "unidentified") != 0)
+									check_type($1, $3);
+								if(strcmp($3->type, "unidentified") == 0)
+									temp->type = strdup($1->type);
+								else
+									temp->type = strdup($3->type);
+								//add_base_type(0, $1, $3, temp);
+								char *s = calloc(1, sizeof(char));
+								s = prependString(s,  $1->code);
+								s = prependString(s,  "-");
+								s = prependString(s,  $3->code);
+								temp->code = s;
+								//temp->code = prependString($1->code, prependString("-", $3->code));
+								$$ = temp;
+								}
 
 	;
 multiplicative_expression : exp_expression { $$ = $1; }

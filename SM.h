@@ -876,6 +876,12 @@ int get_record_params_number(sym_rec* rec) {
 	return count;
 }
 
+char* generate_add_matrix_code(char* mat_1, char* mat_2, char* type, char* param_type, int rows, int cols) {
+	char *s = calloc(1, strlen(mat_1) + strlen(mat_2) + strlen(type) + strlen(param_type)+ 30);
+	sprintf(s, "add_matrix(%s, %s, %s, %s, %d, %d)", type, param_type, mat_1, mat_2, rows, cols);
+	return s; 
+}
+
 void generate_macro_add_matrix() {
 	char* macro = "#define add_matrix(type, param_type, mat_1, mat_2, rows, columns) \\ \n \
 	({ \\ \n \ 

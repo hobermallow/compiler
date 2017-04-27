@@ -10,6 +10,7 @@ newvars mioarrayy arraa;
 newvars miorecord rec;
 newvars miorecord rec2;
 newvars miamatricee mat;
+newvars miamatricee mat2;
 newvars string ciao;
 newvars char c;
 
@@ -20,8 +21,9 @@ begin
 	rec = new(miorecord);
 	rec2 = new(miorecord);
 	arra = new(mioarray);
-	arraa = new(mioarray);
+	arraa = new(mioarrayy);
 	mat = new(miamatricee);
+	mat2 = new(miamatricee);
 	scanf("%d", &mat[1,1]);
 	printf("ciao %d\n", mat[1,1]);
 	arra[0] = mat;
@@ -40,4 +42,5 @@ begin
 	end
 	rec->x = 1;
 	arra = arraa;
+	mat = mat + mat2;
 end
