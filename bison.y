@@ -542,6 +542,18 @@ additive_expression : multiplicative_expression { $$ = $1; }
 								sym_rec* type_2 = get_sym_rec($3->type);
 								if(type_1 != 0 && type_2 != 0) {
 									if(strcmp(type_1->type, "matrix") == 0) {
+										//controllo che le matrici abbiano
+										// le stesse dimensioni
+										int mat_1_rows = *((int*)(type_1->par_list->val));
+										int mat_1_cols = *((int*)(type_1->par_list->next->val));
+										int mat_2_rows = *((int*)(type_2->par_list->val));
+										int mat_2_cols = *((int*)(type_2->par_list->next->val));
+										if(mat_1_rows != mat_2_rows || mat_1_cols != mat_2_cols) {
+											printf("errore : dimensioni delle matrici non compatibili \
+												per effettuare la somma \n");
+											exit(1);
+										}
+										
 										//genero il codice corrispondente all'uso della macro
 										char* type_temp;
 										if(strcmp(type_1->param_type, "integer") == 0 ) {
@@ -583,6 +595,17 @@ additive_expression : multiplicative_expression { $$ = $1; }
 								sym_rec* type_2 = get_sym_rec($3->type);
 								if(type_1 != 0 && type_2 != 0) {
 									if(strcmp(type_1->type, "matrix") == 0) {
+										//controllo che le matrici abbiano
+										// le stesse dimensioni
+										int mat_1_rows = *((int*)(type_1->par_list->val));
+										int mat_1_cols = *((int*)(type_1->par_list->next->val));
+										int mat_2_rows = *((int*)(type_2->par_list->val));
+										int mat_2_cols = *((int*)(type_2->par_list->next->val));
+										if(mat_1_rows != mat_2_rows || mat_1_cols != mat_2_cols) {
+											printf("errore : dimensioni delle matrici non compatibili \
+												per effettuare la differenza\n");
+											exit(1);
+										}
 										//genero il codice corrispondente all'uso della macro
 										char* type_temp;
 										if(strcmp(type_1->param_type, "integer") == 0 ) {
