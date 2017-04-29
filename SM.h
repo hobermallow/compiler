@@ -89,7 +89,11 @@ sym_rec* get_sym_rec(char* name) {
 void check_type(value* val_1, value* val_2) {
 	printf("//SM.h : dentro la check_type\n");
 	//se sono esattamente lo stesso tipo
+	printf("//SM.h : primo tipo %s\n", val_1->type);
+	printf("//SM.h : secondo tipo %s\n", val_1->type);
 	if(strcmp(val_1->type, val_2->type) == 0) {
+		printf("//SM.h fine della check_type\n");
+		return; 
 	}
 	//altrimenti
 	else {
@@ -267,8 +271,11 @@ void check_is_integer(value* val) {
 
 void copy_val(value* dst, value* src) {
 	if(strcmp(src->type, "integer") == 0) {
+		printf("//SM.h : copia valore intero \n");
 		dst->val = (int*) malloc(sizeof(int));
+		printf("//SM.h : dopo malloc\n");
 		*((int*)(dst->val)) = *((int*)(src->val));
+		printf("//SM.h : dopo assegnamento \n");
 	}
 	if(strcmp(src->type, "floating") == 0) {
 		dst->val = (double*) malloc(sizeof(double));

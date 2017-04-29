@@ -715,7 +715,7 @@ exp_expression : cast_expression { $$ = $1; }
 	| exp_expression EXP cast_expression {
 		printf("//bison.y : inizio della exp_expression\n");
 		value* temp = (value*) malloc(sizeof(value));
-		  temp->type = strdup($1->type);
+		temp->type = strdup($1->type);
 		//provo a recuperare il record del tipo dell'espressione
 		sym_rec* type_1 = get_sym_rec($1->type);
 		int flag = 1; 
@@ -745,10 +745,26 @@ exp_expression : cast_expression { $$ = $1; }
 			flag = 0;
 		}
 		if(flag == 1) {
-		  	char *s = calloc(1, sizeof(char));
-		  	s = prependString(s,  $1->code);
-		  	s = prependString(s,  "#");
-		  	s = prependString(s,  $3->code);
+			//controllo comunque che l'esponente sia di tipo intero, cosa che potrebbe dare problemi...
+			if($3->type == 0 || strcmp($3->type, "integer") != 0) {
+				printf("errore: tipo dell'esponente diverso da integer\n");
+				exit(1);	
+			}
+			//genero il codice per l'elevamento a potenza
+			int exp = *((int*)($3->val));
+			int i;
+			char *s = calloc(1, sizeof(char));
+			//controllo che l'esponente sia maggiore uguale ad 1
+			if(exp <= 0) {
+				printf("errore: esponente <= 0\n");
+				exit(1);
+			}
+			s = strdup($1->code);
+			for(i = 1; i < exp; i++ ) {
+				s = prependString(s, "*");
+				s = prependString(s, $1->code);
+			}
+			//per evitare di utilizzare la libreria math.h
 		  	temp->code = s;
 		}
 																					//temp->code = prependString($1->code, prependString("#", $3->code));
@@ -1630,7 +1646,8 @@ iteration_statement : LOOP OP expression CP BEG stmts END {
 assignment_statement : unary_expression assignment_operator expression SEMI_COLON { printf("//bison.y : Dentro l'assignment statement\n");
 											if(strcmp($1->type, "unidentified") != 0 && strcmp($3->type, "unidentified") != 0)
 												check_type($1,$3);
-											copy_val($1,$3);
+											printf("//bison.y : prima della copy_val\n");
+											//copy_val($1,$3);
 											printf("//bison.y : dopo copia del valore\n");
 											char* s = calloc(1, sizeof(char));
 											s = prependString(s,  $1->code);
