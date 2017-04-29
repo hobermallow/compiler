@@ -91,9 +91,11 @@ S : declist_check deffunclist_check overloads varlistdecl main EOF_TOKEN  	{
 											printf("#include<stdio.h>\n");
 											printf("#include<stdlib.h>\n");
 											printf("#include<string.h>\n");
-											//generating macro to add 2 matrixes
+											//generating macro to add 2 matrices
 											generate_macro_add_matrix();
 											generate_macro_minus_matrix();
+											//generate macro to multiply matrices
+											generate_macro_mul_matrix();
 											//printing every source component translated
 											if($1 != 0)
 												printf("%s",$1->code);
@@ -548,6 +550,7 @@ additive_expression : multiplicative_expression { $$ = $1; }
 										int mat_1_cols = *((int*)(type_1->par_list->next->val));
 										int mat_2_rows = *((int*)(type_2->par_list->val));
 										int mat_2_cols = *((int*)(type_2->par_list->next->val));
+										printf("//bison.y : dimensioni delle matrici %d %d %d %d \n", mat_1_rows, mat_1_cols, mat_2_rows, mat_2_cols);
 										if(mat_1_rows != mat_2_rows || mat_1_cols != mat_2_cols) {
 											printf("errore : dimensioni delle matrici non compatibili \
 												per effettuare la somma \n");
@@ -636,20 +639,51 @@ additive_expression : multiplicative_expression { $$ = $1; }
 	;
 multiplicative_expression : exp_expression { $$ = $1; }
 	| multiplicative_expression MUL exp_expression   {
-																											value* temp = (value*) malloc(sizeof(value));
-																											if(strcmp($1->type, "unidentified") != 0 && strcmp($3->type, "unidentified") != 0)
-																												check_type($1, $3);
-																											if(strcmp($3->type, "unidentified") == 0)
-																												temp->type = strdup($1->type);
-																											else
-																												temp->type = strdup($3->type);
-																											//mul_base_type(0, $1, $3, temp);
-																											// associo il codice
-								 char *s = calloc(1, sizeof(char));
-								 s = prependString(s,  $1->code);
-								 s = prependString(s,  "*");
-								 s = prependString(s,  $3->code);
-								 temp->code = s;
+								value* temp = (value*) malloc(sizeof(value));
+								if(strcmp($1->type, "unidentified") != 0 && strcmp($3->type, "unidentified") != 0)
+									check_type($1, $3);
+								if(strcmp($3->type, "unidentified") == 0)
+									temp->type = strdup($1->type);
+								else
+									temp->type = strdup($3->type);
+								//mul_base_type(0, $1, $3, temp);
+								//provo a recuperare i record corrispondenti ai tipi delle due expr
+								sym_rec* type_1 = get_sym_rec($1->type);
+								sym_rec* type_2 = get_sym_rec($3->type);
+								//flag per controllo generazione del codice
+								int flag = 1;
+								//controllo se sto moltiplicando due matrici
+								if(type_1 != 0 && type_2 != 0 && strcmp(type_1->type, "matrix") == 0) {
+									//controllo che le dimensioni delle matrici 
+									//permettano di effettuare la moltiplicazione
+									int mat_1_cols = *((int*)(type_1->par_list->next->val));
+									int mat_2_rows = *((int*)(type_2->par_list->val));
+									if(mat_1_cols != mat_2_rows) {
+										printf("errore: le dimensioni delle due matrici non \
+											permettono di effettuare la moltiplicazione \n");
+										exit(1);
+									}
+									//genero il codice corrispondente alla moltiplicazione di matrici
+									char* type_temp;
+									if(strcmp(type_1->param_type, "integer") == 0 ) {
+										type_temp = "int";
+									}
+									else {
+										 type_temp = "double";	
+									}
+									char *s = generate_mul_matrix_code($1->name, $3->name, type_temp ,*((int*)(type_1->par_list->val)), *((int*)(type_1->par_list->next->val)), *((int*)(type_2->par_list->val)), *((int*)(type_2->par_list->next->val)));	
+									temp->code = s;
+									flag = 0;
+									
+								}
+								if(flag == 1) {
+									// associo il codice
+								 	char *s = calloc(1, sizeof(char));
+								 	s = prependString(s,  $1->code);
+								 	s = prependString(s,  "*");
+								 	s = prependString(s,  $3->code);
+								 	temp->code = s;
+								}
 																											//temp->code = prependString($1->code, prependString("*", $3->code));
 																											$$ = temp;
 																											}

@@ -888,6 +888,12 @@ char* generate_minus_matrix_code(char* mat_1, char* mat_2,  char* param_type, in
 	return s; 
 }
 
+char* generate_mul_matrix_code(char* mat_1, char* mat_2,  char* param_type, int rows_1, int cols_1, int rows_2, int cols_2) {
+	char *s = calloc(1, strlen(mat_1) + strlen(mat_2)  + strlen(param_type)+ 30);
+	sprintf(s, "mul_matrix(\"%s\", %s, %s, %d, %d, %d, %d)", param_type, mat_1, mat_2, rows_1, cols_1, rows_2, cols_2);
+	return s; 
+}
+
 void generate_macro_add_matrix() {
 	char* macro = "void** add_matrix(char const* param_type, void** mat_1, void**  mat_2, int rows, int columns) { \n \
 	int i, j; \n \
@@ -958,6 +964,52 @@ void generate_macro_minus_matrix() {
 	printf("%s", macro);
 }
 
+void generate_macro_mul_matrix() {
+	char* s =  "void* mul_matrix(char const* param_type, int** mat_1, int**  mat_2, int mat_1_rows, int mat_1_cols, int mat_2_rows, int mat_2_cols) { \
+	int i, j, k;\
+	if(strcmp(\"int\", param_type) == 0) {\
+		int** mat;\
+		int sum;\
+		//alloco lo spazio per la matrice da ritornare\
+		//ed effettuo nel contempo l'operazione di somma\
+		mat = calloc(mat_1_rows, sizeof(void*));\
+		for(i=0; i<mat_1_rows; i++) {\
+			mat[i] = calloc(mat_2_cols, sizeof(int));\
+			for(j=0; j<mat_2_cols; j++ ) {\
+				//imposto la somma parziale a 0\
+				sum = 0;\
+				for(k = 0; k < mat_1_cols; k++) {\
+					sum += mat_1[i][k] * mat_2[k][j];\	
+				}\
+				mat[i][j] = sum;\
+			}\
+		}\
+		\
+		return mat;\
+	}\
+	else {\
+		double** mat;\
+		double sum;\
+		//alloco lo spazio per la matrice da ritornare\
+		//ed effettuo nel contempo l'operazione di somma\
+		mat = calloc(mat_1_rows, sizeof(void*));\
+		for(i=0; i<mat_1_rows; i++) {\
+			mat[i] = calloc(mat_2_cols, sizeof(double));\
+			for(j=0; j<mat_2_cols; j++ ) {\
+				//imposto la somma parziale a 0\
+				sum = 0;\
+				for(k = 0; k < mat_1_cols; k++) {\
+					sum += mat_1[i][k] * mat_2[k][j];	\
+				}\
+				mat[i][j] = sum;\
+			}\
+		}\
+		\
+		return mat;\
+	}\
+}\n";
+	printf("%s\n", s);
+}
 
 void* add_matrix(char const* param_type, int** mat_1, int**  mat_2, int rows, int columns) {
 	int i, j;
@@ -982,6 +1034,52 @@ void* add_matrix(char const* param_type, int** mat_1, int**  mat_2, int rows, in
 			}
 		}
 		return mat;
+	}
+	
+}
+
+void* mul_matrix(char const* param_type, int** mat_1, int**  mat_2, int mat_1_rows, int mat_1_cols, int mat_2_rows, int mat_2_cols) {
+	int i, j, k;
+	if(strcmp("int", param_type) == 0) {
+		int** mat;
+		int sum;
+		//alloco lo spazio per la matrice da ritornare
+		//ed effettuo nel contempo l'operazione di somma
+		mat = calloc(mat_1_rows, sizeof(void*));
+		for(i=0; i<mat_1_rows; i++) {
+			mat[i] = calloc(mat_2_cols, sizeof(int));
+			for(j=0; j<mat_2_cols; j++ ) {
+				//imposto la somma parziale a 0
+				sum = 0;
+				for(k = 0; k < mat_1_cols; k++) {
+					sum += mat_1[i][k] * mat_2[k][j];	
+				}
+				mat[i][j] = sum;
+			}
+		}
+		
+		return mat;
+	}
+	else {
+		double** mat;
+		double sum;
+		//alloco lo spazio per la matrice da ritornare
+		//ed effettuo nel contempo l'operazione di somma
+		mat = calloc(mat_1_rows, sizeof(void*));
+		for(i=0; i<mat_1_rows; i++) {
+			mat[i] = calloc(mat_2_cols, sizeof(double));
+			for(j=0; j<mat_2_cols; j++ ) {
+				//imposto la somma parziale a 0
+				sum = 0;
+				for(k = 0; k < mat_1_cols; k++) {
+					sum += mat_1[i][k] * mat_2[k][j];	
+				}
+				mat[i][j] = sum;
+			}
+		}
+		
+		return mat;
+
 	}
 	
 }
