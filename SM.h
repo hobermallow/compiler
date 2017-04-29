@@ -894,6 +894,13 @@ char* generate_mul_matrix_code(char* mat_1, char* mat_2,  char* param_type, int 
 	return s; 
 }
 
+
+char* generate_exp_matrix_code(char* mat_1,  char* param_type, int rows_1, int cols_1, char* exp) {
+	char *s = calloc(1, strlen(mat_1)   + strlen(param_type)+ 30);
+	sprintf(s, "exp_matrix(\"%s\", %s, %d, %d, %s)", param_type, mat_1, rows_1, cols_1, exp);
+	return s; 
+}
+
 void generate_macro_add_matrix() {
 	char* macro = "void** add_matrix(char const* param_type, void** mat_1, void**  mat_2, int rows, int columns) { \n \
 	int i, j; \n \
@@ -1011,6 +1018,22 @@ void generate_macro_mul_matrix() {
 	printf("%s\n", s);
 }
 
+void generate_macro_exp_matrix() {
+	char* s = "void* exp_matrix(char const* param_type, int** mat_1,  int mat_1_rows, int mat_1_cols, int exp) {\
+			if(exp <= 0) {\
+				printf(\"errore: comportamento non definito per esponente = 0\n\");\
+				exit(1);\
+			}\
+			void** mat = mat_1;\
+			int i;\
+			for(i = 1; i < exp; i++ ) {\
+				mat = mul_matrix(param_type, mat, mat, mat_1_rows, mat_1_cols, mat_1_rows, mat_1_cols);		\
+			}\
+			return mat;\
+		}\n";
+	printf("%s", s);
+}
+
 void* add_matrix(char const* param_type, int** mat_1, int**  mat_2, int rows, int columns) {
 	int i, j;
 	if(strcmp("int", param_type) == 0) {
@@ -1082,4 +1105,17 @@ void* mul_matrix(char const* param_type, int** mat_1, int**  mat_2, int mat_1_ro
 
 	}
 	
+}
+
+void* exp_matrix(char const* param_type, int** mat_1,  int mat_1_rows, int mat_1_cols, int exp) {
+	if(exp <= 0) {
+		printf("errore: comportamento non definito per esponente = 0\n");
+		exit(1);
+	}
+	void** mat = mat_1;
+	int i;
+	for(i = 1; i < exp; i++ ) {
+		mat = mul_matrix(param_type, mat, mat, mat_1_rows, mat_1_cols, mat_1_rows, mat_1_cols);		
+	}
+	return mat;
 }

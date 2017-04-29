@@ -96,6 +96,8 @@ S : declist_check deffunclist_check overloads varlistdecl main EOF_TOKEN  	{
 											generate_macro_minus_matrix();
 											//generate macro to multiply matrices
 											generate_macro_mul_matrix();
+											//generate macro to exp matrix
+											generate_macro_exp_matrix();
 											//printing every source component translated
 											if($1 != 0)
 												printf("%s",$1->code);
@@ -712,13 +714,43 @@ multiplicative_expression : exp_expression { $$ = $1; }
 exp_expression : cast_expression { $$ = $1; }
 	| exp_expression EXP cast_expression {
 		printf("//bison.y : inizio della exp_expression\n");
-																					value* temp = (value*) malloc(sizeof(value));
-																					temp->type = strdup($3->type);
-		  char *s = calloc(1, sizeof(char));
-		  s = prependString(s,  $1->code);
-		  s = prependString(s,  "#");
-		  s = prependString(s,  $3->code);
-		  temp->code = s;
+		value* temp = (value*) malloc(sizeof(value));
+		  temp->type = strdup($1->type);
+		//provo a recuperare il record del tipo dell'espressione
+		sym_rec* type_1 = get_sym_rec($1->type);
+		int flag = 1; 
+		if(type_1 != 0 && strcmp(type_1->type, "matrix") == 0) {
+			//controllo che l'esponente sia intero
+			if($3->type == 0 || strcmp($3->type, "integer") != 0) {
+				printf("errore: esponente per elevamento a potenza non di tipo integer\n");
+				exit(1);
+			}
+			//controllo le dimensioni della matrice
+			int rows = *((int*)(type_1->par_list->val));
+			int cols = *((int*)(type_1->par_list->next->val));	
+			if(rows != cols) {
+				printf("errore : per effettuare elevamento a potenza la matrice deve essere quadrata \n");
+				exit(1);
+			}
+			char * temp_type;
+			if(strcmp(type_1->param_type, "integer") == 0) {
+				temp_type = "int";
+			}
+			else {
+				temp_type = "double";
+			}
+			//genero il codice per l'elevamento a potenza
+			char* s = generate_exp_matrix_code($1->name, temp_type, rows, cols, $3->code);  
+			temp->code = s;
+			flag = 0;
+		}
+		if(flag == 1) {
+		  	char *s = calloc(1, sizeof(char));
+		  	s = prependString(s,  $1->code);
+		  	s = prependString(s,  "#");
+		  	s = prependString(s,  $3->code);
+		  	temp->code = s;
+		}
 																					//temp->code = prependString($1->code, prependString("#", $3->code));
 																					$$ = temp;
 		printf("//bison.y : fine dell exp_expression\n");
