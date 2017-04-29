@@ -1730,7 +1730,9 @@ overload : OVERLOAD OP overloadable_operands COMMA IDENTIFIER CP BEG stmts END  
 											sym_rec* rec = (sym_rec*)malloc(sizeof(sym_rec));
 											rec->operand = strdup($3);
 											rec->type = strdup($5);
-											rec->text = "";
+											rec->text = "overload";
+											rec->text = prependString(rec->text, $5);
+											rec->text = prependString(rec->text, $3);
 											insert_sym_rec(rec);
 										 }
 	;
