@@ -70,12 +70,14 @@ sym_rec* get_sym_rec(char* name) {
 			printf("//SM.h : dentro secondo for della get_sym_rec \n");
 			printf("//SM.h : prima \n");
 			printf("//SM.H : %d \n", (int)record->type);
-			printf("//SM.h : Sto analizzando record di tipo %s\n", record->type);
-			printf("//SM.h : Sto analizzando record %s\n", record->text);
+			//printf("//SM.h : Sto analizzando record di tipo %s\n", record->type);
+			//printf("//SM.h : Sto analizzando record %s\n", record->text);
 			printf("//SM.h : dopo \n");
 			printf("//SM.h : Cerco l'identificatore %s\n", name);
-			if(strcmp(record->text, name)== 0) {
-				return record;
+			if(record->text != 0) {
+				if(strcmp(record->text, name)== 0) {
+					return record;
+				}
 			}
 		}
 	}
@@ -503,17 +505,18 @@ int check_recursive_definitions() {
 	//a partire dalla symbol table, per ogni record di tipo
 	//array, matrice o record , controlla la lista dei parametri, cercando
 	//per ciascun tipo custom il corrispondente record nella symbol table
-	//printf("//SM.h: all'inizio della check_recursive_definitions\n");
+	printf("//SM.h: all'inizio della check_recursive_definitions\n");
 	sym_rec* temp_rec;
 	param* temp_param;
+	temp_rec = top->entries;
 	for(temp_rec = top->entries; (int)temp_rec != 0; temp_rec = temp_rec->next) {
 		//se e' record corrispondente a typebuilder
-		//printf("//SM.h: record in analisi nome: %s tipo: %s\n", temp_rec->text, temp_rec->type);
+		printf("//SM.h: record in analisi nome: %s tipo: %s\n", temp_rec->text, temp_rec->type);
 		if(is_recursive_type_builder(temp_rec->type)) {
-			//printf("//SM.h: nome del record %s\n", temp_rec->text);
+			printf("//SM.h: nome del record %s\n", temp_rec->text);
 			//itero sui parametri e controllo che il tipo di ciascun parametro sia esistente
 			for(temp_param = temp_rec->par_list; (int) temp_param != 0; temp_param = temp_param->next) {
-				//printf("//SM.h: puntatore prossimo elemento %d\n", temp_param->next);
+				printf("//SM.h: puntatore prossimo elemento %d\n", temp_param->next);
 				//controllo che esista un record corrispondente al tipo del parametro se non e' base type
 				if(is_base_type(temp_param->type) == 0) {
 					//cerco il record corrispondente al tipo del parametro
@@ -533,6 +536,7 @@ int check_recursive_definitions() {
 
 //utility per controllare che una stringa di tipo indichi un record corrispondente ad un typebuilder
 int is_recursive_type_builder(char* type) {
+	if(type == 0) return 0;
 	if(strcmp(type, "array")==0) {
 		return 1;
 	}
