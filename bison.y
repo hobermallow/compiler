@@ -114,17 +114,19 @@ S : declist_check deffunclist_check overloads varlistdecl main EOF_TOKEN  	{
 	;
 
 declist_check : declist {
+	      			printf("//bison.y : inizio della declist_check\n");
 				int a = check_recursive_definitions();
+				printf("//bison.y : dopo la check_recursive_definitions\n");
 				if( a== 0) {
 					printf("bison.y: errore nella definizione delle funzioni ricorsive\n");
 					exit(1);
 				}
-				//printf("//bison.y : fine della sezione di dichiarazione dei tipi\n");
+				printf("//bison.y : fine della sezione di dichiarazione dei tipi\n");
 				$$ = $1;
 			}
 	;
 declist :
-	/*empty */ { $$ = 0; }
+	/*empty */ { printf("//bison.y : inizio della declist\n"); $$ = 0; printf("//bison.y : fine della declist\n"); }
 	| declist decl {
 				if($1 == 0) {
 					$$ = $2;
@@ -1732,22 +1734,30 @@ overload : OVERLOAD OP overloadable_operands COMMA IDENTIFIER CP BEG stmts END  
 											rec->type = strdup($5);
 											rec->text = "overload";
 											rec->text = prependString(rec->text, $5);
-											rec->text = prependString(rec->text, $3);
+											if(strcmp($3, "+") == 0) {
+												rec->text = prependString(rec->text, "plus");
+											}
+											else if(strcmp($3, "*") == 0) {
+												rec->text = prependString(rec->text, "mul");
+											}
+											else {
+												rec->text = prependString(rec->text, "exp");
+											}
+											//generating code for overload
+											char *s = "void ";
+											s = prependString(s, rec->text);
+											s = prependString(s, "(");
+											s = prependString(s, $5);
+											s = prependString(s, ", ");
+											s = prependString(s, $5);
+											s = prependString(s, ") {");
 											insert_sym_rec(rec);
 										 }
 	;
 
 overloadable_operands : PLUS
-	| MINUS
 	| MUL
-	| DIV
 	| EXP
-	| LST
-	| GRT
-	| LTE
-	| GTE
-	| EQUAL
-	| NOTEQUAL
 	;
 
 
